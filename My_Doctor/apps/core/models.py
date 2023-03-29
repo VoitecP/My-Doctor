@@ -1,46 +1,60 @@
+import datetime, uuid
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.template.defaultfilters import slugify
+from django.contrib.auth.models import AbstractUser
+
 
 
 class User(AbstractUser):
-    usertype = models.CharField(choices = [('d','Doctor'), ('p','Patient')], max_length=1)
+    id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    usertype = models.CharField(choices = [('d','Doctor'), ('p','Patient')], max_length=1, default='p')
+    class Meta: 
+        permissions=[('is_user', 'Is User'),]
 
-    # def save(self, *args, **kwargs) :
-    #     super().save(*args, **kwargs)
-    #     if self.usertype=='p':
-    #         pass
-    #     if self.usertype=='d':
-    #         pass    
-            
-
-
-
-
+        
 class Person(models.Model):  #  Abstract Model 
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    slug = models.SlugField(null=True, unique=True, editable=False)
     class Meta:
         abstract=True
+    
+    def save(self, *args, **kwargs):
+        self.slug=slugify(self.full_name+ "-" + str('self.id')[0:5])
+
+        return super().save(*args,**kwargs)
         
-    
-    
-    
-    
-
-
-    
     
 class Patient(Person):
-    # user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-  
-    citizen_id=models.CharField(max_length=11)
     adress=models.CharField(max_length=80)
-    city=models.CharField(max_length=20)
-    zip_code=models.CharField(max_length=5)
-   
-        
-    
+    class Meta: 
+        permissions=[('is_patient', 'Is Patient'),]
 
+      
 class Doctor(Person):
-    # user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctor')
     specialization=models.CharField(max_length=12)
-    # objects=models.Manager()
+    class Meta: 
+        permissions=[('is_doctor','Is Doctor'),]
+
+
+class Category(models.Model):
+    id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    name=models.CharField(max_length=30, unique=True, default='')
+    class Meta:
+        ordering=('name',)
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class Visit(models.Model):
+    date=models.DateTimeField(default=datetime.date.today)    
+    patient=models.ForeignKey(Patient, models.PROTECT, default='')
+    doctor=models.ForeignKey(Doctor, models.PROTECT, default='')
+    category=models.ForeignKey(Category,models.PROTECT,null=True,blank=True, default='')
+    description=models.TextField()
+    price=models.CharField(max_length=10)
+    class Meta:
+        ordering=('date',)
+
+    def __str__(self):
+        return f' Visit date: {self.date}, Price: {self.price}'
