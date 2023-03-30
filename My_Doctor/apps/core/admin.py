@@ -1,41 +1,42 @@
 from django.contrib import admin
+from django.contrib.admin import  ModelAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import *
 
 # from django.contrib.auth.models import Group, Permission
 # from django.contrib.contenttypes.models import ContentType
 
-class UserAdmin(admin.ModelAdmin):
-    search_fields = ("first_name","last_name",)
-    search_help_text = "User last name"
-    ordering = ("username",)
-    list_display = ("username", "first_name", "last_name", "usertype")
+
+class UserAdmin(BaseUserAdmin):
+    search_fields = ('first_name','last_name', 'username')
+    search_help_text = 'Searching by: first name, last name, username'
+    ordering = ('first_name','last_name', 'username')
+    list_display = ('username', 'first_name', 'last_name', 'usertype')
     fieldsets = (
-        ("User Info", {"fields": ("username", "password", "usertype")}),
-        ("Personal info", {"fields": ("first_name", "last_name")}),
-        ("Permissions",{"fields": (
-                    "is_active",
-                    "is_staff",
-                    "is_superuser",
-                    "groups",
-                    "user_permissions",
+        ('User Info', {'fields': ('username', 'password', 'usertype')}),
+        ('Personal info', {'fields': ('first_name', 'last_name')}),
+        ('Permissions', 
+            {'fields': (
+                    'is_active',
+                    'is_staff',
+                    'is_superuser',
+                    'groups',
+                    'user_permissions',
                 ),
             },
         ),
-        ("Dates", {"fields": ("last_login", "date_joined")}),
+        ('Dates', {'fields': ('last_login', 'date_joined')}),
     )
 
     add_fieldsets = (
-        (
-            None,
-            {
-                "classes": ("wide",),
-                "fields": (
-                    "username",
-                    "first_name",
-                    "last_name",
-                    "password1",
-                    "password2",
-                    "usertype",
+        (None, {'classes': ('wide',),
+                'fields': (
+                    'username',
+                    'first_name',
+                    'last_name',
+                    'password1',
+                    'password2',
+                    'usertype',
                 ),
             },
         ),

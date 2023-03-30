@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 
 
 router=DefaultRouter()
-router.register(r'patients', PatientViewSet, basename='viewsets-patientes')
+router.register(r'login', LoginUserViewSet, basename='viewsets-login')
+router.register(r'patients', PatientViewSet, basename='viewsets-patients')
 # router.register(r'visits', VisitViewSet, basename='viewsets-visits')
 # router.register(r'doctors', DoctorViewSet, basename='viewsets-doctors')
 # router.register(r'categories', CategoryViewSet, basename='viewsets-categories' )

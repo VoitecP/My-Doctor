@@ -7,10 +7,11 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient')], max_length=1, default='p')
+    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient')], max_length=1, default='')
     
     class Meta: 
         permissions=[('is_user', 'Is User'),]
+        managed = True
 
         
 class Person(models.Model):  #  Abstract Model 
