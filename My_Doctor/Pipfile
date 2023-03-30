@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 django = "*"
 python-decouple = "*"
+djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
+drf-spectacular = "*"
 
 [dev-packages]
 

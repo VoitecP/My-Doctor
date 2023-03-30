@@ -43,9 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    ##
+    ##  Packages
+    'rest_framework',
+    'drf_spectacular',
+    ##  Apps
     'apps.core',
-    # 'apps.core.apps.CoreConfig',
+    'apps.api',
 ]
 
 MIDDLEWARE = [
@@ -114,7 +117,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# Default Time zone
+# TIME_ZONE = 'UTC'
+
+TIME_ZONE = "Europe/Warsaw"
 
 USE_I18N = True
 
@@ -132,3 +138,32 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'core.User'
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+                        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+                        ],
+    # "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny",],                     
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 4,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'My Doctor',
+    'DESCRIPTION': 'My Doctor API Documentation',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    
+    # Other Settings
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayRequestDuration": True,
+    },
+}
+
+
