@@ -1,4 +1,4 @@
-import uuid
+import uuid, datetime
 from django.db import models
 from django.utils.crypto import get_random_string as rnd
 from django.template.defaultfilters import slugify
@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient')], max_length=1, default='')
+    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient'),('d','Director'), ], max_length=1, default='')
     
     class Meta: 
         permissions=[('is_user', 'Is User'),]
@@ -17,7 +17,8 @@ class User(AbstractUser):
 class Person(models.Model):  #  Abstract Model 
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     slug=models.SlugField(null=True, editable=False)
-    
+    phone=models.CharField(default='', max_length=50)
+
     class Meta:
         abstract=True
 
@@ -35,6 +36,7 @@ class Person(models.Model):  #  Abstract Model
     
 class Patient(Person):
     adress=models.CharField(max_length=80)
+    birth_date=models.DateField(default=datetime.date.today)
     
     class Meta: 
         permissions=[('is_patient', 'Is Patient'),]
@@ -45,6 +47,14 @@ class Doctor(Person):
     
     class Meta: 
         permissions=[('is_doctor','Is Doctor'),]
+
+
+class Director(Person):
+    description=models.CharField(max_length=12)
+    
+    class Meta: 
+        permissions=[('is_director','Is Director'),]
+
 
 
 class Category(models.Model):

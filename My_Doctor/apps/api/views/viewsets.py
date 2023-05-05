@@ -38,7 +38,7 @@ class LoginUserViewSet(GenericViewSet):
 
 class PatientViewSet(ModelViewSet):
     queryset=Patient.objects.all()
-    serializer_class=PatientSerializer
+    serializer_class=PatientPublicSerializer
     # permission_classes=[IsAuthenticated, SessionAuthentication]
     permission_classes=[IsAuthenticated]
     

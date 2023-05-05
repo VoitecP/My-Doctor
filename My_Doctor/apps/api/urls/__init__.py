@@ -9,10 +9,17 @@ from ..urls import (
 # app_name='apps.api'
 app_name='api'
 
+# urlpatterns = [
+#     path('views/', include(urls_views)),
+#     path('generic/', include(urls_generic)),
+#     path('viewsets/', include(urls_viewsets)),
+# ]
+
+
 urlpatterns = [
-    path('views/', include(urls_views)),
-    path('generic/', include(urls_generic)),
-    path('viewsets/', include(urls_viewsets)),
+    path('', include(urls_views)),
+    path('', include(urls_generic)),
+    path('', include(urls_viewsets)),
 ]
 
 

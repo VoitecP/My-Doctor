@@ -43,10 +43,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     ##  Packages
     'rest_framework',
+    'rest_framework.authtoken',
     'drf_spectacular',
-    ##  Apps
+    'dj_rest_auth',  
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    ##  Local Apps
     'apps.core',
     'apps.api',
 ]
@@ -146,14 +153,24 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': [
     #                     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     # ],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny",],                     
+    # "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny",],  
+
+    "DEFAULT_PERMISSION_CLASSES": [
+        # "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
+        ], 
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 4,
+
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ]
+    
 }
 
 
