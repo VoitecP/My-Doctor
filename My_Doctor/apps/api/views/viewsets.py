@@ -1,5 +1,6 @@
 from apps.core.models import *
 from ..serializers import *
+from ..permissions import *
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
@@ -33,6 +34,13 @@ class LoginUserViewSet(GenericViewSet):
             else:
                 return Response({"detail": "You are not logged in"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+    @action(detail=False, methods=["GET"], url_path='logout')
+    def user_logout(self, request):
+        if request.user.is_authenticated == False:
+            return Response({"detail": "You are not logged in"}, status=status.HTTP_400_BAD_REQUEST)
+        logout(request)
+        return Response({"detail": "Successfully logged out"}, status=status.HTTP_200_OK)
     
 
 
@@ -40,11 +48,17 @@ class PatientViewSet(ModelViewSet):
     queryset=Patient.objects.all()
     serializer_class=PatientPublicSerializer
     # permission_classes=[IsAuthenticated, SessionAuthentication]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated, IsPatient]
     
     # filter_backends=[DjangoFilterBackend, SearchFilter, OrderingFilter]
     # filterset_class=PatientFilter        
     # search_fields=['name','surname','citizen_id']
     # ordering_fields=['citizen_id', 'name', 'surname'] 
 
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return PatientSerializer
+       
+        else:
+            return PatientSerializer
 

@@ -24,7 +24,8 @@ class PatientPublicSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Patient
-        fields = ['first_name','last_name']
+        # fields = ['first_name','last_name','tracks']
+        fields = '__all__'
 
 
 class PatientVisitSerializer(serializers.ModelSerializer):
