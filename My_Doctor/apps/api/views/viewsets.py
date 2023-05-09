@@ -45,20 +45,30 @@ class LoginUserViewSet(GenericViewSet):
 
 
 class PatientViewSet(ModelViewSet):
-    queryset=Patient.objects.all()
+    # queryset=Patient.objects.all()
     serializer_class=PatientPublicSerializer
+    http_method_names = ['get','post','retrieve','put','patch']
     # permission_classes=[IsAuthenticated, SessionAuthentication]
-    permission_classes=[IsAuthenticated, IsPatient]
+    # permission_classes=[IsAuthenticated, IsPatient]
     
     # filter_backends=[DjangoFilterBackend, SearchFilter, OrderingFilter]
     # filterset_class=PatientFilter        
     # search_fields=['name','surname','citizen_id']
     # ordering_fields=['citizen_id', 'name', 'surname'] 
 
-    def get_serializer_class(self):
-        if self.request.method == "POST":
-            return PatientSerializer
+    # def get_serializer_class(self):
+    #     if self.request.method == "POST":
+    #         return PatientSerializer
        
-        else:
-            return PatientSerializer
+    #     else:
+    #         return PatientSerializer
+
+    def get_queryset(self):
+
+        user=self.request.user
+        if user.usertype == 'd':
+            return Patient.objects.all()
+        
+        if user.usertype == 'p':
+            return Patient.objects.filter(user=user)
 

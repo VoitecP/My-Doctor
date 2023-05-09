@@ -8,4 +8,19 @@ class LoginUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'password')
+
+
+
+class UserPublicSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
+        # fields = '__all__'
+
         
+class UserFormSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = '__all__'
