@@ -1,2 +1,2 @@
-from .user_serializer import *
+from .user_serializers import *
 from .patient_serializers import *

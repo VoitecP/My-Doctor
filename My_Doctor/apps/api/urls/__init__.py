@@ -1,25 +1,25 @@
 from django.urls import path, include
 
-from ..urls import (
-                    urls_views,
-                    urls_generic,
-                    urls_viewsets,
+from ..urls import (  
+                    user_urls,
+                    patient_urls,
+                    doctor_urls,
+                    director_urls,
+                    category_urls,
+                    visit_urls
 )
 
 # app_name='apps.api'
 app_name='api'
 
-# urlpatterns = [
-#     path('views/', include(urls_views)),
-#     path('generic/', include(urls_generic)),
-#     path('viewsets/', include(urls_viewsets)),
-# ]
-
 
 urlpatterns = [
-    path('', include(urls_views)),
-    path('', include(urls_generic)),
-    path('', include(urls_viewsets)),
+    path('user/', include(user_urls)),
+    path('patient/', include(patient_urls)),
+    path('doctor/', include(doctor_urls)),
+    path('director/', include(director_urls)),
+    path('category/', include(category_urls)),
+    path('visit/', include(visit_urls)),
 ]
 
 
