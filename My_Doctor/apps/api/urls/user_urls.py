@@ -10,8 +10,10 @@ router.register(r'', user_views.LoginUserView, basename='user-login')           
 
 urlpatterns =[
     path('', include(router.urls)),   
-    # register error 'Userform serializer'          
-    path('user-register/',user_views.RegisterUserView.as_view(),name='user-register'),
+         
+    path('register/',user_views.RegisterUserView.as_view(), name='user-register'),
+    path('update/',user_views.UpdateUserView.as_view(), name='user-register'),
+
     # path('patients/<str:pk>/',PatientApi.as_view(),name='views-patient'),
     # path('doctors/', DoctorsApi.as_view(),name='views-doctors'),
     # path('doctors/<str:pk>/', DoctorApi.as_view(),name='views-doctor'),

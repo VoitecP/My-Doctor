@@ -39,3 +39,12 @@ class PatientVisitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = '__all__'
+
+
+class PatientUpdateSerializer(serializers.ModelSerializer):
+    tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    
+    class Meta:
+        model = Patient
+        fields = ['tracks','adress', 'birth_date','phone']
+       

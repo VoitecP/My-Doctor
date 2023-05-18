@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient'),('d','Director'), ], max_length=1, default='')
+    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient'),('c','Director'), ], max_length=1, default='')
     
     class Meta: 
         permissions=[('is_user', 'Is User'),]

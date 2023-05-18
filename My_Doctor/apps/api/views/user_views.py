@@ -1,5 +1,5 @@
-from apps.core.models import Patient, User
-from ..serializers import user_serializers
+from apps.core.models import Patient, User, Doctor
+from ..serializers import user_serializers, patient_serializers
 from ..permissions import *
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
@@ -46,7 +46,6 @@ class LoginUserView(GenericViewSet):
 
 class RegisterUserView(ListCreateAPIView):
     
-    # queryset = User.objects.all()
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -59,10 +58,37 @@ class RegisterUserView(ListCreateAPIView):
 
         if self.request.method == "POST":
             return user_serializers.UserRegisterSerializer
-        # return PhotoListSerializer
-        # else:
+        
         if self.request.method == "GET":
             return user_serializers.UserRegisterSerializer
+
+
+class UpdateUserView(ListCreateAPIView):
+
+    
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+
+        usertype=self.request.user.usertype
+        user=self.request.user
+        if usertype == 'p':
+            return Patient.objects.filter(user=user)
+        if usertype == 'd':
+            return Doctor.object.none()
+
+    def get_serializer_class(self):
+
+     
+        usertype=self.request.user.usertype
+        if usertype == 'p':
+            return patient_serializers.PatientUpdateSerializer
+        if usertype == 'd':
+            return patient_serializers.PatientUpdateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 
 
