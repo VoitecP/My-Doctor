@@ -5,14 +5,15 @@ from django.urls import path, include
 
 
 router=DefaultRouter()
-router.register(r'', user_views.LoginUserView, basename='user-login')           # Must be pattern  r''  not r'login' or 'login/'
+router.register(r'users', user_views.UserListView, basename='users')
+router.register(r'users', user_views.UserAuthView, basename='login')           # Must be pattern  r''  not r'login' or 'login/'
 
 
 urlpatterns =[
     path('', include(router.urls)),   
          
-    path('register/',user_views.RegisterUserView.as_view(), name='user-register'),
-    path('update/',user_views.UpdateUserView.as_view(), name='user-register'),
+    path('register/',user_views.UserRegisterView.as_view(), name='user-register'),
+    path('update/',user_views.UserTypeUpdateView.as_view(), name='user-type-update'),
 
     # path('patients/<str:pk>/',PatientApi.as_view(),name='views-patient'),
     # path('doctors/', DoctorsApi.as_view(),name='views-doctors'),

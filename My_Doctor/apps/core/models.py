@@ -44,6 +44,7 @@ class Patient(Person):
       
 class Doctor(Person):
     specialization=models.CharField(max_length=12)
+    private_field=models.CharField(max_length=50, default='private')
     
     class Meta: 
         permissions=[('is_doctor','Is Doctor'),]

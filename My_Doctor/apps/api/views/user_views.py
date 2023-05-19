@@ -1,8 +1,11 @@
 from apps.core.models import Patient, User, Doctor
-from ..serializers import user_serializers, patient_serializers
+from ..serializers import user_serializers
+from ..serializers.patient_serializers import PatientUpdateSerializer
+from ..serializers.doctor_serializers import DoctorUpdateSerializer
 from ..permissions import *
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet,  ReadOnlyModelViewSet
+from rest_framework.serializers import ValidationError
 
 from django.contrib.auth import login, logout, authenticate
 from rest_framework.response import Response  
@@ -12,10 +15,11 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework.generics import ListCreateAPIView
+from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
 
 
 
-class LoginUserView(GenericViewSet):
+class UserAuthView(GenericViewSet):
 
     permission_classes = [AllowAny]
     serializer_class=user_serializers.LoginUserSerializer
@@ -44,7 +48,7 @@ class LoginUserView(GenericViewSet):
         return Response({"detail": "Successfully logged out"}, status=status.HTTP_200_OK)
     
 
-class RegisterUserView(ListCreateAPIView):
+class UserRegisterView(ListCreateAPIView):
     
     permission_classes = [AllowAny]
 
@@ -63,32 +67,41 @@ class RegisterUserView(ListCreateAPIView):
             return user_serializers.UserRegisterSerializer
 
 
-class UpdateUserView(ListCreateAPIView):
 
-    
-    permission_classes = [IsAuthenticated]
+
+## User register serializer  + Patient serializer
+
+class UserTypeUpdateView(ListCreateAPIView):
+
+    permission_classes = [IsAuthenticated, IsNotUserUpdated]
 
     def get_queryset(self):
-
         usertype=self.request.user.usertype
-        user=self.request.user
         if usertype == 'p':
-            return Patient.objects.filter(user=user)
+            return Patient.objects.filter(user=self.request.user)
         if usertype == 'd':
-            return Doctor.object.none()
+            return Doctor.objects.filter(user=self.request.user)
+            
 
     def get_serializer_class(self):
 
-     
         usertype=self.request.user.usertype
         if usertype == 'p':
-            return patient_serializers.PatientUpdateSerializer
+            return PatientUpdateSerializer
         if usertype == 'd':
-            return patient_serializers.PatientUpdateSerializer
+            return DoctorUpdateSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        try:
+            serializer.save(user=self.request.user)
+        except:
+            raise ValidationError({"detail": "Operation not allowed"})
+            
+    
 
-#
+# for director only
+class UserListView(ReadOnlyModelViewSet):
 
-
+    queryset=User.objects.all()
+    permission_classes=[IsAuthenticated,IsDoctor]
+    serializer_class=user_serializers.UserPublicSerializer
