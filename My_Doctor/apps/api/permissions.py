@@ -1,113 +1,91 @@
-from rest_framework import permissions
-from apps.core.models import Patient, User, Doctor
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+from apps.core.models import Patient, User, Doctor, Director
 
-class IsNotUserUpdated(permissions.BasePermission):
+
+class BaseObjectPermission(BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:      # Read permissions are allowed to any request 
+            return True
+        return obj.user == request.user          # Write permissions are only allowed to the user
+
+
+class ModelExistsPermission(BaseObjectPermission):
+    patient_status=False
+    doctor_status=False
+    director_status=False
+    ##
+    return_status=False
 
     def has_permission(self, request, view):
         if request.user.is_authenticated:
             if Patient.objects.filter(user=request.user).exists():
-                return False
+                return self.patient_status
             if Doctor.objects.filter(user=request.user).exists():
-                return False
-        return True
+                return self.doctor_status
+            if Director.objects.filter(user=request.user).exists():
+                return self.director_status
+        return self.return_status
 
-    def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request so we'll always
-        # allow GET, HEAD, or OPTIONS requests
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # # Write permissions are only allowed to the user
-        return obj.user == request.user
-
-
-
-class IsUserUpdated(permissions.BasePermission):
+    
+class UserTypePermission(BaseObjectPermission):
+    usertype = 'x'
 
     def has_permission(self, request, view):
         if request.user.is_authenticated:
-            if Patient.objects.filter(user=request.user).exists():
+            if request.user.usertype == self.usertype:
                 return True
-            if Doctor.objects.filter(user=request.user).exists():
-                return True
-        return False
-
-    def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request so we'll always
-        # allow GET, HEAD, or OPTIONS requests
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # # Write permissions are only allowed to the user
-        return obj.user == request.user
+        return False 
 
 
-class IsPatient(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            if request.user.usertype == 'p':
-                return True
-        return False
-
-    def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request so we'll always
-        # allow GET, HEAD, or OPTIONS requests
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        # # Write permissions are only allowed to the user
-        return obj.user == request.user
+class IsNotUserUpdated(ModelExistsPermission):
+    patient_status=False
+    doctor_status=False
+    director_status=False
+    ##
+    return_status=True
 
 
-class IsDoctor(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            if request.user.usertype == 'd':
-                return True
-        return False
-
-    def has_object_permission(self, request, view, obj):
-    # Read permissions are allowed to any request so we'll always
-    # allow GET, HEAD, or OPTIONS requests
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-    # # Write permissions are only allowed to the user
-        return obj.user == request.user
+class IsUserUpdated(ModelExistsPermission):
+    patient_status=True
+    doctor_status=True
+    director_status=True
+    ##
+    return_status=False
 
 
-class IsPatientCreated(permissions.BasePermission):
 
-    def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            if Patient.objects.filter(user=request.user).exists():
-                return True
-        return False
+class IsPatient(UserTypePermission):
+    usertype = 'p'
 
-    def has_object_permission(self, request, view, obj):
-    # Read permissions are allowed to any request so we'll always
-    # allow GET, HEAD, or OPTIONS requests
-        if request.method in permissions.SAFE_METHODS:
-            return True
 
-    # # Write permissions are only allowed to the user
-        return obj.user == request.user
+class IsDoctor(UserTypePermission):
+    usertype = 'd'
 
-class IsDoctorCreated(permissions.BasePermission):
 
-    def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            if Doctor.objects.filter(user=request.user).exists():  #  == True:
-                return True
-        return False
+class IsDirector(UserTypePermission):
+    usertype = 'c'
 
-    def has_object_permission(self, request, view, obj):
-    # Read permissions are allowed to any request so we'll always
-    # allow GET, HEAD, or OPTIONS requests
-        if request.method in permissions.SAFE_METHODS:
-            return True
 
-    # # Write permissions are only allowed to the user
-        return obj.user == request.user
+class IsPatientCreated(ModelExistsPermission):
+    patient_status=True
+    doctor_status=False
+    director_status=False
+    ##
+    return_status=False
+
+
+class IsDoctorCreated(ModelExistsPermission):
+    patient_status=False
+    doctor_status=True
+    director_status=False
+    ##
+    return_status=False
+
+
+class IsDirectorCreated(ModelExistsPermission):
+    patient_status=False
+    doctor_status=False
+    director_status=True
+    ##
+    return_status=False

@@ -8,20 +8,17 @@ router=DefaultRouter()
 router.register(r'users', user_views.UserListView, basename='users')
 router.register(r'users', user_views.UserAuthView, basename='login')           # Must be pattern  r''  not r'login' or 'login/'
 
+# router.register('type-update/',user_views.UserTypeUpdateView, basename='user-type-update'),
 
 urlpatterns =[
     path('', include(router.urls)),   
          
     path('register/',user_views.UserRegisterView.as_view(), name='user-register'),
-    path('update/',user_views.UserTypeUpdateView.as_view(), name='user-type-update'),
-
-    # path('patients/<str:pk>/',PatientApi.as_view(),name='views-patient'),
-    # path('doctors/', DoctorsApi.as_view(),name='views-doctors'),
-    # path('doctors/<str:pk>/', DoctorApi.as_view(),name='views-doctor'),
-    # path('categories/', CategoriesApi.as_view(),name='views-categories'),
-    # path('categories/<str:pk>/', CategoryApi.as_view(),name='views-category'),
-    # path('visits/', VisitsApi.as_view(),name='views-visits'),
-    # path('visits/<str:pk>/', VisitApi.as_view(),name='views-visit'),  
+    path('type-update/',user_views.UserTypeUpdateView.as_view(), name='user-type-update'),
+    path('profile-update/',user_views.UserProfileUpdateView.as_view(), name='user-profile-update'),
+    path('user-pernament-delete/',user_views.UserPernamentDeleteView.as_view(), name='user-pernament-delete'),
+    path('user-delete/',user_views.UserDeleteView.as_view(), name='user-delete'),
+    
 ]
 
 

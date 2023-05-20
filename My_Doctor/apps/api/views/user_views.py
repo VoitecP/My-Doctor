@@ -1,7 +1,8 @@
-from apps.core.models import Patient, User, Doctor
+from apps.core.models import User, Patient, Doctor, Director
 from ..serializers import user_serializers
-from ..serializers.patient_serializers import PatientUpdateSerializer
-from ..serializers.doctor_serializers import DoctorUpdateSerializer
+# from ..serializers.patient_serializers import PatientUpdateSerializer
+# from ..serializers.doctor_serializers import DoctorUpdateSerializer
+# from ..serializers.director_serializers import DirectorUpdateSerializer
 from ..permissions import *
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet,  ReadOnlyModelViewSet
@@ -14,9 +15,46 @@ from rest_framework.decorators import action
 # from django.contrib.auth import logout as django_logout
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, ListCreateAPIView
 from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
 
+from django.shortcuts import get_object_or_404
+
+from .mixins import QuerysetMixin, ObjectMixin, SerializerMixin
+
+
+# class QuerysetMixin:
+
+#     def get_queryset(self):
+#         usertype=self.request.user.usertype
+#         if usertype == 'p':
+#             return Patient.objects.filter(user=self.request.user)  # replace to get_object.. or 404
+#         if usertype == 'd':
+#             return Doctor.objects.filter(user=self.request.user)
+#         if usertype == 'c':
+#             return get_object_or_404(Director, user=self.request.user)
+
+# class ObjectMixin:
+
+#     def get_object(self):
+#         usertype=self.request.user.usertype
+#         if usertype == 'p':
+#             return get_object_or_404(Patient, user=self.request.user)
+#         if usertype == 'd':
+#             return get_object_or_404(Doctor, user=self.request.user)
+#         if usertype == 'c':
+#             return get_object_or_404(Director, user=self.request.user)
+
+# class SerializerMixin:
+
+#     def get_serializer_class(self):
+#         usertype=self.request.user.usertype
+#         if usertype == 'p':
+#             return PatientUpdateSerializer
+#         if usertype == 'd':
+#             return DoctorUpdateSerializer
+#         if usertype == 'c':
+#             return DirectorUpdateSerializer
 
 
 class UserAuthView(GenericViewSet):
@@ -53,43 +91,18 @@ class UserRegisterView(ListCreateAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        # user=self.request.user
-        # return Patient.objects.filter(user=user)
         return User.objects.none()
        
-
     def get_serializer_class(self):
-
         if self.request.method == "POST":
             return user_serializers.UserRegisterSerializer
-        
         if self.request.method == "GET":
             return user_serializers.UserRegisterSerializer
 
 
-
-
-## User register serializer  + Patient serializer
-
-class UserTypeUpdateView(ListCreateAPIView):
-
+class UserTypeUpdateView(QuerysetMixin, SerializerMixin, ListCreateAPIView):
+    
     permission_classes = [IsAuthenticated, IsNotUserUpdated]
-
-    def get_queryset(self):
-        usertype=self.request.user.usertype
-        if usertype == 'p':
-            return Patient.objects.filter(user=self.request.user)
-        if usertype == 'd':
-            return Doctor.objects.filter(user=self.request.user)
-            
-
-    def get_serializer_class(self):
-
-        usertype=self.request.user.usertype
-        if usertype == 'p':
-            return PatientUpdateSerializer
-        if usertype == 'd':
-            return DoctorUpdateSerializer
 
     def perform_create(self, serializer):
         try:
@@ -98,6 +111,43 @@ class UserTypeUpdateView(ListCreateAPIView):
             raise ValidationError({"detail": "Operation not allowed"})
             
     
+class UserProfileUpdateView(SerializerMixin, ObjectMixin, RetrieveUpdateAPIView): 
+
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+class UserPernamentDeleteView(SerializerMixin, ObjectMixin, RetrieveDestroyAPIView): 
+
+    permission_classes = [IsAuthenticated]
+    
+    def destroy(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            user.delete()
+            logout(request)
+            return Response({"detail": "User deleted pernamently"})
+        except:
+            return Response({"detail": "User Cannot be deleted"})
+
+
+class UserDeleteView(SerializerMixin, ObjectMixin, RetrieveDestroyAPIView): 
+
+    permission_classes = [IsAuthenticated]
+    
+    def destroy(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            user.is_active = False
+            user.save()
+            logout(request)
+            return Response({"detail": "User has status 'inactive' "})
+        except:
+            return Response({"detail": "Cannot set status 'inactive' "})
+
+
+
 
 # for director only
 class UserListView(ReadOnlyModelViewSet):
