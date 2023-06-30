@@ -1,6 +1,6 @@
 from apps.core.models import Patient, User
 from rest_framework import serializers
-from apps.api.serializers import UserPublicSerializer  
+from apps.api.serializers import UserPublicSerializer, UserUpdateSerializer  
 
 class PatientSerializer(serializers.ModelSerializer):
     tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -43,11 +43,12 @@ class PatientVisitSerializer(serializers.ModelSerializer):
 
 class PatientUpdateSerializer(serializers.ModelSerializer):
     tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    # user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    user = UserUpdateSerializer()
     
     class Meta:
         model = Patient
-        fields = ['tracks','adress', 'birth_date','phone']
+        fields = ['tracks','adress', 'birth_date','phone', 'user']
 
 
     # def update(self, instance, validated_data):

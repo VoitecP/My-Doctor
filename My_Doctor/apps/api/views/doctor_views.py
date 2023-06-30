@@ -24,8 +24,11 @@ class DoctorListView(ReadOnlyModelViewSet):
 
     def get_queryset(self):
         usertype=self.request.user.usertype
-        if usertype == 'p':
+        if usertype == 'p':         # filter by visit
             return Doctor.objects.all()
         
         if usertype == 'd':
             return Doctor.objects.filter(user=self.request.user)
+
+        if usertype == 'c':
+            return Doctor.objects.all()

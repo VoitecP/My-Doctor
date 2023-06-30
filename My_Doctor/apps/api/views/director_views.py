@@ -2,7 +2,7 @@ from apps.core.models import User, Patient, Doctor, Director
 from ..serializers import user_serializers
 from ..serializers.patient_serializers import PatientUpdateSerializer
 from ..serializers.doctor_serializers import DoctorUpdateSerializer
-from ..serializers.director_serializers import DirectorUpdateSerializer
+from ..serializers.director_serializers import DirectorPublicSerializer
 from ..permissions import *
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet,  ReadOnlyModelViewSet
@@ -22,10 +22,18 @@ from django.shortcuts import get_object_or_404
 from .mixins import QuerysetMixin, ObjectMixin, SerializerMixin
 
 
+# jest jako user.
+# class DirectorProfileUpdateView(SerializerMixin, ObjectMixin, RetrieveUpdateAPIView): 
 
-class UserProfileUpdateView(SerializerMixin, ObjectMixin, RetrieveUpdateAPIView): 
+#     permission_classes = [IsAuthenticated, IsDirector]
 
+#     def put(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)
+
+
+class DirectorListView(ReadOnlyModelViewSet):
+    queryset=Director.objects.all()
+    serializer_class=DirectorPublicSerializer
     permission_classes = [IsAuthenticated]
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+    # http_method_names = ['get','post','retrieve','put','patch']
+    

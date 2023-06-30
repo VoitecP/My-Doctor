@@ -8,5 +8,5 @@ router.register(r'doctors', doctor_views.DoctorListView, basename='viewsets-doct
 
 urlpatterns =[
     path('',include(router.urls)),
- 
+    # path('profile-update/',doctor_views.UserProfileUpdateView.as_view(), name='user-profile-update'), 
 ]

@@ -19,14 +19,19 @@ from ..permissions import IsDoctorCreated, IsPatientCreated
 class PatientListView(ReadOnlyModelViewSet):
     # queryset=Patient.objects.all()
     serializer_class=PatientPublicSerializer
-    permission_classes = [IsAuthenticated, IsDoctorCreated]
+    permission_classes = [IsAuthenticated] #  , IsDoctorCreated]       No other perm_class
     # http_method_names = ['get']
     
 
     def get_queryset(self):
         usertype=self.request.user.usertype
-        if usertype == 'd':
+        if usertype == 'd':         # Filter by visit
             return Patient.objects.all()
         
-        if usertype == 'p':
+        if usertype == 'p':         # filter by visit
             return Patient.objects.filter(user=self.request.user)
+
+        if usertype == 'c':
+            return Patient.objects.all()
+        
+        

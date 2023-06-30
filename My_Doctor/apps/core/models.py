@@ -7,7 +7,7 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient'),('c','Director'), ], max_length=1, default='')
+    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient'), ('c','Director'),], max_length=1, default='')  # ,('c','Director'),  By Admin
     
     class Meta: 
         permissions=[('is_user', 'Is User'),]
@@ -45,6 +45,11 @@ class Patient(Person):
 class Doctor(Person):
     specialization=models.CharField(max_length=12)
     private_field=models.CharField(max_length=50, default='private')
+
+
+    def save(self, *args, **kwargs):
+        self.__class__.objects.exclude(id=self.id).delete()
+        super(Doctor, self).save(*args, **kwargs)
     
     class Meta: 
         permissions=[('is_doctor','Is Doctor'),]
