@@ -28,7 +28,7 @@ class PatientListView(ReadOnlyModelViewSet):
         if usertype == 'd':         # Filter by visit
             return Patient.objects.all()
         
-        if usertype == 'p':         # filter by visit
+        if usertype == 'p':        
             return Patient.objects.filter(user=self.request.user)
 
         if usertype == 'c':

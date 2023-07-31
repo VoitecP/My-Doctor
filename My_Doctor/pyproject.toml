@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "my-doctor"
+version = "0.1.0"
+description = "CRUD Aplication"
+authors = ["VoitecP <piwowarski.connect@gmail.com>"]
+readme = "../README.md"
+packages = [{include = "my_doctor"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "*"
+python-decouple = "*"
+djangorestframework = "*"
+markdown = "*"
+django-filter = "*"
+drf-spectacular = "*"
+dj-rest-auth = "*"
+django-allauth = "*"
+pycodestyle = "*"
+
+
+[tool.poetry.group.dev.dependencies]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
