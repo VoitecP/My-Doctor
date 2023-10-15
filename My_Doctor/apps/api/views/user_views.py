@@ -1,60 +1,17 @@
 from apps.core.models import User, Patient, Doctor, Director
 from ..serializers import user_serializers
-# from ..serializers.patient_serializers import PatientUpdateSerializer
-# from ..serializers.doctor_serializers import DoctorUpdateSerializer
-# from ..serializers.director_serializers import DirectorUpdateSerializer
+from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
+from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 from ..permissions import *
-from rest_framework import status
-from rest_framework.viewsets import ModelViewSet, GenericViewSet,  ReadOnlyModelViewSet
-from rest_framework.serializers import ValidationError
 
 from django.contrib.auth import login, logout, authenticate
+from rest_framework import status
+from rest_framework.viewsets import GenericViewSet,  ReadOnlyModelViewSet
+from rest_framework.serializers import ValidationError
 from rest_framework.response import Response  
 from rest_framework.decorators import action
-
-# from django.contrib.auth import logout as django_logout
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView,UpdateAPIView, CreateAPIView, ListCreateAPIView
-from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
-
-from django.shortcuts import get_object_or_404
-
-from .mixins import QuerysetMixin, ObjectMixin, SerializerMixin
-
-
-# class QuerysetMixin:
-
-#     def get_queryset(self):
-#         usertype=self.request.user.usertype
-#         if usertype == 'p':
-#             return Patient.objects.filter(user=self.request.user)  # replace to get_object.. or 404
-#         if usertype == 'd':
-#             return Doctor.objects.filter(user=self.request.user)
-#         if usertype == 'c':
-#             return get_object_or_404(Director, user=self.request.user)
-
-# class ObjectMixin:
-
-#     def get_object(self):
-#         usertype=self.request.user.usertype
-#         if usertype == 'p':
-#             return get_object_or_404(Patient, user=self.request.user)
-#         if usertype == 'd':
-#             return get_object_or_404(Doctor, user=self.request.user)
-#         if usertype == 'c':
-#             return get_object_or_404(Director, user=self.request.user)
-
-# class SerializerMixin:
-
-#     def get_serializer_class(self):
-#         usertype=self.request.user.usertype
-#         if usertype == 'p':
-#             return PatientUpdateSerializer
-#         if usertype == 'd':
-#             return DoctorUpdateSerializer
-#         if usertype == 'c':
-#             return DirectorUpdateSerializer
 
 
 class UserAuthView(GenericViewSet):
@@ -91,34 +48,31 @@ class UserAuthView(GenericViewSet):
 class UserRegisterView(CreateAPIView):
     """
     User register View
-    """
-    
+    """  
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-
         return User.objects.none()
        
     def get_serializer_class(self):
-        if self.request.method == "POST":
-            return user_serializers.UserRegisterSerializer
-        if self.request.method == "GET":
-            return user_serializers.UserRegisterSerializer
+        return user_serializers.CustomUserRegisterSerializer
+        
+    def perform_create(self, serializer):
+        try:
+            serializer.save(self.request)
+            return Response({"detail": "Success"})
+        except:
+            raise ValidationError({"detail": "Operation not allowed"})
 
 
-class UserUpdateView(RetrieveUpdateAPIView):
+
+class UserUpdateView(UserObjectMixin, RetrieveUpdateAPIView):
     """
     View for update User model
     """
-# class UserUpdateView(UpdateAPIView):
-
-    permission_classes=[IsAuthenticated]
-    
-    def get_queryset(self):
-
-        return User.objects.all()
+    permission_classes=[IsAuthenticated, IsAdminUser]
+   
         
-
     def get_serializer_class(self):
         return user_serializers.UserUpdateSerializer
 
@@ -138,34 +92,37 @@ class UserUpdateView(RetrieveUpdateAPIView):
 #     def put(self, request, *args, **kwargs):
 #         return self.update(request, *args, **kwargs)
     
-# 
-class UserTypeCreateView(QuerysetMixin, SerializerMixin, ListCreateAPIView):
+
+
+
+class UserTypeCreateView(UserQuerysetMixin, UserSerializerMixin, ListCreateAPIView):
     """
     View for create Patient/Doctor/Director model
     """
- 
-    
-    permission_classes = [IsAuthenticated, IsNotUserUpdated]
+    permission_classes = [IsAuthenticated, IsNotUserUpdated] #, IsAdminUser]   it can make errors
 
     def perform_create(self, serializer):
         try:
             serializer.save(user=self.request.user)
+            return Response({"detail": "Success"})
         except:
             raise ValidationError({"detail": "Operation not allowed"})
-            
+        
     
-class UserTypeUpdateView(SerializerMixin, ObjectMixin, RetrieveUpdateAPIView): 
+class UserTypeUpdateView(UserObjectMixin, UserSerializerMixin,  RetrieveUpdateAPIView): 
     """
     View for Update Patient/Doctor/Director model
     """
-
     permission_classes = [IsAuthenticated, IsUserUpdated]
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
-class UserPernamentDeleteView(SerializerMixin, ObjectMixin, RetrieveDestroyAPIView): 
 
+class UserPernamentDeleteView(UserSerializerMixin, UserObjectMixin, RetrieveDestroyAPIView): 
+    """
+    View for pernament delete User model
+    """
     permission_classes = [IsAuthenticated]
     
     def destroy(self, request, *args, **kwargs):
@@ -178,11 +135,10 @@ class UserPernamentDeleteView(SerializerMixin, ObjectMixin, RetrieveDestroyAPIVi
             return Response({"detail": "User Cannot be deleted"})
 
 
-class UserDeleteView(SerializerMixin, ObjectMixin, RetrieveDestroyAPIView): 
+class UserDeleteView(UserSerializerMixin, UserObjectMixin, RetrieveDestroyAPIView): 
     """
     View for deleting (making inactive) User model
     """
-
     permission_classes = [IsAuthenticated]
     
     def destroy(self, request, *args, **kwargs):
@@ -195,49 +151,54 @@ class UserDeleteView(SerializerMixin, ObjectMixin, RetrieveDestroyAPIView):
         except:
             return Response({"detail": "Cannot set status 'inactive' "})
 
-
-
-
 # for director only  all users
 # for p , d  only  self.id
 
-
 class UserListView(ReadOnlyModelViewSet):
-
     """
     User model List View (filtered list view)
     """
-
-    # queryset=User.objects.all()
     permission_classes=[IsAuthenticated]
-    # serializer_class=user_serializers.UserPublicSerializer
-
 
     def get_queryset(self):
 
         usertype=self.request.user.usertype
-        if usertype == 'p':
-            return User.objects.filter(id=self.request.user.id)
-        
-        if usertype == 'd':
-            return User.objects.filter(id=self.request.user.id)
+        is_superuser=self.request.user.is_superuser
 
-        if usertype == 'c':
+        if is_superuser == True:
             return User.objects.all()
 
+        else:
+            if usertype == 'p':
+                return User.objects.filter(id=self.request.user.id)
+            
+            if usertype == 'd':
+                return User.objects.filter(id=self.request.user.id)
+
+            if usertype == 'c':
+                return User.objects.all()
+            
+            
+       
     def get_serializer_class(self):
 
         usertype=self.request.user.usertype
-        if usertype == 'p':
-            return user_serializers.UserPublicSerializer
+        is_superuser=self.request.user.is_superuser
 
+        if is_superuser == True:
+            return user_serializers.UserPrivateSerializer
         
-        if usertype == 'd':
-            return user_serializers.UserPublicSerializer
+        else:
+            if usertype == 'p':
+                return user_serializers.UserPublicSerializer
+    
+            if usertype == 'd':
+                return user_serializers.UserPublicSerializer
 
-
-        if usertype == 'c':
-            return user_serializers.UserPublicSerializer
+            if usertype == 'c':
+                return user_serializers.UserPublicSerializer
+        
+        
 
 
       

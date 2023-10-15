@@ -19,7 +19,7 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIVie
 from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
 
 from django.shortcuts import get_object_or_404
-from .mixins import QuerysetMixin, ObjectMixin, SerializerMixin
+from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 
 
 # jest jako user.

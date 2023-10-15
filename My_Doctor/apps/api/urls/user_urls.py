@@ -5,8 +5,8 @@ from django.urls import path, include
 
 
 router=DefaultRouter()
-router.register(r'users', user_views.UserListView, basename='viewsets-users')
-router.register(r'', user_views.UserAuthView, basename='login')           # Must be pattern  r''  not r'login' or 'login/'
+router.register(r'user', user_views.UserListView, basename='viewsets-user')
+router.register('', user_views.UserAuthView, basename='login')           # Must be pattern  r''  not r'login' or 'login/'
 
 # router.register('type-update/',user_views.UserTypeUpdateView, basename='user-type-update'),
 
@@ -14,11 +14,11 @@ urlpatterns =[
     path('', include(router.urls)),   
          
     path('register/',user_views.UserRegisterView.as_view(), name='user-register'),
-    path('type-create/',user_views.UserTypeCreateView.as_view(), name='user-type-update'),
-    path('type-update/',user_views.UserTypeUpdateView.as_view(), name='user-profile-update'),
-    path('user-update/', user_views.UserUpdateView.as_view(), name='user-update'),
-    path('user-pernament-delete/', user_views.UserPernamentDeleteView.as_view(), name='user-pernament-delete'),
-    path('user-delete/',user_views.UserDeleteView.as_view(), name='user-delete'),
+    path('user/<uuid:pk>/type-create/',user_views.UserTypeCreateView.as_view(), name='user-type-update'),
+    path('user/<uuid:pk>/type-update/',user_views.UserTypeUpdateView.as_view(), name='user-profile-update'),
+    path('user/<uuid:pk>/user-update/', user_views.UserUpdateView.as_view(), name='user-update'),
+    path('user/<uuid:pk>/user-pernament-delete/', user_views.UserPernamentDeleteView.as_view(), name='user-pernament-delete'),
+    path('user/<uuid:pk>/user-delete/',user_views.UserDeleteView.as_view(), name='user-delete'),
     
 ]
 

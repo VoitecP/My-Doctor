@@ -29,7 +29,7 @@ class ModelExistsPermission(BaseObjectPermission):
 
     
 class UserTypePermission(BaseObjectPermission):
-    usertype = 'x'
+    usertype = None   
 
     def has_permission(self, request, view):
         if request.user.is_authenticated:

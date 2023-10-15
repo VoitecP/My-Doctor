@@ -8,9 +8,12 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient'), ('c','Director'),], max_length=1, default='')  # ,('c','Director'),  By Admin
+    # first_name  (Heritated from AbstractUser)
+    # last_name
+    # email
     
     class Meta: 
-        permissions=[('is_user', 'Is User'),]
+        permissions=[('is_user', 'Is User'),]  # what to do with that ?
         managed = True
 
         
@@ -44,7 +47,7 @@ class Patient(Person):
       
 class Doctor(Person):
     specialization=models.CharField(max_length=12)
-    private_field=models.CharField(max_length=50, default='private')
+    private_field=models.CharField(max_length=50, default='private')    # temporary field
 
 
     def save(self, *args, **kwargs):
@@ -66,7 +69,8 @@ class Director(Person):
 class Category(models.Model):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     name=models.CharField(max_length=30, unique=True, default='')
-    
+    description=models.TextField(default='')
+
     class Meta:
         ordering=('name',)
         verbose_name_plural = 'Categories'
@@ -91,3 +95,6 @@ class Visit(models.Model):
     def __str__(self):
         format= f'{self.date}'
         return f' Visit: {format[0:10]} - {self.title}'
+
+
+

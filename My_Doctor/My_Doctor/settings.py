@@ -189,4 +189,12 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
+# If error in when registering new user in endpoint (api/dj-rest-auth/register/') 
+# Use this setting
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+
+REST_AUTH = {
+
+    
+}
