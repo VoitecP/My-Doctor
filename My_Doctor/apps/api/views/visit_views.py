@@ -17,9 +17,6 @@ from rest_framework.serializers import ValidationError
 
 
 
-
-
-
 class VisitListView(ReadOnlyModelViewSet):
     """
     Visit model List View (filtered list view)
@@ -40,7 +37,6 @@ class VisitListView(ReadOnlyModelViewSet):
                 return Visit.objects.filter(doctor__pk=id)
             if usertype == 'c':
                 return Visit.objects.all()
-            
 
     def get_serializer_class(self):
         usertype=self.request.user.usertype
@@ -52,7 +48,57 @@ class VisitListView(ReadOnlyModelViewSet):
         if usertype == 'c':
             return visit_serializers.VisitPublicSerializer
         
+class VisitCreateView(ListCreateAPIView):
+    """
+    View for create Visit model
+    """
+    permission_classes = [IsAuthenticated] #, IsAdminUser]   it can make errors
+
+    def get_queryset(self):
+        return Visit.objects.none() 
+
+    def get_serializer_class(self):
+        return visit_serializers.VisitCreateSerializer    
+
+    def perform_create(self, serializer):
+        try:
+            serializer.save()
+            return Response({"detail": "Success"})
+        except:
+            raise ValidationError({"detail": "Operation not allowed"})
 
 
+class VisitUpdateView(RetrieveUpdateAPIView):
+    """
+    View for update Visit model
+    """
+    permission_classes=[IsAuthenticated, IsAdminUser]
+   
+    def get_serializer_class(self):
+        return visit_serializers.VisitUpdateSerializer
+
+    # def path(self, request, *args, **kwargs):
+    #     return self.partial_update(request, *args, **kwargs)
       
 
+class VisitDeleteView(RetrieveDestroyAPIView):
+    """
+    View for Delete Visit model
+    """
+    permission_classes=[IsAuthenticated, IsAdminUser]
+
+    def get_queryset(self):
+        return Visit.objects.all()
+   
+    def get_serializer_class(self):
+        return visit_serializers.VisitDeleteSerializer
+
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            visit = self.get_object()
+            self.perform_destroy(visit)
+            return Response({"detail": "Visit deleted"})
+        except:
+           return Response({"detail": "User Cannot be deleted"})
+    

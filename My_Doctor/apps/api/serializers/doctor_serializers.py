@@ -29,7 +29,7 @@ class DoctorPrivateSerializer(serializers.ModelSerializer):
         fields = ['user','specialization','private_field','tracks']
 
 
-class DoctoVisitSerializer(serializers.ModelSerializer):
+class DoctorVisitSerializer(serializers.ModelSerializer):
     """
     Only connected thru common visit can see these fields
     """

@@ -62,9 +62,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'email']
 
 
-
-
-
 class DeleteUserSerializer(serializers.ModelSerializer):
     """
     Serializer for delete user
@@ -74,10 +71,11 @@ class DeleteUserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
-
-
 class CustomUserRegisterSerializer(RegisterSerializer, serializers.ModelSerializer):
+    """
+    Serializer for Register User, mixin with dj_rest_auth app
+    """
+
     class Meta:
         model = User
         fields = ['username','email','usertype','password1', 'password2']
@@ -92,7 +90,7 @@ class CustomUserRegisterSerializer(RegisterSerializer, serializers.ModelSerializ
         return user
 
 
-
+## Someting wrong
 class UserRegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for register user
