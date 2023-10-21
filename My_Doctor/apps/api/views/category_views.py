@@ -6,10 +6,8 @@ from .view_mixins import CategoryQuerysetMixin, CategorySerializerMixin
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.response import Response  
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, CreateAPIView, DestroyAPIView
-
-
-
+from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, ListCreateAPIView, DestroyAPIView
+from rest_framework.serializers import ValidationError
 
 
 class CategoryListView(CategoryQuerysetMixin, CategorySerializerMixin, ReadOnlyModelViewSet):
@@ -17,8 +15,7 @@ class CategoryListView(CategoryQuerysetMixin, CategorySerializerMixin, ReadOnlyM
     # http_method_names = ['get','post','retrieve','put','patch']
     
 
-class CategoryCreateView(CreateAPIView):
-      
+class CategoryCreateView(ListCreateAPIView):
     """
     View for create Category model
     """
@@ -30,6 +27,13 @@ class CategoryCreateView(CreateAPIView):
     
     def get_serializer_class(self):
         return category_serializers.CategoryCreateSerializer
+    
+    def perform_create(self, serializer):
+        try:
+            serializer.save()
+            return Response({"detail": "Success"})
+        except:
+            raise ValidationError({"detail": "Operation not allowed"})
 
    
 class CategoryUpdateView(CategoryQuerysetMixin, CategorySerializerMixin, RetrieveUpdateAPIView):
@@ -38,9 +42,8 @@ class CategoryUpdateView(CategoryQuerysetMixin, CategorySerializerMixin, Retriev
     """
     permission_classes=[IsAdminUser, IsDirector]
 
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)            
+    # def put(self, request, *args, **kwargs):
+    #     return self.update(request, *args, **kwargs)            
 
 
 class CategoryDeleteView(CategoryQuerysetMixin, CategorySerializerMixin, RetrieveDestroyAPIView): 

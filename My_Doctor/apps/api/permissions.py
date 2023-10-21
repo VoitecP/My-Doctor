@@ -10,6 +10,13 @@ class BaseObjectPermission(BasePermission):
         return obj.user == request.user          # Write permissions are only allowed to the user
 
 
+class DirectorSingletonPermission(BaseObjectPermission):
+    message='Director sigleton instance'
+
+    def has_permission(self, request, view):
+        if Director.objects.exists():
+            return False
+
 class ModelExistsPermission(BaseObjectPermission):
     patient_status=False
     doctor_status=False

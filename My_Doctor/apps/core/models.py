@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.crypto import get_random_string as rnd
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import AbstractUser
-
+from rest_framework.serializers import ValidationError
 
 class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
@@ -54,15 +54,36 @@ class Doctor(Person):
         self.__class__.objects.exclude(id=self.id).delete()
         super(Doctor, self).save(*args, **kwargs)
     
+    
     class Meta: 
         permissions=[('is_doctor','Is Doctor'),]
 
 
 class Director(Person):
     description=models.CharField(max_length=12)
+    # _singleton = models.BooleanField(default=True, editable=False, unique=True)
     
     class Meta: 
         permissions=[('is_director','Is Director'),]
+
+
+    def save(self, *args, **kwargs):
+        if not self.pk and Director.objects.exists():
+            raise ValidationError('Only one Director instance is allowed')
+        return super(Director, self).save(*args, **kwargs)
+
+    # def save(self, *args, **kwargs):
+    #     self.pk = 1
+    #     super(Director, self).save(*args, **kwargs)
+
+    # def delete(self, *args, **kwargs):
+    #     pass
+
+    # @classmethod
+    # def load(cls):
+    #     obj, created = cls.objects.get_or_create(pk=1)
+    #     return obj
+
 
 
 

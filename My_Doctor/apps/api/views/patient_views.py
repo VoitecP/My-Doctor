@@ -2,9 +2,9 @@ from apps.core.models import *
 from ..serializers import *
 from ..permissions import *
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import  ReadOnlyModelViewSet
 
-from django.contrib.auth import login, logout, authenticate
+
 from rest_framework.response import Response  
 from rest_framework.decorators import action
 

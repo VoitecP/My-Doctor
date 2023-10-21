@@ -90,7 +90,7 @@ class CustomUserRegisterSerializer(RegisterSerializer, serializers.ModelSerializ
         return user
 
 
-## Someting wrong
+## Someting wrong, not used 
 class UserRegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for register user

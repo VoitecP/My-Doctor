@@ -88,28 +88,7 @@ class VisitCreateSerializer(serializers.ModelSerializer):
         visit.category = validated_data['category']
         visit.description = validated_data['decsription']
         visit.price = validated_data['price']
-        # user.is_valid() # checks
         visit.save()
         return visit  
 
 
-    # id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    # title=models.CharField(max_length=100, default='')
-    # date=models.DateTimeField(default=None, null=True, blank=True)    
-    # patient=models.ForeignKey(Patient, models.PROTECT, default=None)
-    # doctor=models.ForeignKey(Doctor, models.PROTECT, default=None)
-    # category=models.ForeignKey(Category,models.PROTECT,null=True,blank=True, default=None)
-    # description=models.TextField()
-    # price=models.CharField(max_length=10)
-
-
-
-    # def perform_create(self, validated_data):
-    #     category = Category.objects.create(
-    #         validated_data['name'], 
-    #         validated_data['description'])
-    #     category.name = validated_data['name']
-    #     category.description = validated_data['description']
-    #     # category.is_valid() # checks
-    #     category.save()
-    #     return category

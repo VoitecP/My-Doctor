@@ -21,8 +21,8 @@ class UserAuthView(GenericViewSet):
     permission_classes = [AllowAny]
     serializer_class=user_serializers.LoginUserSerializer
 
-    @action(detail=False, methods=["post"], url_path='login')   # , serializer_class=LoginUserSerializer) 
-    def user_login(self, request):                              # , *args, **kwargs):
+    @action(detail=False, methods=["post"], url_path='login')  
+    def user_login(self, request):                             
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
@@ -71,28 +71,12 @@ class UserUpdateView(UserObjectMixin, RetrieveUpdateAPIView):
     View for update User model
     """
     permission_classes=[IsAuthenticated, IsAdminUser]
-   
         
     def get_serializer_class(self):
         return user_serializers.UserUpdateSerializer
 
-    def path(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-        
-# class UserUpdateAPIView(generics.RetrieveUpdateAPIView):
-#     permission_classes = (permissions.IsAdminUser,)
-#     serializer_class = UserUpdateSerialier
-#     lookup_field = 'username'
-
-#     def get_object(self):
-#         username = self.kwargs["username"]
-#         return get_object_or_404(User, username=username)
-
-#     def put(self, request, *args, **kwargs):
-#         return self.update(request, *args, **kwargs)
-    
-
+    # def path(self, request, *args, **kwargs):
+    #     return self.partial_update(request, *args, **kwargs)
 
 
 class UserTypeCreateView(UserQuerysetMixin, UserSerializerMixin, ListCreateAPIView):
@@ -161,40 +145,31 @@ class UserListView(ReadOnlyModelViewSet):
     permission_classes=[IsAuthenticated]
 
     def get_queryset(self):
-
         usertype=self.request.user.usertype
         is_superuser=self.request.user.is_superuser
 
         if is_superuser == True:
             return User.objects.all()
-
         else:
             if usertype == 'p':
                 return User.objects.filter(id=self.request.user.id)
-            
             if usertype == 'd':
                 return User.objects.filter(id=self.request.user.id)
-
             if usertype == 'c':
                 return User.objects.all()
             
             
-       
     def get_serializer_class(self):
-
         usertype=self.request.user.usertype
         is_superuser=self.request.user.is_superuser
 
         if is_superuser == True:
             return user_serializers.UserPrivateSerializer
-        
         else:
             if usertype == 'p':
                 return user_serializers.UserPublicSerializer
-    
             if usertype == 'd':
                 return user_serializers.UserPublicSerializer
-
             if usertype == 'c':
                 return user_serializers.UserPublicSerializer
         

@@ -2,11 +2,11 @@ from apps.core.models import *
 from ..serializers import doctor_serializers
 from ..permissions import *
 from rest_framework import status
-from rest_framework.viewsets import ModelViewSet, GenericViewSet,ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 
 from rest_framework.response import Response  
-from rest_framework.decorators import action
+
 
 # from django.contrib.auth import logout as django_logout
 from rest_framework.permissions import IsAuthenticated, AllowAny

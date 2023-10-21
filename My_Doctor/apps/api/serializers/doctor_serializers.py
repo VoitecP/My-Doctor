@@ -41,18 +41,6 @@ class DoctorVisitSerializer(serializers.ModelSerializer):
         fields = ['user','specialization','tracks']
          
 
-####
-
-#  Not need
-
-# class DoctorSerializer(serializers.ModelSerializer):
-#     tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    
-#     class Meta:
-#         model = Doctor
-#         fields = '__all__'
-
-
 class DoctorUpdateSerializer(serializers.ModelSerializer):
     tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     

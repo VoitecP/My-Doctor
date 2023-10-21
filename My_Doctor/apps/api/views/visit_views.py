@@ -1,17 +1,14 @@
 from apps.core.models import Visit, Patient, Doctor, Director
 from ..serializers import visit_serializers
 from ..permissions import *
-from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
-from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
+# from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
+# from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 
-from django.contrib.auth import login, logout, authenticate
-from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response  
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView,UpdateAPIView, CreateAPIView, ListCreateAPIView
-from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet,  ReadOnlyModelViewSet
 from rest_framework.serializers import ValidationError
 
@@ -48,6 +45,7 @@ class VisitListView(ReadOnlyModelViewSet):
         if usertype == 'c':
             return visit_serializers.VisitPublicSerializer
         
+
 class VisitCreateView(ListCreateAPIView):
     """
     View for create Visit model
@@ -88,11 +86,10 @@ class VisitDeleteView(RetrieveDestroyAPIView):
     permission_classes=[IsAuthenticated, IsAdminUser]
 
     def get_queryset(self):
-        return Visit.objects.all()
+        return Visit.objects.none()
    
     def get_serializer_class(self):
         return visit_serializers.VisitDeleteSerializer
-
 
     def destroy(self, request, *args, **kwargs):
         try:
