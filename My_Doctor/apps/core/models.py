@@ -5,6 +5,8 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.models import AbstractUser
 from rest_framework.serializers import ValidationError
 
+from apps.core import models_manager
+
 class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient'), ('c','Director'),], max_length=1, default='')  # ,('c','Director'),  By Admin
@@ -110,6 +112,11 @@ class Visit(models.Model):
     description=models.TextField()
     price=models.CharField(max_length=10)
     
+    objects=models.Manager()  
+    year_objects=models_manager.VisitYearSummary()
+    month_objects=models_manager.VisitMonthSummary()
+
+
     class Meta:
         ordering=('date',)
 

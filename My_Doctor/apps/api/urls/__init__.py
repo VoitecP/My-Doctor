@@ -6,7 +6,8 @@ from ..urls import (
                     doctor_urls,
                     director_urls,
                     category_urls,
-                    visit_urls
+                    visit_urls,
+                    summary_urls
 )
 
 # app_name='apps.api'
@@ -20,6 +21,7 @@ urlpatterns = [
     path('director/', include(director_urls)),
     path('category/', include(category_urls)),
     path('visit/', include(visit_urls)),
+    path('summary/', include(summary_urls)),
 ]
 
 

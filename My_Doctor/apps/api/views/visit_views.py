@@ -19,21 +19,24 @@ class VisitListView(ReadOnlyModelViewSet):
     Visit model List View (filtered list view)
     """
     # permission_classes=[IsAuthenticated, IsAdminUser, IsDirector]
-    
-    def get_queryset(self):
-        usertype=self.request.user.usertype
-        is_superuser=self.request.user.is_superuser
-        id=self.request.user.id
 
-        if is_superuser == True:
-            return Visit.objects.all()     
-        else:
-            if usertype == 'p':
-                return Visit.objects.filter(patient__pk=id)   
-            if usertype == 'd':
-                return Visit.objects.filter(doctor__pk=id)
-            if usertype == 'c':
-                return Visit.objects.all()
+    queryset=Visit.objects.all()
+    
+    
+    # def get_queryset(self):
+    #     usertype=self.request.user.usertype
+    #     is_superuser=self.request.user.is_superuser
+    #     id=self.request.user.id
+
+    #     if is_superuser == True:
+    #         return Visit.objects.all()     
+    #     else:
+    #         if usertype == 'p':
+    #             return Visit.objects.filter(patient__pk=id)   
+    #         if usertype == 'd':
+    #             return Visit.objects.filter(doctor__pk=id)
+    #         if usertype == 'c':
+    #             return Visit.objects.all()
 
     def get_serializer_class(self):
         usertype=self.request.user.usertype
