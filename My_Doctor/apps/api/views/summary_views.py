@@ -9,10 +9,17 @@ class SummaryYearVisitListView(ReadOnlyModelViewSet):
     #permission_classes = [IsAuthenticated] #  , IsDoctorCreated]       No other perm_class
     # http_method_names = ['get']
 
+
 class SummaryMonthVisitListView(ReadOnlyModelViewSet):
     queryset=Visit.month_objects.all()
     serializer_class=summary_serializers.VisitMonthSummarySerializer
 
+
 class SummaryCategoryVisitListView(ReadOnlyModelViewSet):
     queryset=Visit.category_objects.all()
     serializer_class=summary_serializers.VisitCategorySummarySerializer
+
+
+class SummaryDoctorVisitListView(ReadOnlyModelViewSet):
+    queryset=Visit.doctor_objects.all()
+    serializer_class=summary_serializers.VisitDoctorSummarySerializer

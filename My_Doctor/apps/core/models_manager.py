@@ -24,7 +24,10 @@ class VisitMonthSummary(models.Manager):
                     .annotate(total=models.Count('price'))
                     .annotate(sum=models.Sum('price'))
                     .order_by('date__year','date__month')
-                    .values('date__month','date__year','total','sum')
+                    .values('date__month',
+                            'date__year',
+                            'total',
+                            'sum')
                     )
         return queryset
     
@@ -36,7 +39,10 @@ class VisitMonthSummary(models.Manager):
                     .annotate(total=models.Count('price'))
                     .annotate(sum=models.Sum('price'))
                     .order_by('date__year','date__month')
-                    .values('date__month','date__year','total','sum')
+                    .values('date__month',
+                            'date__year',
+                            'total',
+                            'sum')
                     )
         return queryset	
 
@@ -48,15 +54,28 @@ class VisitCategorySummary(models.Manager):
                 .values('category_name')
                 .annotate(total=models.Count('price'))
                 .annotate(sum=models.Sum('price'))
+                .order_by('-category')
                 .values('category_name','total','sum')
                 )
         return queryset
+    
 
-    # try:
-	# 	queryset=(OrderedDict(sorted(
-	# 		queryset
-	# 		.annotate(category_name=Coalesce('category__name', Value('-No Category-')))
-	# 		.order_by('category')
-	# 		.values('category_name')
-	# 		.annotate(sum=Sum('price'))
-	# 		.values_list('category_name','sum')))) 	
+
+class VisitDoctorSummary(models.Manager):
+    def get_queryset(self):
+        queryset=(super().get_queryset()
+                .values('doctor_id',
+                        'doctor__user__first_name',
+                        'doctor__user__last_name')
+                .annotate(total=models.Count('price'))
+                .annotate(sum=models.Sum('price'))
+                .order_by('-sum')
+                .values('doctor_id',
+                        'doctor__user__first_name',
+                        'doctor__user__last_name',
+                        'total',
+                        'sum')
+                )
+        return queryset
+
+    

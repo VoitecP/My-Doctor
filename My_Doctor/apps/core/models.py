@@ -53,7 +53,8 @@ class Doctor(Person):
 
 
     def save(self, *args, **kwargs):
-        self.__class__.objects.exclude(id=self.id).delete()
+        # sometring wrong
+        # self.__class__.objects.exclude(user_id=self.user.id).delete()
         super(Doctor, self).save(*args, **kwargs)
     
     
@@ -116,6 +117,7 @@ class Visit(models.Model):
     year_objects=models_manager.VisitYearSummary()
     month_objects=models_manager.VisitMonthSummary()
     category_objects=models_manager.VisitCategorySummary()
+    doctor_objects=models_manager.VisitDoctorSummary()
 
 
     class Meta:

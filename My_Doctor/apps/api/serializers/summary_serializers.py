@@ -35,7 +35,7 @@ class VisitMonthSummarySerializer(serializers.ModelSerializer):
 
 class VisitCategorySummarySerializer(serializers.ModelSerializer):
     """
-    Serializer For Visit Month/Year Summary View
+    Serializer For Visit Category Summary View
     """
     category=serializers.CharField(source='category_name')
     total=serializers.IntegerField()
@@ -45,6 +45,27 @@ class VisitCategorySummarySerializer(serializers.ModelSerializer):
         model = Visit
         fields =['category','total','sum']
 
+
+class VisitDoctorSummarySerializer(serializers.ModelSerializer):
+    """
+    Serializer For Visit Doctor Summary View
+    """
+    id=serializers.UUIDField(source='doctor_id')
+    name=serializers.CharField(source='doctor__user__first_name')
+    surname=serializers.CharField(source='doctor__user__last_name')
+    total=serializers.IntegerField()
+    sum=serializers.IntegerField()
+
+    class Meta:
+        model = Visit
+        fields =['id','name','surname','total','sum']
+        # fields =['id','sum']
+
+
+
+# .values('doctor_id','doctor__user__first_name','doctor__user__last_name', 'sum')
+                
+   #  .values('id','doctor__name','doctor__surname', 'sum')
 
 
 
