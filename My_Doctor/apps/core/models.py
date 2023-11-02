@@ -115,6 +115,7 @@ class Visit(models.Model):
     objects=models.Manager()  
     year_objects=models_manager.VisitYearSummary()
     month_objects=models_manager.VisitMonthSummary()
+    category_objects=models_manager.VisitCategorySummary()
 
 
     class Meta:

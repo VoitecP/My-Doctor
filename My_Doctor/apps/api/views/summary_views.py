@@ -12,3 +12,7 @@ class SummaryYearVisitListView(ReadOnlyModelViewSet):
 class SummaryMonthVisitListView(ReadOnlyModelViewSet):
     queryset=Visit.month_objects.all()
     serializer_class=summary_serializers.VisitMonthSummarySerializer
+
+class SummaryCategoryVisitListView(ReadOnlyModelViewSet):
+    queryset=Visit.category_objects.all()
+    serializer_class=summary_serializers.VisitCategorySummarySerializer

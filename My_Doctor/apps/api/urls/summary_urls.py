@@ -7,7 +7,7 @@ from django.urls import path, include
 router=DefaultRouter()
 router.register(r'year', summary_views.SummaryYearVisitListView, basename='viewsets-year-summary')
 router.register(r'month', summary_views.SummaryMonthVisitListView, basename='viewsets-month-summary')
-
+router.register(r'category', summary_views.SummaryCategoryVisitListView, basename='viewsets-category-summary')
 
 urlpatterns =[
     path('', include(router.urls)),   
