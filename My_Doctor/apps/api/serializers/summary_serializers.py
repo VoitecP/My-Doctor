@@ -1,5 +1,6 @@
 from apps.core.models import Visit
 from rest_framework import serializers
+from django.db.models import Sum, Aggregate
 
 from ..serializers import visit_serializers
 from .doctor_serializers import DoctorPublicSerializer, DoctorPrivateSerializer, DoctorVisitSerializer
@@ -60,13 +61,4 @@ class VisitDoctorSummarySerializer(serializers.ModelSerializer):
         model = Visit
         fields =['id','name','surname','total','sum']
         # fields =['id','sum']
-
-
-
-# .values('doctor_id','doctor__user__first_name','doctor__user__last_name', 'sum')
-                
-   #  .values('id','doctor__name','doctor__surname', 'sum')
-
-
-
 

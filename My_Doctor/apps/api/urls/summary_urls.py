@@ -12,6 +12,10 @@ router.register(r'doctor', summary_views.SummaryDoctorVisitListView, basename='v
 
 urlpatterns =[
     path('', include(router.urls)),   
-         
-    #path('register/',user_views.UserRegisterView.as_view(), name='user-register'),
+    path('total/',summary_views.SummaryVisitView.as_view(), name='visit-total'),
 ]
+
+
+
+
+# TotalSumVisitListView

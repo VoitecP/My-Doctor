@@ -18,8 +18,19 @@ import os, sys
 PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, 'apps'))
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Add mser-files
+# MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'user-files')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'user-files')
+
+
+
+# URL used to access files
+MEDIA_URL = 'user-files/'
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,7 +42,9 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG')
 
-ALLOWED_HOSTS = [config('ALLOWED_HOST_1'),config('ALLOWED_HOST_2'),config('ALLOWED_HOST_3')]
+ALLOWED_HOSTS = [config('ALLOWED_HOST_1'),
+                 config('ALLOWED_HOST_2'),
+                 config('ALLOWED_HOST_3')]
 
 
 # Application definition

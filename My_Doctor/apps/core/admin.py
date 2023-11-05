@@ -61,6 +61,9 @@ class CategoryAdmin(admin.ModelAdmin):
 class VisitAdmin(admin.ModelAdmin):
     pass 
 
+class PatientPhotoAdmin(admin.ModelAdmin):
+    pass
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Patient, PatientAdmin)
@@ -68,6 +71,7 @@ admin.site.register(Doctor, DoctorAdmin)
 admin.site.register(Director, DirectorAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Visit, VisitAdmin)
+admin.site.register(PatientPhotoFile, PatientPhotoAdmin)
 
 ####
  

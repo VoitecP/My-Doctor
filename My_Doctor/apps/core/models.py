@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 from rest_framework.serializers import ValidationError
 
 from apps.core import models_manager
+from apps.core import storage
 
 class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
@@ -19,6 +20,9 @@ class User(AbstractUser):
         managed = True
 
         
+
+
+
 class Person(models.Model):  #  Abstract Model 
     user=models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     slug=models.SlugField(null=True, editable=False)
@@ -26,6 +30,7 @@ class Person(models.Model):  #  Abstract Model
 
     class Meta:
         abstract=True
+
 
     @property
     def full_name(self):
@@ -75,17 +80,27 @@ class Director(Person):
             raise ValidationError('Only one Director instance is allowed')
         return super(Director, self).save(*args, **kwargs)
 
-    # def save(self, *args, **kwargs):
-    #     self.pk = 1
-    #     super(Director, self).save(*args, **kwargs)
+    
+##
 
-    # def delete(self, *args, **kwargs):
-    #     pass
+class PhotoFile(models.Model):
+    user=models.ForeignKey(User, default=None, on_delete=models.CASCADE)
+    image=models.ImageField(upload_to=storage.user_image_path, 
+                            validators=[storage.ext_validator], blank=False)
+    thumb=models.ImageField(upload_to=storage.user_thumb_path, blank=False, editable=False)
+    class Meta:
+        abstract=True
 
-    # @classmethod
-    # def load(cls):
-    #     obj, created = cls.objects.get_or_create(pk=1)
-    #     return obj
+
+    def save(self, *args, **kwargs):
+        storage.make_thumb(self)
+        return super(PhotoFile, self).save(*args, **kwargs)
+    
+
+
+class PatientPhotoFile(PhotoFile):
+
+    pass
 
 
 
@@ -118,6 +133,7 @@ class Visit(models.Model):
     month_objects=models_manager.VisitMonthSummary()
     category_objects=models_manager.VisitCategorySummary()
     doctor_objects=models_manager.VisitDoctorSummary()
+    
 
 
     class Meta:

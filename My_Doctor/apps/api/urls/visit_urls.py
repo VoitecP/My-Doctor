@@ -9,7 +9,7 @@ router.register(r'visits', visit_views.VisitListView, basename='viewsets-visits'
 
 urlpatterns =[
     path('',include(router.urls)),
-    path('create/',visit_views.VisitCreateView.as_view(),name='create-visit'),
+    path('visits/create/',visit_views.VisitCreateView.as_view(),name='create-visit'),
 
     path('visits/<uuid:pk>/update/',visit_views.VisitUpdateView.as_view(),name='visit-update'),
     path('visits/<uuid:pk>/delete/',visit_views.VisitDeleteView.as_view(),name='visit-delete'),

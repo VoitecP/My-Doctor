@@ -17,6 +17,7 @@ drf-spectacular = "*"
 dj-rest-auth = "*"
 django-allauth = "*"
 pycodestyle = "*"
+pillow = "^10.1.0"
 
 
 [tool.poetry.group.dev.dependencies]

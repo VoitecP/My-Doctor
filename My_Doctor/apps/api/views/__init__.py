@@ -5,3 +5,4 @@ from .director_views import *
 from .visit_views import *
 from .category_views import *
 from .view_mixins import *
+from .file_views import *

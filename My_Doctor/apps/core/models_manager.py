@@ -78,4 +78,3 @@ class VisitDoctorSummary(models.Manager):
                 )
         return queryset
 
-    
