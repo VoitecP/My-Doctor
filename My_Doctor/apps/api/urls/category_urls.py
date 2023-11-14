@@ -5,7 +5,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 router=DefaultRouter()
-router.register(r'category', category_views.CategoryListView, basename='category-list')
+router.register(r'category', category_views.CategoryViewset, basename='category-list')
 
 urlpatterns =[
     path('',include(router.urls)),

@@ -7,11 +7,13 @@ class CategoryPublicSerializer(serializers.ModelSerializer):
     """
     Public category serializer for all users
     """
-    tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['name','description']
+        extra_kwargs = {'name': {'read_only': True},
+                        'description': {'read_only': True}
+                        }
 
 
 class CategoryCreateSerializer(serializers.ModelSerializer):
@@ -20,7 +22,7 @@ class CategoryCreateSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ['name','description']
         
 
     def perform_create(self, validated_data):

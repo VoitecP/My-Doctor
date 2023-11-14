@@ -2,7 +2,7 @@ from apps.core.models import *
 from ..serializers import *
 from ..permissions import *
 from rest_framework import status
-from rest_framework.viewsets import  ReadOnlyModelViewSet
+from rest_framework.viewsets import  ModelViewSet
 
 
 from rest_framework.response import Response  
@@ -16,7 +16,7 @@ from ..permissions import IsDoctorCreated, IsPatientCreated
 
 
 
-class PatientListView(ReadOnlyModelViewSet):
+class PatientViewset(ModelViewSet):
     # queryset=Patient.objects.all()
     serializer_class=PatientPublicSerializer
     permission_classes = [IsAuthenticated] #  , IsDoctorCreated]       No other perm_class

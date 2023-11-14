@@ -31,6 +31,7 @@ class SummaryDoctorVisitListView(ReadOnlyModelViewSet):
 
 
 class SummaryVisitView(APIView):
+#class SummaryVisitView(GenericViewSet):
     """
     Return a summary view
     """

@@ -4,9 +4,9 @@ from django.urls import path, include
 
 
 router=DefaultRouter()
-router.register(r'files', file_views.PatientPhotoListView, basename='viewsets-files')
+router.register(r'files', file_views.PatientImageViewset, basename='viewsets-files')
 
 urlpatterns =[
     path('',include(router.urls)),
-    path('upload/',file_views.PatientPhotoCreateView.as_view(), name='patient-photo-create'), 
+    path('upload/',file_views.PatientImageCreateView.as_view(), name='patient-photo-create'), 
 ]

@@ -2,7 +2,7 @@ from apps.core.models import  Director
 from ..serializers import director_serializers
 from ..permissions import *
 from rest_framework import status
-from rest_framework.viewsets import   ReadOnlyModelViewSet
+from rest_framework.viewsets import   ModelViewSet
 from rest_framework.serializers import ValidationError
 
 
@@ -16,6 +16,12 @@ from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
 
 from django.shortcuts import get_object_or_404
 from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
+
+class DirectorViewset(ModelViewSet):
+    queryset=Director.objects.all()
+    serializer_class=director_serializers.DirectorPublicSerializer
+    permission_classes = [IsAuthenticated]
+    # http_method_names = ['get','post','retrieve','put','patch']
 
 
 class DirectorCreateView(ListCreateAPIView):
@@ -35,11 +41,7 @@ class DirectorCreateView(ListCreateAPIView):
         
 
 
-class DirectorListView(ReadOnlyModelViewSet):
-    queryset=Director.objects.all()
-    serializer_class=director_serializers.DirectorPublicSerializer
-    permission_classes = [IsAuthenticated]
-    # http_method_names = ['get','post','retrieve','put','patch']
+
     
 class DirectorUpdateView(RetrieveUpdateAPIView):
     queryset=Director.objects.all()

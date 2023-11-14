@@ -8,7 +8,8 @@ from ..urls import (
                     category_urls,
                     visit_urls,
                     summary_urls,
-                    file_urls
+                    file_urls,
+                    viewsets_urls
 )
 
 # app_name='apps.api'
@@ -16,6 +17,7 @@ app_name='api'
 
 
 urlpatterns = [
+    #
     path('user/', include(user_urls)),
     path('patient/', include(patient_urls)),
     path('doctor/', include(doctor_urls)),

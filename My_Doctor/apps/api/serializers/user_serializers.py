@@ -2,8 +2,9 @@ from apps.core.models import User, Patient
 
 from rest_framework import serializers
 
-from dj_rest_auth.serializers import UserDetailsSerializer
-from dj_rest_auth.registration.serializers import RegisterSerializer
+# Removed
+# from dj_rest_auth.serializers import UserDetailsSerializer
+# from dj_rest_auth.registration.serializers import RegisterSerializer
 
 
 class UserPublicSerializer(serializers.ModelSerializer):
@@ -71,44 +72,96 @@ class DeleteUserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CustomUserRegisterSerializer(RegisterSerializer, serializers.ModelSerializer):
-    """
-    Serializer for Register User, mixin with dj_rest_auth app
-    """
+# for DRF-auth
+# # class CustomUserRegisterSerializer(RegisterSerializer, serializers.ModelSerializer):
+# class CustomUserRegisterSerializer(serializers.ModelSerializer):
+#     """
+#     Serializer for Register User, mixin with dj_rest_auth app
+#     """
 
-    class Meta:
-        model = User
-        fields = ['username','email','usertype','password1', 'password2']
+#     class Meta:
+#         model = User
+#         fields = ['username','email','usertype','password']
 
-    def custom_signup(self, request, user):
-        user.username = self.validated_data['username']
-        user.email = self.validated_data['email']
-        user.usertype = self.validated_data['usertype']
-        user.password1 = self.validated_data['password1']
-        user.password2 = self.validated_data['password2']
-        user.save()
-        return user
+#     def custom_signup(self, request, user):
+#         user.username = self.validated_data['username']
+#         user.email = self.validated_data['email']
+#         user.usertype = self.validated_data['usertype']
+#         user.password = self.validated_data['password']
+#         user.password2 = self.validated_data['password2']
+#         user.save()
+#         return user
+    
+    
 
 
-## Someting wrong, not used 
 class UserRegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for register user
     """
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'usertype' ,'email', 'password']
+        fields = ['id', 'username', 'first_name', 
+                  'last_name', 'usertype' ,'email', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
-    def perform_create(self, validated_data):
-        user = User.objects.create(
-            validated_data['username'], 
-            validated_data['email'], 
-            validated_data['password'])
+    def create(self, validated_data):
+        user = User()
+        user.username = validated_data['username']
+        user.email=  validated_data['email']
         user.first_name = validated_data['first_name']
         user.last_name = validated_data['last_name']
         user.usertype = validated_data['usertype']
-        # user.is_valid() # checks
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+    
+    # def create(self, validated_data):
+    #     user = User.objects.create(
+    #         username=validated_data['username']
+    #     )
+    #     user.set_password(validated_data['password'])
+    #     user.save()
+    #     return user
+
+
+    # def create(self, validated_data):
+    #     user = User(
+    #         username=validated_data['username']
+    #     )
+    #     user.set_password(validated_data['password'])
+    #     user.save()
+    #     return user
+
+# lass CreateUser(APIView):
+#     permission_classes = [AllowAny]
+
+#     def post(self, request, format='json'):
+#         print(request.data)
+#         data = request.data
+#         reg_serializer = RegisterUserSerializer(data=data)
+#         if reg_serializer.is_valid():
+#             password = reg_serializer.validated_data.get('password')
+#             reg_serializer.validated_data['password']=make_password(password)
+#             new_user = reg_serializer.save()
+#             if new_user:
+#                 return Response(status=status.HTTP_201_CREATED)
+#         return Response(reg_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+
+##
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'password')
+
+    def create(self, validated_data):
+        user = User(
+            username=validated_data['username']
+        )
+        user.set_password(validated_data['password'])
         user.save()
         return user
 

@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 router=DefaultRouter()
-router.register(r'director', director_views.DirectorListView, basename='director-list')
+router.register(r'director', director_views.DirectorViewset, basename='director-list')
 
 urlpatterns =[
     path('',include(router.urls)),

@@ -14,39 +14,44 @@ from rest_framework.serializers import ValidationError
 
 
 
-class VisitListView(ReadOnlyModelViewSet):
+class VisitListView(ModelViewSet):
     """
     Visit model List View (filtered list view)
     """
     # permission_classes=[IsAuthenticated, IsAdminUser, IsDirector]
 
-    queryset=Visit.objects.all()
+    # queryset=Visit.objects.all()
     
     
-    # def get_queryset(self):
-    #     usertype=self.request.user.usertype
-    #     is_superuser=self.request.user.is_superuser
-    #     id=self.request.user.id
+    def get_queryset(self):
+        usertype=self.request.user.usertype
+        is_superuser=self.request.user.is_superuser
+        id=self.request.user.id
 
-    #     if is_superuser == True:
-    #         return Visit.objects.all()     
-    #     else:
-    #         if usertype == 'p':
-    #             return Visit.objects.filter(patient__pk=id)   
-    #         if usertype == 'd':
-    #             return Visit.objects.filter(doctor__pk=id)
-    #         if usertype == 'c':
-    #             return Visit.objects.all()
+        if is_superuser == True:
+            return Visit.objects.all()     
+        else:
+            if usertype == 'p':
+                return Visit.objects.filter(patient__pk=id)   
+            if usertype == 'd':
+                return Visit.objects.filter(doctor__pk=id)
+            if usertype == 'c':
+                return Visit.objects.all()
 
     def get_serializer_class(self):
         usertype=self.request.user.usertype
+        is_superuser=self.request.user.is_superuser
+        id=self.request.user.id
 
-        if usertype == 'p':
-            return visit_serializers.VisitPublicSerializer   
-        if usertype == 'd':
-            return visit_serializers.VisitPublicSerializer
-        if usertype == 'c':
-            return visit_serializers.VisitPublicSerializer
+        if is_superuser == True:
+            return visit_serializers.VisitViewsetSerializer 
+        else:  
+            if usertype == 'p':
+                return visit_serializers.VisitViewsetSerializer   
+            if usertype == 'd':
+                return visit_serializers.VisitPublicSerializer
+            if usertype == 'c':
+                return visit_serializers.VisitPublicSerializer
         
 
 class VisitCreateView(ListCreateAPIView):
@@ -56,7 +61,9 @@ class VisitCreateView(ListCreateAPIView):
     permission_classes = [IsAuthenticated] #, IsAdminUser]   it can make errors
 
     def get_queryset(self):
-        return Visit.objects.none() 
+        return Visit.objects.all()  
+        # return Visit.objects.all() 
+
 
     def get_serializer_class(self):
         return visit_serializers.VisitCreateSerializer    

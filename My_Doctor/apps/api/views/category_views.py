@@ -3,17 +3,17 @@ from ..serializers import category_serializers
 from ..permissions import IsDirector
 from .view_mixins import CategoryQuerysetMixin, CategorySerializerMixin
 
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.response import Response  
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, ListCreateAPIView, DestroyAPIView
 from rest_framework.serializers import ValidationError
 
 
-class CategoryListView(CategoryQuerysetMixin, CategorySerializerMixin, ReadOnlyModelViewSet):
-    permission_classes = [IsAuthenticated, IsDirector]
-    # http_method_names = ['get','post','retrieve','put','patch']
+class CategoryViewset(CategoryQuerysetMixin, CategorySerializerMixin, ModelViewSet):
+    permission_classes = [IsAuthenticated, IsDirector, IsAdminUser]
     
+    pass
 
 class CategoryCreateView(ListCreateAPIView):
     """

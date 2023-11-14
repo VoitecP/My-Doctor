@@ -3,22 +3,20 @@ from rest_framework.routers import DefaultRouter
 from django.urls import path, include 
 
 router=DefaultRouter()
-router.register(r'visits', visit_views.VisitListView, basename='viewsets-visits')
+router.register(r'visit', visit_views.VisitListView, basename='viewsets-visits')
 
 
 
 urlpatterns =[
     path('',include(router.urls)),
-    path('visits/create/',visit_views.VisitCreateView.as_view(),name='create-visit'),
+    # path('create/',visit_views.VisitCreateView.as_view(),name='create-visit'),
+    # path('create/',visit_views.VisitCreateView.as_view(),name='create-visit'),
 
-    path('visits/<uuid:pk>/update/',visit_views.VisitUpdateView.as_view(),name='visit-update'),
-    path('visits/<uuid:pk>/delete/',visit_views.VisitDeleteView.as_view(),name='visit-delete'),
-    # path('doctors/', DoctorsApi.as_view(),name='views-doctors'),
-    # path('doctors/<str:pk>/', DoctorApi.as_view(),name='views-doctor'),
-    # path('categories/', CategoriesApi.as_view(),name='views-categories'),
-    # path('categories/<str:pk>/', CategoryApi.as_view(),name='views-category'),
-    # path('visits/', VisitsApi.as_view(),name='views-visits'),
-    # path('visits/<str:pk>/', VisitApi.as_view(),name='views-visit'),  
+    # path('visits/<uuid:pk>/update/',visit_views.VisitUpdateView.as_view(),name='visit-update'),
+    # path('visits/<uuid:pk>/delete/',visit_views.VisitDeleteView.as_view(),name='visit-delete'),
+    
+    
+    
 ]
 
 

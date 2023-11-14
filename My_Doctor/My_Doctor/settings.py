@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.join(PROJECT_ROOT, 'apps'))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Add mser-files
+# Add user-files
 # MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'user-files')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'user-files')
 
@@ -61,11 +61,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_spectacular',
-    'dj_rest_auth',  
-    'dj_rest_auth.registration',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
+
+    ## Removed
+    # 'dj_rest_auth',  
+    # 'dj_rest_auth.registration',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
+
     ##  Local Apps
     'apps.core',
     'apps.api',
@@ -79,6 +82,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'My_Doctor.urls'
@@ -170,15 +175,22 @@ REST_FRAMEWORK = {
     # "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny",],  
 
     "DEFAULT_PERMISSION_CLASSES": [
-        # "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.AllowAny",
         "rest_framework.permissions.IsAuthenticated",
         ], 
 
+    
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
+        ## Correct order for auth
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+         ## Disabled
+        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ],
+
+
+
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 4,
@@ -203,11 +215,43 @@ SPECTACULAR_SETTINGS = {
 }
 
 # If error in when registering new user in endpoint (api/dj-rest-auth/register/') 
-# Use this setting
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# # Use this setting
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 REST_AUTH = {
 
     
 }
+
+# Disabled
+# REST_USE_JWT = True
+
+# JWT_AUTH_COOKIE = 'my-app-auth'
+
+
+# AUTHENTICATION_BACKENDS = [
+#     'allauth.account.auth_backends.AuthenticationBackend',
+#     'django.contrib.auth.backends.ModelBackend',
+# ]
+
+
+# ACCOUNT_AUTHENTICATION_METHOD = 'username'
+# ACCOUNT_EMAIL_REQUIRED = False
+# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+# LOGIN_URL = 'http://localhost:8000/users/login'
+
+
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_HOST_USER = 'email@gmail.com'
+# EMAIL_HOST_PASSWORD = ********
+# EMAIL_PORT = 587
+

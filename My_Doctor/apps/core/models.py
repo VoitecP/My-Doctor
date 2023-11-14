@@ -4,6 +4,7 @@ from django.utils.crypto import get_random_string as rnd
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import AbstractUser
 from rest_framework.serializers import ValidationError
+from django.core.validators import RegexValidator
 
 from apps.core import models_manager
 from apps.core import storage
@@ -31,10 +32,8 @@ class Person(models.Model):  #  Abstract Model
     class Meta:
         abstract=True
 
-
-    @property
-    def full_name(self):
-        return f'{self.user.first_name} {self.user.last_name}'
+    def get_absolute_url(self):
+        return f"/api/test/{self.pk}/"
     
     def save(self, *args, **kwargs):
         self.slug=slugify(self.full_name+ "-" + rnd(7))
@@ -43,6 +42,15 @@ class Person(models.Model):  #  Abstract Model
     def __str__(self):
         return f'{self.slug}'
         
+    @property
+    def url(self):
+        return self.get_absolute_url()
+    
+
+    @property
+    def full_name(self):
+        return f'{self.user.first_name} {self.user.last_name}'
+
     
 class Patient(Person):
     adress=models.CharField(max_length=80)
@@ -51,7 +59,8 @@ class Patient(Person):
     class Meta: 
         permissions=[('is_patient', 'Is Patient'),]
 
-      
+
+
 class Doctor(Person):
     specialization=models.CharField(max_length=12)
     private_field=models.CharField(max_length=50, default='private')    # temporary field
@@ -83,24 +92,36 @@ class Director(Person):
     
 ##
 
-class PhotoFile(models.Model):
-    user=models.ForeignKey(User, default=None, on_delete=models.CASCADE)
+class ImageFile(models.Model):
     image=models.ImageField(upload_to=storage.user_image_path, 
                             validators=[storage.ext_validator], blank=False)
     thumb=models.ImageField(upload_to=storage.user_thumb_path, blank=False, editable=False)
+    title=models.CharField(max_length=50, blank=False, default=None)
+            
     class Meta:
         abstract=True
 
 
     def save(self, *args, **kwargs):
         storage.make_thumb(self)
-        return super(PhotoFile, self).save(*args, **kwargs)
+        return super(ImageFile, self).save(*args, **kwargs)
     
 
 
-class PatientPhotoFile(PhotoFile):
+    
 
-    pass
+    @property
+    def image_url(self):
+        return self.image.url
+    
+    @property
+    def thumb_url(self):
+        return self.thumb.url
+    
+
+
+
+    
 
 
 
@@ -117,6 +138,14 @@ class Category(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    def get_absolute_url(self):
+        return f"/api/category-test/{self.pk}/"
+    
+    @property
+    def url(self):
+        return self.get_absolute_url()
+    
+
 
 class Visit(models.Model):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
@@ -125,6 +154,9 @@ class Visit(models.Model):
     patient=models.ForeignKey(Patient, models.PROTECT, default=None)
     doctor=models.ForeignKey(Doctor, models.PROTECT, default=None)
     category=models.ForeignKey(Category,models.PROTECT,null=True,blank=True, default=None)
+    image=models.ImageField(upload_to=storage.user_image_path, 
+                            validators=[storage.ext_validator], blank=True, default='')
+
     description=models.TextField()
     price=models.CharField(max_length=10)
     
@@ -142,6 +174,23 @@ class Visit(models.Model):
     def __str__(self):
         format= f'{self.date}'
         return f' Visit: {format[0:10]} - {self.title}'
+    
+    def get_absolute_url(self):
+        return f"/api/visit-test/{self.pk}/"
+    
+    @property
+    def url(self):
+        return self.get_absolute_url()
 
 
 
+class VisitImageFile(ImageFile):
+    visit=models.ForeignKey(Visit, related_name='images', on_delete=models.CASCADE)
+    
+     
+    class Meta: 
+        unique_together = ['visit', 'title']
+        ordering = ['title']
+    
+    def __str__(self):
+        return f'{self.visit}, {self.title}'

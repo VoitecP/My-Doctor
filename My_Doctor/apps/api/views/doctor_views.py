@@ -2,7 +2,7 @@ from apps.core.models import *
 from ..serializers import doctor_serializers
 from ..permissions import *
 from rest_framework import status
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet
 
 
 from rest_framework.response import Response  
@@ -15,7 +15,7 @@ from rest_framework.authentication import SessionAuthentication
 
 
 
-class DoctorListView(ReadOnlyModelViewSet):
+class DoctorViewSet(ModelViewSet):
     # queryset=Patient.objects.all()
     serializer_class=doctor_serializers.DoctorPublicSerializer
     permission_classes = [IsAuthenticated]

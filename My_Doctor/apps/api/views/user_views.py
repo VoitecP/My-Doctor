@@ -6,13 +6,53 @@ from ..permissions import *
 
 from django.contrib.auth import login, logout, authenticate
 from rest_framework import status
-from rest_framework.viewsets import GenericViewSet,  ReadOnlyModelViewSet
+from rest_framework.viewsets import GenericViewSet,  ReadOnlyModelViewSet, ModelViewSet
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response  
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView,UpdateAPIView, CreateAPIView, ListCreateAPIView
 
+
+class UserViewSet(ModelViewSet):
+    """
+    User model List View (filtered list view)
+    """
+    permission_classes=[IsAuthenticated]
+
+    def get_queryset(self):
+        usertype=self.request.user.usertype
+        is_superuser=self.request.user.is_superuser
+
+        if is_superuser == True:
+            return User.objects.all()
+        else:
+            if usertype == 'p':
+                return User.objects.filter(id=self.request.user.id)
+            if usertype == 'd':
+                return User.objects.filter(id=self.request.user.id)
+            if usertype == 'c':
+                return User.objects.all()
+            
+            
+    def get_serializer_class(self):
+        usertype=self.request.user.usertype
+        is_superuser=self.request.user.is_superuser
+
+        if is_superuser == True:
+            return user_serializers.UserPrivateSerializer
+        else:
+            if usertype == 'p':
+                return user_serializers.UserPublicSerializer
+            if usertype == 'd':
+                return user_serializers.UserPublicSerializer
+            if usertype == 'c':
+                return user_serializers.UserPublicSerializer
+        
+        
+
+
+      
 
 class UserAuthView(GenericViewSet):
     """
@@ -55,15 +95,16 @@ class UserRegisterView(CreateAPIView):
         return User.objects.none()
        
     def get_serializer_class(self):
-        return user_serializers.CustomUserRegisterSerializer
+        return user_serializers.UserRegisterSerializer
         
     def perform_create(self, serializer):
         try:
-            serializer.save(self.request)
+            serializer.save()
             return Response({"detail": "Success"})
         except:
             raise ValidationError({"detail": "Operation not allowed"})
 
+       
 
 
 class UserUpdateView(UserObjectMixin, RetrieveUpdateAPIView):
@@ -137,43 +178,3 @@ class UserDeleteView(UserSerializerMixin, UserObjectMixin, RetrieveDestroyAPIVie
 
 # for director only  all users
 # for p , d  only  self.id
-
-class UserListView(ReadOnlyModelViewSet):
-    """
-    User model List View (filtered list view)
-    """
-    permission_classes=[IsAuthenticated]
-
-    def get_queryset(self):
-        usertype=self.request.user.usertype
-        is_superuser=self.request.user.is_superuser
-
-        if is_superuser == True:
-            return User.objects.all()
-        else:
-            if usertype == 'p':
-                return User.objects.filter(id=self.request.user.id)
-            if usertype == 'd':
-                return User.objects.filter(id=self.request.user.id)
-            if usertype == 'c':
-                return User.objects.all()
-            
-            
-    def get_serializer_class(self):
-        usertype=self.request.user.usertype
-        is_superuser=self.request.user.is_superuser
-
-        if is_superuser == True:
-            return user_serializers.UserPrivateSerializer
-        else:
-            if usertype == 'p':
-                return user_serializers.UserPublicSerializer
-            if usertype == 'd':
-                return user_serializers.UserPublicSerializer
-            if usertype == 'c':
-                return user_serializers.UserPublicSerializer
-        
-        
-
-
-      
