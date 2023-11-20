@@ -2,13 +2,14 @@ from ..views import visit_views
 from rest_framework.routers import DefaultRouter 
 from django.urls import path, include 
 
-router=DefaultRouter()
-router.register(r'visit', visit_views.VisitListView, basename='viewsets-visits')
+# router=DefaultRouter()
+# router.register(r'visit', visit_views.VisitListView, basename='viewsets-visits')
 
 
 
 urlpatterns =[
-    path('',include(router.urls)),
+    # path('',include(router.urls)),
+    
     # path('create/',visit_views.VisitCreateView.as_view(),name='create-visit'),
     # path('create/',visit_views.VisitCreateView.as_view(),name='create-visit'),
 

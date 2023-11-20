@@ -31,7 +31,6 @@ class SummaryDoctorVisitListView(ReadOnlyModelViewSet):
 
 
 class SummaryVisitView(APIView):
-#class SummaryVisitView(GenericViewSet):
     """
     Return a summary view
     """
@@ -41,9 +40,10 @@ class SummaryVisitView(APIView):
     total=Visit.objects.count()
     
     def get(self, request, format=None):
-        return Response({'Price Summary':self.summary['sum'],
-                         'Total Visits':self.total
-                         })
+
+        return Response({'Total Visits':self.total,
+                        'Total Sum':self.summary['sum']
+                          })
 
 
 

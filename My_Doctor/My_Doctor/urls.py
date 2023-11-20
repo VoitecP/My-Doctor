@@ -38,7 +38,7 @@ urlpatterns = [
     # DRF  Authentication
     path('admin/', admin.site.urls),
     path('api/rest-auth/', include('rest_framework.urls')),
-    path('api/rest-auth/register/',RedirectView.as_view(pattern_name='api:user-register'), name='user-register-base'),
+    path('api/rest-auth/register/',RedirectView.as_view(pattern_name='apps.api:user-register'), name='user-register-base'),
     
     # Dj Rest Auth Views - removed
     # path('register/', RegisterView.as_view()),

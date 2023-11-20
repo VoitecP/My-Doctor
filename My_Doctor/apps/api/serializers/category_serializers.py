@@ -11,9 +11,9 @@ class CategoryPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['name','description']
-        extra_kwargs = {'name': {'read_only': True},
-                        'description': {'read_only': True}
-                        }
+        # extra_kwargs = {'name': {'read_only': True},
+        #                 'description': {'read_only': True}
+        #                 }
 
 
 class CategoryCreateSerializer(serializers.ModelSerializer):

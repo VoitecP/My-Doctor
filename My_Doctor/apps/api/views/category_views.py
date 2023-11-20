@@ -1,19 +1,26 @@
 from apps.core.models import Category
 from ..serializers import category_serializers
-from ..permissions import IsDirector
+from ..permissions import IsDirector, IsDirectorOrReadOnly
 from .view_mixins import CategoryQuerysetMixin, CategorySerializerMixin
+from rest_framework import status
 
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.response import Response  
+from rest_framework.response import Response 
+from rest_framework.exceptions import MethodNotAllowed 
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, ListCreateAPIView, DestroyAPIView
 from rest_framework.serializers import ValidationError
 
 
 class CategoryViewset(CategoryQuerysetMixin, CategorySerializerMixin, ModelViewSet):
-    permission_classes = [IsAuthenticated, IsDirector, IsAdminUser]
-    
+   #permission_classes = [IsAuthenticated, IsDirector, IsAdminUser]
+    permission_classes=[IsDirectorOrReadOnly]
+
     pass
+
+    
+        
+
 
 class CategoryCreateView(ListCreateAPIView):
     """

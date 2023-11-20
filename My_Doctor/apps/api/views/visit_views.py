@@ -14,16 +14,19 @@ from rest_framework.serializers import ValidationError
 
 
 
-class VisitListView(ModelViewSet):
+class VisitViewset(ModelViewSet):
     """
     Visit model List View (filtered list view)
     """
     # permission_classes=[IsAuthenticated, IsAdminUser, IsDirector]
+    permission_classes=[VisitPermissions]
+    # permission_classes=[IsPatientOrReadOnly]
 
-    # queryset=Visit.objects.all()
+    queryset=Visit.objects.all()
+    serializer_class=visit_serializers.VisitViewsetSerializer
     
     
-    def get_queryset(self):
+    def get_dqueryset(self):
         usertype=self.request.user.usertype
         is_superuser=self.request.user.is_superuser
         id=self.request.user.id
@@ -35,10 +38,11 @@ class VisitListView(ModelViewSet):
                 return Visit.objects.filter(patient__pk=id)   
             if usertype == 'd':
                 return Visit.objects.filter(doctor__pk=id)
+                # return Visit.objects.all()
             if usertype == 'c':
                 return Visit.objects.all()
 
-    def get_serializer_class(self):
+    def get_dserializer_class(self):
         usertype=self.request.user.usertype
         is_superuser=self.request.user.is_superuser
         id=self.request.user.id

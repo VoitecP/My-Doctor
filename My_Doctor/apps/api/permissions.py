@@ -96,3 +96,69 @@ class IsDirectorCreated(ModelExistsPermission):
     director_status=True
     ##
     return_status=False
+
+
+class IsUserTypeOrReadOnly(BasePermission):
+    usertype=None
+    
+    def has_permission(self, request, view):
+
+        if request.user.is_authenticated:
+            if request.method in SAFE_METHODS:
+                return True
+        
+            elif (request.user.usertype == self.usertype
+               and request.user.is_authenticated):
+                return True
+        else:
+            return False
+    
+class IsDirectorOrReadOnly(IsUserTypeOrReadOnly):
+    usertype='d'
+
+
+class IsPatientOrReadOnly(IsUserTypeOrReadOnly):
+    usertype='p'
+
+        
+class VisitPermissions(BasePermission):
+
+    P_METHODS = ('GET', 'HEAD', 'OPTIONS', 'PUT','PATH','POST')
+    D_METHODS = ('GET', 'HEAD', 'OPTIONS', 'PUT','PATH',)
+    C_METHODS = ('GET', 'HEAD', 'OPTIONS', 'PUT','PATH','POST','DELETE')
+    NOT_ALLOWED= ('PUT','PATH','POST','DELETE')
+
+    def has_permission(self, request,view):
+        if request.user.is_authenticated:
+            if request.user.usertype =='p':
+                return bool(request.method in self.C_METHODS)
+            if request.user.usertype =='d':
+                return bool(request.method in self.P_METHODS)
+            if request.user.usertype =='c':
+                return bool(request.method in self.P_METHODS)
+        else:
+            return False
+            
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_authenticated:
+            if request.user.usertype =='p':
+                if obj.closed == True and request.method in SAFE_METHODS:
+                    return True
+                if obj.closed == False and request.method in self.NOT_ALLOWED:
+                    return False
+            if request.user.usertype =='d':
+                if obj.closed == True and request.method in SAFE_METHODS:
+                    return True
+                if obj.closed == False and request.method in self.NOT_ALLOWED:
+                    return False
+            if request.user.usertype =='c':
+                if request.method in self.D_METHODS:
+                    return True
+            else:
+                False
+        else:
+            False
+                
+            
+            
+    

@@ -159,6 +159,7 @@ class Visit(models.Model):
 
     description=models.TextField()
     price=models.CharField(max_length=10)
+    closed=models.BooleanField(default=False)
     
     objects=models.Manager()  
     year_objects=models_manager.VisitYearSummary()

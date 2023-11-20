@@ -12,8 +12,8 @@ from ..urls import (
                     viewsets_urls
 )
 
-# app_name='apps.api'
-app_name='api'
+app_name='apps.api'
+#app_name='api'
 
 
 urlpatterns = [

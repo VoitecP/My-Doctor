@@ -6,3 +6,10 @@ class CoreConfig(AppConfig):
     # name = 'core'
     label='core'
     name = 'apps.core'
+
+    # signals config
+
+    def ready(self):
+
+        import apps.core.signals
+        #from . import signals

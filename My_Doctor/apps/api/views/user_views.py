@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView,UpdateAPIView, CreateAPIView, ListCreateAPIView
 
 
-class UserViewSet(ModelViewSet):
+class UserViewset(ModelViewSet):
     """
     User model List View (filtered list view)
     """
@@ -88,7 +88,8 @@ class UserAuthView(GenericViewSet):
 class UserRegisterView(CreateAPIView):
     """
     User register View
-    """  
+    """
+    # TODO  Automatic Logout if user is loged in.  
     permission_classes = [AllowAny]
 
     def get_queryset(self):
