@@ -18,20 +18,30 @@ from ..permissions import IsDoctorCreated, IsPatientCreated
 
 class PatientViewset(ModelViewSet):
     # queryset=Patient.objects.all()
-    serializer_class=PatientPublicSerializer
+    # serializer_class=PatientPrivateSerializer
+    # TODO usertype serializers
+    #serializer_class=PatientForDoctorSerializer
     permission_classes = [IsAuthenticated] #  , IsDoctorCreated]       No other perm_class
     # http_method_names = ['get']
     
 
     def get_queryset(self):
         usertype=self.request.user.usertype
-        if usertype == 'd':         # Filter by visit
-            return Patient.objects.all()
-        
+        if usertype == 'd':      
+            return Patient.objects.filter(visit__doctor__user=self.request.user).distinct()
+            # Patient Visit serializer add visit count.. with that doctor     
         if usertype == 'p':        
             return Patient.objects.filter(user=self.request.user)
-
+            # Patient Private Serializer
         if usertype == 'c':
             return Patient.objects.all()
-        
+
+    def get_serializer_class(self):
+        usertype=self.request.user.usertype
+        if usertype == 'd':  
+            return PatientForDoctorSerializer
+        if usertype == 'p':  
+            return PatientForPatientSerializer
+        if usertype == 'c':  
+            return PatientForDoctorSerializer
         

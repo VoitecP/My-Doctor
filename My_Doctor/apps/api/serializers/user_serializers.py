@@ -112,6 +112,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user.first_name = validated_data['first_name']
         user.last_name = validated_data['last_name']
         user.usertype = validated_data['usertype']
+        # TODO , if admin.is_staff  user.usertype= user.DIRECTOR or just another view for director.
+        
         user.set_password(validated_data['password'])
         user.save()
         return user

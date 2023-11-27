@@ -1,9 +1,9 @@
-from apps.core.models import Patient, User
+from apps.core.models import Patient, User, Visit
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 # from apps.api.serializers import UserPublicSerializer, UserUpdateSerializer, UserPrivateSerializer  
 from apps.api.serializers import user_serializers
-
+from django.db.models import Sum
 
 class PatientPublicSerializer(serializers.ModelSerializer):
     """
@@ -30,9 +30,9 @@ class PatientPrivateSerializer(serializers.ModelSerializer):
         fields = ['user','adress','birth_date','tracks']
 
 
-class PatientVisitSerializer(serializers.ModelSerializer):
+class PatientForDoctorSerializer(serializers.ModelSerializer):
     """
-    Only connected thru common visit can see these fields
+    Only doctors connected thru common visit can see these Patients
     """
     #patient = user_serializers.UserVisitSerializer
     # first name,  last name,  email
@@ -40,21 +40,22 @@ class PatientVisitSerializer(serializers.ModelSerializer):
     first_name=serializers.SerializerMethodField(label='first name', read_only=True)
     last_name=serializers.SerializerMethodField(label='last name', read_only=True)
     email=serializers.SerializerMethodField(read_only=True)
-
+    visits=serializers.SerializerMethodField(read_only=True)
+    total_prices=serializers.SerializerMethodField(label='Total prices',read_only=True)
     
     class Meta:
         model = Patient
         # fields = '__all__'
         fields = ['url','first_name','last_name','email',
-                  'birth_date']
+                  'birth_date','visits','total_prices']
 
     def get_url(self,obj):
         request=self.context.get('request')
        
         if request is None:
             return None
-        #return reverse('viewsets-patients', kwargs={"pk": obj.pk}, request=request)
-        return 'reverse'
+        return reverse('api:patient-detail', kwargs={"pk": obj.pk}, request=request)
+        #return 'reverse'
     
     def get_first_name(self, obj):
         return obj.user.first_name
@@ -64,8 +65,18 @@ class PatientVisitSerializer(serializers.ModelSerializer):
     
     def get_email(self, obj):
         return obj.user.email
+    
+    def get_visits(self, obj):
+        return Visit.objects.filter(patient=obj).count()
+    
+    def get_total_prices(self, obj):
+        total=Visit.objects.filter(patient=obj).aggregate(sum=Sum('price'))
+        return total['sum']
+        # return Visit.objects.filter(patient=obj).aggregate(sum=Sum('price'))
 
+class PatientForPatientSerializer(serializers.ModelSerializer):
 
+    pass
 
 class PatientUpdateSerializer(serializers.ModelSerializer):
     tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)

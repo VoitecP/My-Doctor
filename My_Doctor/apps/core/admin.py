@@ -10,10 +10,22 @@ from .models import *
 class UserAdmin(BaseUserAdmin):
     search_fields = ('first_name','last_name', 'username')
     search_help_text = 'Searching by: first name, last name, username'
-    ordering = ('first_name','last_name', 'username')
-    list_display = ('username', 'first_name', 'last_name', 'usertype')
+    ordering = ('username','first_name','last_name', )
+    list_display = ('username', 
+                    'first_name', 
+                    'last_name', 
+                    'usertype',
+                    'type_created',
+                    'type_updated'
+                    )
     fieldsets = (
-        ('User Info', {'fields': ('username', 'password', 'usertype')}),
+        ('User Info', {'fields': (
+                                    'username', 
+                                    'password', 
+                                    'usertype',
+                                    # 'type_created',
+                                    # 'type_updated'
+                                    )}),
         ('Personal info', {'fields': ('first_name', 'last_name')}),
         ('Permissions', 
             {'fields': (

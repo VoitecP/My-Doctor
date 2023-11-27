@@ -4,7 +4,7 @@ from django.db.models import Sum, Aggregate
 
 from ..serializers import visit_serializers
 from .doctor_serializers import DoctorPublicSerializer, DoctorPrivateSerializer, DoctorVisitSerializer
-from .patient_serializers import PatientPublicSerializer, PatientPrivateSerializer, PatientVisitSerializer
+from .patient_serializers import PatientPublicSerializer, PatientPrivateSerializer 
 
 
 class VisitYearSummarySerializer(serializers.ModelSerializer):

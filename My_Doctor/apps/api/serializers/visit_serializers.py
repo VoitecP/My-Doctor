@@ -1,12 +1,129 @@
 from apps.core.models import Visit, VisitImageFile, User, Patient, Doctor
 from rest_framework import serializers
 from .doctor_serializers import DoctorPublicSerializer, DoctorPrivateSerializer, DoctorVisitSerializer
-from .patient_serializers import PatientPublicSerializer, PatientPrivateSerializer, PatientVisitSerializer
+from .patient_serializers import *
+from .category_serializers import *
+#PatientPublicSerializer, PatientPrivateSerializer, PatientVisitSerializer
 from .file_serializers import VisitImageSerializer
+from rest_framework.reverse import reverse
 
 
 
+#####
+#####
 
+class VisitListPTypeSerializer(serializers.ModelSerializer):
+
+    doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    visit_category=CategoryPublicSerializer(label='category', source='category', read_only=True)
+    visit_price=serializers.SerializerMethodField(label='url',read_only=True)
+    url=serializers.SerializerMethodField(label='url',read_only=True)
+    class Meta:
+        model = Visit
+        fields = ['id', 
+                  'url',
+                'title',
+                #'patient', 
+                'doctor_visit',       
+                'category',
+                'visit_category',
+                #'image',
+                #'images',
+                #'description',
+                'price',
+                'visit_status']
+        extra_kwargs =  {'doctor': {'write_only': True},
+                        'category': {'write_only': True},
+                        'closed': {'write_only': True}}
+        
+    
+    def get_visit_status(self, obj):
+        if obj.closed == True:
+            return  'Visit Closed'
+        if obj.closed == False:
+            return 'Visit Open'   
+
+    def get_url(self,obj):
+        request=self.context.get('request')
+
+        if request is None:
+            return None
+        return reverse('api:visit-detail', kwargs={"pk": obj.pk}, request=request)
+        #return 'reverse'
+class VisitRetrievePTypeSerializer(serializers.ModelSerializer):
+    
+    doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    #url=serializers.SerializerMethodField(label='url')
+    class Meta:
+        model = Visit
+        fields = ['id', 
+                  'url',
+                'title',
+                #'patient', 
+                'doctor',
+                'doctor_visit',       
+                'category',
+                'image',
+                'images',
+                'description',
+                'price',
+                'visit_status']
+        extra_kwargs =  {'doctor': {'write_only': True},
+                        'category': {'write_only': True},
+                        'closed': {'write_only': True}}
+        
+    def get_visit_status(self, obj):
+        if obj.closed == True:
+            return  'Visit Closed'
+        if obj.closed == False:
+            return 'Visit Open'
+        
+    # def get_url(self,obj):
+    #     request=self.context.get('request')
+
+    #     if request is None:
+    #         return None
+    #     return reverse('api:visit-detail', kwargs={"pk": obj.pk}, request=request)
+        
+    
+    
+        
+
+    pass
+
+class VisitUpdatePTypeSerializer(serializers.ModelSerializer):
+    
+    doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    #url=serializers.SerializerMethodField(label='url')
+    class Meta:
+        model = Visit
+        fields = ['id', 
+                  'url',
+                'title',
+                #'patient', 
+                #'doctor',
+                'doctor_visit',       
+                'category',
+                'image',
+                'images',
+                'description',
+                #'price',
+                'visit_status']
+         
+        extra_kwargs =  {'category': {'write_only': True},
+                        'closed': {'write_only': True}}
+        
+    def get_visit_status(self, obj):
+        if obj.closed == True:
+            return  'Visit Closed'
+        if obj.closed == False:
+            return 'Visit Open'
+
+#####
+#####
 class VisitPublicSerializer(serializers.ModelSerializer):
     """
     Director can see, all visits
@@ -23,16 +140,10 @@ class VisitPublicSerializer(serializers.ModelSerializer):
 # Public serializer for category , doctor, patient
 # TODO  ## user.doctor can see all public patients
 
+class VisitRetrieveViewsetSerializer(serializers.ModelSerializer):
 
-class VisitViewsetSerializer(serializers.ModelSerializer):
-
-    
-    #patient = serializers.PrimaryKeyRelatedField(queryset=Patient.objects.all(),write_only=True)
-    patient_visit=PatientVisitSerializer(label='patient', source='patient', read_only=True)
-    #doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all(),write_only=True)
+    patient_visit=PatientForPatientSerializer(label='patient', source='patient', read_only=True)
     doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
-    #category_public=
-    #images = VisitImageSerializer(many=True, read_only=True)
     
    
     class Meta:
@@ -48,24 +159,54 @@ class VisitViewsetSerializer(serializers.ModelSerializer):
                         'doctor': {'write_only': True},
                         'category': {'write_only': True}
                         }
+        # exclude=['patient']
 
 # }
 
+
+
+class VisitViewsetSerializer(serializers.ModelSerializer):
+
+
+
+    
+    #patient = serializers.PrimaryKeyRelatedField(queryset=Patient.objects.all(),write_only=True)
+    #TODO patient specific serializers
+    #patient_visit=PatientForPatientSerializer(label='patient', source='patient', read_only=True)
+
+    patient_visit=PatientUpdateSerializer(label='patient', source='patient', read_only=True)
+    #doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.all(),write_only=True)
+    doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    #category_public=
+    #images = VisitImageSerializer(many=True, read_only=True)
+    price_visit=serializers.SerializerMethodField()
     
 
-    #  id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    # title=models.CharField(max_length=100, default='')
-    # date=models.DateTimeField(default=None, null=True, blank=True)    
-    # patient=models.ForeignKey(Patient, models.PROTECT, default=None)
-    # doctor=models.ForeignKey(Doctor, models.PROTECT, default=None)
-    # category=models.ForeignKey(Category,models.PROTECT,null=True,blank=True, default=None)
-    # image=models.ImageField(upload_to=storage.user_image_path, 
-    #                         validators=[storage.ext_validator], blank=True, default='')
+    def get_price_visit(self, obj):
+        if obj.closed==True:
+            return f'closed {obj.price}'
+        else:
+            return f'open {obj.price}'
+   
+    class Meta:
+        model = Visit
+        fields = ['id', 'title',
+                'patient',
+                'patient_visit',  
+                'doctor',
+                'doctor_visit',       
+                'category','image','images','description','price',
+                'price_visit',
+                ]
+  
 
-    # description=models.TextField()
-    # price=models.CharField(max_length=10)
-
-
+        extra_kwargs =  {'patient': {'write_only': True},
+                        'doctor': {'write_only': True},
+                        'category': {'write_only': True}
+                        }
+       
+      
+    
 # TODO base serializer for Visits
 class VisitPrivateSerializer(serializers.ModelSerializer):
     """
@@ -73,7 +214,7 @@ class VisitPrivateSerializer(serializers.ModelSerializer):
     """
     images = VisitImageSerializer(many=True, read_only=True)
     visit_doctor = DoctorPrivateSerializer(source='doctor',read_only=True)  # Disable to allow choose doctor
-    patient = PatientVisitSerializer(read_only=True)
+    patient = PatientForPatientSerializer(read_only=True)
 
     uploaded_images = serializers.ListField(
         child = serializers.ImageField(max_length = 1000000, allow_empty_file = False, use_url = False),

@@ -10,17 +10,31 @@ from apps.core import models_manager
 from apps.core import storage
 
 class User(AbstractUser):
+    PATIENT = 'p'
+    DOCTOR = 'd'
+    DIRECTOR = 'c'
+    CHOICES = [
+        (PATIENT, 'Patient'),
+        (DOCTOR, 'Doctor'),
+        #(DIRECTOR, 'Director'), 
+    ]
+
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    usertype=models.CharField(choices = [('d','Doctor'), ('p','Patient'), ('c','Director'),], max_length=1, default='')  # ,('c','Director'),  By Admin
+    usertype=models.CharField(choices = CHOICES, max_length=1, default='') 
+    type_created=models.BooleanField(default=False, editable=False)
+    type_updated=models.BooleanField(default=False, editable=False)
     # first_name  (Heritated from AbstractUser)
     # last_name
     # email
     
+
+
     class Meta: 
         permissions=[('is_user', 'Is User'),]  # what to do with that ?
         managed = True
 
         
+    # def get_usertype_choices(instance, request):
 
 
 
@@ -156,7 +170,6 @@ class Visit(models.Model):
     category=models.ForeignKey(Category,models.PROTECT,null=True,blank=True, default=None)
     image=models.ImageField(upload_to=storage.user_image_path, 
                             validators=[storage.ext_validator], blank=True, default='')
-
     description=models.TextField()
     price=models.CharField(max_length=10)
     closed=models.BooleanField(default=False)

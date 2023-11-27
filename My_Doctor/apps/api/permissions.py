@@ -1,6 +1,8 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from apps.core.models import Patient, User, Doctor, Director
-
+from rest_framework.reverse import reverse
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
 
 class BaseObjectPermission(BasePermission):
 
@@ -18,6 +20,7 @@ class DirectorSingletonPermission(BaseObjectPermission):
             return False
 
 class ModelExistsPermission(BaseObjectPermission):
+    # Not need more
     patient_status=False
     doctor_status=False
     director_status=False
@@ -25,7 +28,7 @@ class ModelExistsPermission(BaseObjectPermission):
     return_status=False
 
     def has_permission(self, request, view):
-        if request.user.is_authenticated:
+        if bool (request.user and request.user.is_authenticated):
             if Patient.objects.filter(user=request.user).exists():
                 return self.patient_status
             if Doctor.objects.filter(user=request.user).exists():
@@ -34,7 +37,49 @@ class ModelExistsPermission(BaseObjectPermission):
                 return self.director_status
         return self.return_status
 
+class TypeCreatedPermission(BaseObjectPermission):
+# Proparbly not need because it will automatic create models.
+   
+    def has_permission(self, request, view):
+        if (request.user.is_authenticated 
+            and request.user.is_staff == False
+            and request.user.type_created == True):
+            return True
+        else:
+            return False
     
+
+class TypeUpdatedPermission(BasePermission):
+
+    def url_pattern(self, request):
+    
+        if request.user.usertype == 'p':
+            pattern = 'api:patient-detail'
+        if request.user.usertype == 'd':
+            pattern = 'api:doctor-detail'
+        if request.user.usertype == 'c':
+            pattern = 'api:director-detail'
+        
+        return reverse(pattern, 
+                    kwargs={"pk": request.user.pk}, 
+                    request=request)
+        
+
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            if (request.user.is_staff == False
+                and request.user.type_created == True
+                and request.user.type_updated == False):
+                return True
+            else:
+                url=self.url_pattern(request)
+                raise PermissionDenied(f'Update Your profile here: {url}')
+        else:
+            raise PermissionDenied(f'Please Login:')
+        
+
+
+
 class UserTypePermission(BaseObjectPermission):
     usertype = None   
 
@@ -128,7 +173,12 @@ class VisitPermissions(BasePermission):
     C_METHODS = ('GET', 'HEAD', 'OPTIONS', 'PUT','PATH','POST','DELETE')
     NOT_ALLOWED= ('PUT','PATH','POST','DELETE')
 
-    def has_permission(self, request,view):
+
+    def url_pattern(self, request):
+        return reverse('api:login', kwargs={},request=request)
+
+
+    def has_permission(self, request, view):
         if request.user.is_authenticated:
             if request.user.usertype =='p':
                 return bool(request.method in self.C_METHODS)
@@ -145,19 +195,24 @@ class VisitPermissions(BasePermission):
                 if obj.closed == True and request.method in SAFE_METHODS:
                     return True
                 if obj.closed == False and request.method in self.NOT_ALLOWED:
-                    return False
+                    # return False
+                    raise PermissionDenied(f'Visit is closed')
+                    
             if request.user.usertype =='d':
                 if obj.closed == True and request.method in SAFE_METHODS:
                     return True
                 if obj.closed == False and request.method in self.NOT_ALLOWED:
-                    return False
+                    # return False
+                    raise PermissionDenied(f'Visit is closed')
             if request.user.usertype =='c':
                 if request.method in self.D_METHODS:
                     return True
             else:
                 False
         else:
-            False
+            # False
+            url=self.url_pattern(self,request)
+            raise PermissionDenied(f'Please login here:{url}')
                 
             
             

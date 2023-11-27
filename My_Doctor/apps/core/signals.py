@@ -2,47 +2,33 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import User, Patient, Doctor, Director
 
-# doctor create works
-def create_doctor(sender, instance, created, **kwargs):
+
+def create_usertype(sender, instance, created, **kwargs):
     if created:
-        print('some created')
-        if instance.usertype=='p':
-                print('patient created')
-        if instance.usertype=='d':
-                print('doctor created')
-        # Doctor.objects.create(user=user)
-
-post_save.connect(create_doctor, sender=User)
-
-
-
-##
-
-# models:
-
-# class Profile(models.model):
-#     user=models.OnetoOne(User, on delete
-#                         )
-#     first_name=
-#     last+name
+        if instance.usertype =='p':
+            Patient.objects.create(user=instance)
+            instance.type_created = True
+            instance.save()
+        if instance.usertype =='d':
+            Doctor.objects.create(user=instance)
+            instance.type_created = True
+            instance.save()
+        if instance.usertype =='c':
+            Director.objects.create(user=instance)
+            instance.type_created = True
+            instance.save()
+      
+post_save.connect(create_usertype, sender=User)
 
 
-# def create_profile():
-#     if created:
-#         Profile.object.create(..)
-#         print('created')
+def update_usertype(sender, instance, created, **kwargs):
+    if not created:
+        if instance.user.type_updated == False:
+            instance.user.type_updated = True
+            instance.user.save()
+      
+post_save.connect(update_usertype, sender=Patient)
+post_save.connect(update_usertype, sender=Doctor)
+post_save.connect(update_usertype, sender=Director)
 
-post_save.connect(create_doctor, sender=User )
 
-# def update_profile():
-#     if created== False:
-#       instance.profile.save()
-#         print()
-#         try:
-#             instance.profile.save()
-#             print()
-#         execpt:
-#             profile.objects.create()
-#             print()
-
-# post_save.connect(update_doctor, sender=User )

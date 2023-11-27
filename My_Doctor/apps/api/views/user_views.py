@@ -125,6 +125,9 @@ class UserTypeCreateView(UserQuerysetMixin, UserSerializerMixin, ListCreateAPIVi
     """
     View for create Patient/Doctor/Director model
     """
+    # TODO: When Usertype is created in signals, (later should be confirmed by email,
+    # TODO: User should be redirect or blocked ; to be only able to update profile
+    # This view is not need, onle user type update view
     permission_classes = [IsAuthenticated, IsNotUserUpdated] #, IsAdminUser]   it can make errors
 
     def perform_create(self, serializer):
