@@ -16,6 +16,12 @@ class PatientPublicSerializer(serializers.ModelSerializer):
         model = Patient
         fields = ['user']
         
+class PatientDocotorVisitSerializer(serializers.ModelSerializer):
+# tODO  Make serializer with common visits with doctor.
+    user = user_serializers.UserPublicSerializer(read_only=True)
+    class Meta:
+        model = Patient
+        fields = ['user']
        
 
 class PatientPrivateSerializer(serializers.ModelSerializer):

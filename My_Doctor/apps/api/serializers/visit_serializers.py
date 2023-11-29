@@ -7,17 +7,19 @@ from .category_serializers import *
 from .file_serializers import VisitImageSerializer
 from rest_framework.reverse import reverse
 
-
-
 #####
+# Visit Serializers for Patient
 #####
 
-class VisitListPTypeSerializer(serializers.ModelSerializer):
+class VisitListSerializerForPatient(serializers.ModelSerializer):
+    '''
+    Serializer for GET/List of instances
+    '''
 
     doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
     visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
-    visit_category=CategoryPublicSerializer(label='category', source='category', read_only=True)
-    visit_price=serializers.SerializerMethodField(label='url',read_only=True)
+    visit_category=serializers.SerializerMethodField(label='Visit Category', read_only=True)
+    visit_price=serializers.SerializerMethodField(label='url',source='price',read_only=True)
     url=serializers.SerializerMethodField(label='url',read_only=True)
     class Meta:
         model = Visit
@@ -26,16 +28,17 @@ class VisitListPTypeSerializer(serializers.ModelSerializer):
                 'title',
                 #'patient', 
                 'doctor_visit',       
-                'category',
+                #'category',
                 'visit_category',
                 #'image',
                 #'images',
                 #'description',
-                'price',
+                'visit_price',
                 'visit_status']
-        extra_kwargs =  {'doctor': {'write_only': True},
-                        'category': {'write_only': True},
-                        'closed': {'write_only': True}}
+        # extra_kwargs =  {'doctor': {'write_only': True},
+        #                 'category': {'write_only': True},
+        #                 'closed': {'write_only': True},
+        #                 'price':{'write_only':True}}
         
     
     def get_visit_status(self, obj):
@@ -43,7 +46,11 @@ class VisitListPTypeSerializer(serializers.ModelSerializer):
             return  'Visit Closed'
         if obj.closed == False:
             return 'Visit Open'   
-
+        
+    def get_visit_price(self, obj):
+        return  obj.price
+    
+            
     def get_url(self,obj):
         request=self.context.get('request')
 
@@ -51,26 +58,349 @@ class VisitListPTypeSerializer(serializers.ModelSerializer):
             return None
         return reverse('api:visit-detail', kwargs={"pk": obj.pk}, request=request)
         #return 'reverse'
-class VisitRetrievePTypeSerializer(serializers.ModelSerializer):
+
+    def get_visit_category(self, obj):
+        return obj.category.name
+
+class VisitRetrieveSerializerForPatient(serializers.ModelSerializer):
+    '''
+    Serializer for GET/Retrieve instance,  POST/Create instance or DEL/Destroy instance
+    '''
+    doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    visit_category=CategoryPublicSerializer(label='Category', read_only=True)
+    visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    visit_price=serializers.SerializerMethodField(label='Visit Price', source='price')
+    #url=serializers.SerializerMethodField(label='url')
+    class Meta:
+        model = Visit
+        fields = ['id', 
+                  #'url',
+                'title',
+                'patient', 
+                'doctor',
+                'doctor_visit',  
+                'visit_category',     
+                'category',
+                'image',
+                'images',
+                'description',
+                'visit_price',
+                'visit_status']
+        extra_kwargs =  {'doctor': {'write_only': True},
+                        'category': {'write_only': True},
+                        # 'price':{'write_only':True},
+                        # 'closed': {'write_only': True}
+                        }
+        
+    def get_visit_status(self, obj):
+        if obj.closed == True:
+            return  'Visit Closed'
+        if obj.closed == False:
+            return 'Visit Open'
+        
+    def get_visit_price(self, obj):
+        return  obj.price
     
+
+class VisitUpdateSerializerForPatient(serializers.ModelSerializer):
+    '''
+    Serializer for PUT/Update instance
+    '''
+    
+    # doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    # visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    #url=serializers.SerializerMethodField(label='url')
+    class Meta:
+        model = Visit
+        fields = ['id', 
+                #   'url',
+                'title',
+                #'patient', 
+                'doctor',
+                # 'doctor_visit',       
+                'category',
+                'image',
+                'images',
+                'description',
+                #'price',
+                # 'visit_status'
+                ]
+         
+        # extra_kwargs =  {'category': {'write_only': True},
+        #                 }
+        
+    # def get_visit_status(self, obj):
+    #     if obj.closed == True:
+    #         return  'Visit Closed'
+    #     if obj.closed == False:
+    #         return 'Visit Open'
+
+#####
+# Visit Serializers for Doctor
+#####
+
+class VisitListSerializerForDoctor(serializers.ModelSerializer):
+    '''
+    Serializer for GET/List of instances
+    '''
+
+    patient_visit = serializers.SerializerMethodField(label='patient visit',read_only=True)
+    visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+   
+    visit_category=serializers.SerializerMethodField(label='visit category', read_only=True)
+    visit_price=serializers.SerializerMethodField(label='url',source='price',read_only=True)
+    url=serializers.SerializerMethodField(label='url',read_only=True)
+    class Meta:
+        model = Visit
+        fields = [ 
+                'url',
+                'title',
+                'patient_visit', 
+                #'doctor_visit',       
+                #'category',
+                'visit_category',
+                #'image',
+                #'images',
+                #'description',
+                'visit_price',
+                'visit_status']
+        
+        # extra_kwargs =  {'doctor': {'write_only': True},
+        #                 'category': {'write_only': True},
+        #                 'closed': {'write_only': True},
+        #                 'price':{'write_only':True}}
+        
+    
+    def get_visit_status(self, obj):
+        if obj.closed == True:
+            return  'Visit Closed'
+        if obj.closed == False:
+            return 'Visit Open'   
+        
+    def get_visit_price(self, obj):
+        return  obj.price
+    
+            
+    def get_url(self, obj):
+        request=self.context.get('request')
+
+        if request is None:
+            return None
+        return reverse('api:visit-detail', kwargs={"pk": obj.pk}, request=request)
+        #return 'reverse'
+
+    def get_visit_category(self, obj):
+        return obj.category.name
+        
+    def get_patient_visit(self, obj):
+        return obj.patient.full_name
+
+class VisitRetrieveSerializerForDoctor(serializers.ModelSerializer):
+    '''
+    Serializer  GET/Retrieve instance, POST/Create instance and DEL/Destroy Instance
+    '''
+    
+    #doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    # TODO Fix patient/user serialzier and models to not put empty fields
+    patient_visit=PatientDocotorVisitSerializer(label='Patient Visit', read_only=True)
+    visit_status=serializers.SerializerMethodField(label='visit status', read_only=True)
+    visit_category=CategoryPublicSerializer(label='category', source='category', read_only=True)
+    visit_price=serializers.SerializerMethodField(label='Visit Price', read_only=True)
+    #url=serializers.SerializerMethodField(label='url')
+    class Meta:
+        model = Visit
+        fields = [
+                'id', 
+                'title',
+                'patient',
+                'patient_visit', 
+                #'doctor',
+                # 'doctor_visit',
+                'visit_category',       
+                # 'category',
+                'image',  # TODO Set proper field for images.
+                'images',
+                'description',
+                'visit_price',
+                'price',
+                'visit_status',
+                
+                ]
+        # extra_kwargs =  {
+        #                 # 'category': {'write_only': True},
+        #                 # 'price':{'write_only':True},
+        #                 }
+        
+    def get_visit_status(self, obj):
+        if obj.closed == True:
+            return  'Visit Closed'
+        if obj.closed == False:
+            return 'Visit Open'
+        
+    def get_visit_price(self, obj):
+        return  obj.price
+    
+class VisitUpdateSerializerForDoctor(serializers.ModelSerializer):
+    '''
+    Serializer for  PUT/Update instance,
+    '''
+
+    # doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    # visit_status=serializers.SerializerMethodField(label='visit status', read_only=True)
+    closed=serializers.BooleanField(label='Is visit closed')
+
+    class Meta:
+        model = Visit
+        fields = [ 
+                'id',
+                #'title',
+                #'patient', 
+                #'doctor',
+                
+                ## Not need it is only update serializer
+                #'doctor_visit',       
+                'category',
+                'image',
+                'images',
+                'description',
+                'price',
+                'closed',
+                #'visit_status'
+                ]
+         
+        extra_kwargs =  {'category': {'write_only': True},
+                        'price':{'write_only':True},
+                        'closed': {'write_only': True}}
+          
+
+#####
+# Visit Serializers for Director
+#####
+
+class VisitListSerializerForDirector(serializers.ModelSerializer):
+    '''
+    Serializer for GET/List of instances
+    '''
+    patient_visit=serializers.SerializerMethodField(label='patient', read_only=True)
     doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
     visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
-    #url=serializers.SerializerMethodField(label='url')
+    visit_category=serializers.SerializerMethodField(label='category', source='category', read_only=True)
+    visit_price=serializers.SerializerMethodField(label='url',source='price',read_only=True)
+    url=serializers.SerializerMethodField(label='url',read_only=True)
     class Meta:
         model = Visit
         fields = ['id', 
                   'url',
                 'title',
                 #'patient', 
+                'patient_visit'
+                'doctor_visit',       
+                #'category',
+                'visit_category',
+                #'image',
+                #'images',
+                #'description',
+                'visit_price',
+                'visit_status']
+        # extra_kwargs =  {'doctor': {'write_only': True},
+        #                 'category': {'write_only': True},
+        #                 'closed': {'write_only': True},
+        #                 'price':{'write_only':True}}
+        
+    
+    def get_visit_status(self, obj):
+        if obj.closed == True:
+            return  'Visit Closed'
+        if obj.closed == False:
+            return 'Visit Open'   
+        
+    def get_visit_price(self, obj):
+        return  obj.price
+    
+            
+    def get_visit_category(self, obj):
+        return obj.category.name  
+          
+    def get_url(self,obj):
+        request=self.context.get('request')
+
+        if request is None:
+            return None
+        return reverse('api:visit-detail', kwargs={"pk": obj.pk}, request=request)
+        #return 'reverse'
+
+
+class VisitRetrieveSerializerForDirector(serializers.ModelSerializer):
+    '''
+    Serializer for GET/Retrieve instance,  POST/Create instance or DEL/Destroy instance
+    '''
+    patient_visit=PatientDocotorVisitSerializer(label='Patient Visit', read_only=True)
+    doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    visit_price=serializers.SerializerMethodField(label='Visit Price', source='price')
+    #url=serializers.SerializerMethodField(label='url')
+    class Meta:
+        model = Visit
+        fields = ['id', 
+                'title',
+                'patient',
+                'patient_visit',
                 'doctor',
                 'doctor_visit',       
+                'category',
+                'category_visit',
+                'image',
+                'images',
+                'description',
+                'price',
+                'visit_price',
+                'closed',
+                'visit_status']
+        extra_kwargs =  {
+                        'patient':{'write_only':True},
+                        'doctor': {'write_only': True},
+                        'category': {'write_only': True},
+                        'price':{'write_only':True},
+                        'closed': {'write_only': True}}
+        
+    def get_visit_status(self, obj):
+        if obj.closed == True:
+            return  'Visit Closed'
+        if obj.closed == False:
+            return 'Visit Open'
+        
+    def get_visit_price(self, obj):
+        return  obj.price
+    
+
+class VisitUpdateSerializerForDirector(serializers.ModelSerializer):
+    '''
+    Serializer for  PUT/Update instance,
+    '''
+    
+    # doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
+    # visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    #url=serializers.SerializerMethodField(label='url')
+    closed=serializers.BooleanField(label='Is visit closed')
+    class Meta:
+        model = Visit
+        fields = ['id', 
+                #   'url',
+                'title',
+                'patient', 
+                'doctor',
+                #'doctor_visit',       
                 'category',
                 'image',
                 'images',
                 'description',
                 'price',
-                'visit_status']
-        extra_kwargs =  {'doctor': {'write_only': True},
+                'closed',
+                ]
+         
+        extra_kwargs =  {
+                        'patient': {'write_only': True},
+                        'docotor': {'write_only': True},
                         'category': {'write_only': True},
                         'closed': {'write_only': True}}
         
@@ -79,48 +409,13 @@ class VisitRetrievePTypeSerializer(serializers.ModelSerializer):
             return  'Visit Closed'
         if obj.closed == False:
             return 'Visit Open'
-        
-    # def get_url(self,obj):
-    #     request=self.context.get('request')
 
-    #     if request is None:
-    #         return None
-    #     return reverse('api:visit-detail', kwargs={"pk": obj.pk}, request=request)
-        
-    
-    
-        
 
-    pass
 
-class VisitUpdatePTypeSerializer(serializers.ModelSerializer):
-    
-    doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
-    visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
-    #url=serializers.SerializerMethodField(label='url')
-    class Meta:
-        model = Visit
-        fields = ['id', 
-                  'url',
-                'title',
-                #'patient', 
-                #'doctor',
-                'doctor_visit',       
-                'category',
-                'image',
-                'images',
-                'description',
-                #'price',
-                'visit_status']
-         
-        extra_kwargs =  {'category': {'write_only': True},
-                        'closed': {'write_only': True}}
-        
-    def get_visit_status(self, obj):
-        if obj.closed == True:
-            return  'Visit Closed'
-        if obj.closed == False:
-            return 'Visit Open'
+
+
+##########
+## Other serializers
 
 #####
 #####

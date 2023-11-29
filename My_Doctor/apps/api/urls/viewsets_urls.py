@@ -5,14 +5,14 @@ from ..views.doctor_views import DoctorViewSet
 from ..views.patient_views import PatientViewset
 from ..views.file_views import PatientImageViewset
 from ..views.user_views import UserViewset
-from ..views.visit_views import VisitViewset, Visit2Viewset
+from ..views.visit_views import VisitViewset
 
 
 from django.urls import path, include 
 from rest_framework.routers import DefaultRouter
 
 router=DefaultRouter()
-router.register(r'visit', Visit2Viewset, basename='visit')
+router.register(r'visit', VisitViewset, basename='visit')
 router.register(r'category',  CategoryViewset, basename='category')
 router.register(r'director', DirectorViewset, basename='director')
 router.register(r'doctor', DoctorViewSet, basename='doctor')

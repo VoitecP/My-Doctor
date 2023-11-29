@@ -167,53 +167,41 @@ class IsPatientOrReadOnly(IsUserTypeOrReadOnly):
 
         
 class VisitPermissions(BasePermission):
+    '''
+    Permission class for managing Visit objects, need to be with IsAuthenticated class.
+    '''
 
-    P_METHODS = ('GET', 'HEAD', 'OPTIONS', 'PUT','PATH','POST')
-    D_METHODS = ('GET', 'HEAD', 'OPTIONS', 'PUT','PATH',)
-    C_METHODS = ('GET', 'HEAD', 'OPTIONS', 'PUT','PATH','POST','DELETE')
+    P_METHODS = ('PUT','PATH','POST')
+    D_METHODS = ('PUT','PATH',)
+    C_METHODS = ('PUT','PATH','POST','DELETE')
     NOT_ALLOWED= ('PUT','PATH','POST','DELETE')
 
 
-    def url_pattern(self, request):
-        return reverse('api:login', kwargs={},request=request)
-
-
-    def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            if request.user.usertype =='p':
-                return bool(request.method in self.C_METHODS)
-            if request.user.usertype =='d':
-                return bool(request.method in self.P_METHODS)
-            if request.user.usertype =='c':
-                return bool(request.method in self.P_METHODS)
-        else:
-            return False
             
     def has_object_permission(self, request, view, obj):
+
         if request.user.is_authenticated:
             if request.user.usertype =='p':
                 if obj.closed == True and request.method in SAFE_METHODS:
                     return True
-                if obj.closed == False and request.method in self.NOT_ALLOWED:
-                    # return False
+                if obj.closed == True and request.method in self.NOT_ALLOWED:
                     raise PermissionDenied(f'Visit is closed')
-                    
+                if obj.closed == False and request.method in SAFE_METHODS or self.P_METHODS:
+                    return True
+                
             if request.user.usertype =='d':
                 if obj.closed == True and request.method in SAFE_METHODS:
                     return True
-                if obj.closed == False and request.method in self.NOT_ALLOWED:
-                    # return False
+                if obj.closed == True and request.method in self.NOT_ALLOWED:
                     raise PermissionDenied(f'Visit is closed')
+                if obj.closed == False and request.method in SAFE_METHODS or self.D_METHODS:
+                    return True
+                
             if request.user.usertype =='c':
-                if request.method in self.D_METHODS:
+                if request.method in SAFE_METHODS or self.D_METHODS:
                     return True
             else:
-                False
+                return False
         else:
-            # False
-            url=self.url_pattern(self,request)
-            raise PermissionDenied(f'Please login here:{url}')
-                
-            
-            
-    
+            return False
+          
