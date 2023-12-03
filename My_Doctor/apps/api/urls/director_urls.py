@@ -9,8 +9,9 @@ urlpatterns =[
     # path('',include(router.urls)),
     ## Disable create, or only for admin ##
     path('create/',director_views.DirectorCreateView.as_view(), name='director-create'),
-    path('director/<uuid:pk>/update/',director_views.DirectorUpdateView.as_view(), name='director-update'),
-    path('director/<uuid:pk>/delete/',director_views.DirectorDeleteView.as_view(), name='director-delete'),
-
+   # todo removed serializers so removed views
+    # path('director/<uuid:pk>/update/',director_views.DirectorUpdateView.as_view(), name='director-update'),
+    # path('director/<uuid:pk>/delete/',director_views.DirectorDeleteView.as_view(), name='director-delete'),
+# 
 
 ]

@@ -2,7 +2,7 @@ from apps.core.models import User, Patient, Doctor, Director, Category
 from ..serializers.patient_serializers import PatientUpdateSerializer
 from ..serializers.doctor_serializers import DoctorUpdateSerializer
 from ..serializers.director_serializers import DirectorUpdateSerializer
-from ..serializers.category_serializers import CategoryPublicSerializer
+from ..serializers.category_serializers import CategorySerializer
 from django.shortcuts import get_object_or_404
 from django.views.generic.detail import SingleObjectMixin
 
@@ -58,7 +58,7 @@ class CategoryQuerysetMixin:
 class CategorySerializerMixin:
 
     def get_serializer_class(self):
-            return CategoryPublicSerializer
+            return CategorySerializer
 
 
 class VisitQuerysetMixin:

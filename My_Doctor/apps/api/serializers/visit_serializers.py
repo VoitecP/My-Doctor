@@ -60,14 +60,16 @@ class VisitListSerializerForPatient(serializers.ModelSerializer):
         #return 'reverse'
 
     def get_visit_category(self, obj):
-        return obj.category.name
-
+        if obj.category.name:
+            return obj.category.name
+        else: 
+            return 'empty'
 class VisitRetrieveSerializerForPatient(serializers.ModelSerializer):
     '''
     Serializer for GET/Retrieve instance,  POST/Create instance or DEL/Destroy instance
     '''
     doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
-    visit_category=CategoryPublicSerializer(label='Category', read_only=True)
+    visit_category=CategorySerializer(label='Category', read_only=True)
     visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
     visit_price=serializers.SerializerMethodField(label='Visit Price', source='price')
     #url=serializers.SerializerMethodField(label='url')
@@ -204,7 +206,7 @@ class VisitRetrieveSerializerForDoctor(serializers.ModelSerializer):
     # TODO Fix patient/user serialzier and models to not put empty fields
     patient_visit=PatientDocotorVisitSerializer(label='Patient Visit', read_only=True)
     visit_status=serializers.SerializerMethodField(label='visit status', read_only=True)
-    visit_category=CategoryPublicSerializer(label='category', source='category', read_only=True)
+    visit_category=CategorySerializer(label='category', source='category', read_only=True)
     visit_price=serializers.SerializerMethodField(label='Visit Price', read_only=True)
     #url=serializers.SerializerMethodField(label='url')
     class Meta:
@@ -282,8 +284,8 @@ class VisitListSerializerForDirector(serializers.ModelSerializer):
     Serializer for GET/List of instances
     '''
     patient_visit=serializers.SerializerMethodField(label='patient', read_only=True)
-    doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
-    visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    doctor_visit=serializers.SerializerMethodField(label='doctor visit', read_only=True)
+    visit_status=serializers.SerializerMethodField(label='visit status', read_only=True)
     visit_category=serializers.SerializerMethodField(label='category', source='category', read_only=True)
     visit_price=serializers.SerializerMethodField(label='url',source='price',read_only=True)
     url=serializers.SerializerMethodField(label='url',read_only=True)
@@ -293,7 +295,7 @@ class VisitListSerializerForDirector(serializers.ModelSerializer):
                   'url',
                 'title',
                 #'patient', 
-                'patient_visit'
+                'patient_visit',
                 'doctor_visit',       
                 #'category',
                 'visit_category',
@@ -307,6 +309,11 @@ class VisitListSerializerForDirector(serializers.ModelSerializer):
         #                 'closed': {'write_only': True},
         #                 'price':{'write_only':True}}
         
+    def get_patient_visit(self, obj):
+        return obj.patient.full_name  
+
+    def get_doctor_visit(self, obj):
+        return obj.doctor.full_name    
     
     def get_visit_status(self, obj):
         if obj.closed == True:
@@ -318,8 +325,13 @@ class VisitListSerializerForDirector(serializers.ModelSerializer):
         return  obj.price
     
             
+    # def get_visit_category(self, obj):
+    #     return obj.category.name  
     def get_visit_category(self, obj):
-        return obj.category.name  
+        try:
+            return obj.category.name
+        except: 
+            return 'empty'
           
     def get_url(self,obj):
         request=self.context.get('request')
@@ -337,6 +349,7 @@ class VisitRetrieveSerializerForDirector(serializers.ModelSerializer):
     patient_visit=PatientDocotorVisitSerializer(label='Patient Visit', read_only=True)
     doctor_visit=DoctorVisitSerializer(label='doctor', source='doctor', read_only=True)
     visit_status=serializers.SerializerMethodField(label='visit status', source ='closed', read_only=True)
+    category_visit=serializers.SerializerMethodField(label='Categor Visit', read_only=True)
     visit_price=serializers.SerializerMethodField(label='Visit Price', source='price')
     #url=serializers.SerializerMethodField(label='url')
     class Meta:
@@ -372,6 +385,9 @@ class VisitRetrieveSerializerForDirector(serializers.ModelSerializer):
     def get_visit_price(self, obj):
         return  obj.price
     
+    def get_category_visit(self, obj):
+        return obj.category.name
+
 
 class VisitUpdateSerializerForDirector(serializers.ModelSerializer):
     '''

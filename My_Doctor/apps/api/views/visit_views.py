@@ -12,6 +12,11 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIVie
 from rest_framework.viewsets import ModelViewSet, GenericViewSet,  ReadOnlyModelViewSet
 from rest_framework.serializers import ValidationError
 
+#####
+# Viewsets
+#####
+
+
 class VisitViewset(ModelViewSet):
 
     # TODO None type of user , gives error need permission.
@@ -20,16 +25,17 @@ class VisitViewset(ModelViewSet):
 
     def get_queryset(self):
         usertype=self.request.user.usertype
-        #is_superuser=self.request.user.is_superuser
-        id=self.request.user.id
+        is_staff=self.request.user.is_staff
+       
 
         if usertype == 'p':
+            #TODO  replace to filter by id when finished
             # return Visit.objects.filter(patient__pk=id)
             return Visit.objects.all()    
         if usertype == 'd':
             #  return Visit.objects.filter(doctor__pk=id)
             return Visit.objects.all()
-        if usertype == 'c':
+        if usertype == 'c' or is_staff == True:
             return Visit.objects.all()
         else:
             return Visit.objects.all()
@@ -37,16 +43,17 @@ class VisitViewset(ModelViewSet):
 
     def get_serializer_class(self):
         usertype=self.request.user.usertype
+        is_staff=self.request.user.is_staff
 
         if usertype == 'p':
-            if self.action == ('list'):
+            if self.action == 'list':
                 # TODO url,  patient/doctor/description/date..
                 return visit_serializers.VisitListSerializerForPatient
-            if self.action  in ('retrieve', 'create', 'destroy'):
+            if self.action  in ['retrieve', 'create', 'destroy']:
                 # TODO url   full list
                 # return visit_serializers.VisitViewsetSerializer
                 return visit_serializers.VisitRetrieveSerializerForPatient
-            if self.action in ('update','partial_update'):
+            if self.action in ['update','partial_update']:
                 # return visit_serializers.VisitViewsetSerializer
                 return visit_serializers.VisitUpdateSerializerForPatient   
             
@@ -54,24 +61,24 @@ class VisitViewset(ModelViewSet):
                 return visit_serializers.VisitListSerializerForPatient   
             
         if usertype == 'd':
-            if self.action == ('list'):
+            if self.action == ['list']:
                 #  url,  patient/doctor/description/date..
                 return visit_serializers.VisitListSerializerForDoctor
-            if self.action  in ('retrieve', 'create', 'destroy'):
+            if self.action  in ['retrieve', 'create', 'destroy']:
                 return visit_serializers.VisitRetrieveSerializerForDoctor
-            if self.action in ('update','partial_update'):
+            if self.action in ['update','partial_update']:
                 return visit_serializers.VisitUpdateSerializerForDoctor
             
             else:
                 return visit_serializers.VisitListSerializerForDoctor
         
-        if usertype == 'c':
-            if self.action == ('list'):
+        if usertype == 'c' or is_staff == True:
+            if self.action == 'list':
                 #  url,  patient/doctor/description/date..
                 return visit_serializers.VisitListSerializerForDirector
-            if self.action  in ('retrieve', 'create', 'destroy'):
+            if self.action  in ['retrieve', 'create', 'destroy']:
                 return visit_serializers.VisitRetrieveSerializerForDirector
-            if self.action in ('update','partial_update'):
+            if self.action in ['update','partial_update']:
                 return visit_serializers.VisitUpdateSerializerForDirector
             
             else:
@@ -81,6 +88,9 @@ class VisitViewset(ModelViewSet):
             return visit_serializers.VisitListSerializerForPatient  # must be default serializer
 
 
+#####
+# API Views
+#####
 
 
 class VisitCreateView(ListCreateAPIView):

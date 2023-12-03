@@ -165,19 +165,73 @@ class IsDirectorOrReadOnly(IsUserTypeOrReadOnly):
 class IsPatientOrReadOnly(IsUserTypeOrReadOnly):
     usertype='p'
 
-        
+
+
+class CategoryPermissions(BasePermission):
+    '''
+    Permission class for managing Category objects, need to be with IsAuthenticated class.
+    '''
+
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            if request.user.usertype =='p' or request.user.usertype =='d':
+                if request.method in SAFE_METHODS:
+                    return True                
+            if request.user.usertype =='c' or request.user.is_staff == True:
+                return True
+            
+            else:
+                return False
+        else:
+            return False
+
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_authenticated:
+            if request.user.usertype =='p' or request.user.usertype =='d':
+                if request.method in SAFE_METHODS:
+                    return True
+                if request.method in self.NOT_ALLOWED:
+                    raise PermissionDenied(f'You are not allowed to this operation')
+                
+    
+            if request.user.usertype =='c' or request.user.is_staff == True:
+                return True
+            
+            else:
+                return False
+        else:
+            return False
+                
+    
+
 class VisitPermissions(BasePermission):
     '''
-    Permission class for managing Visit objects, need to be with IsAuthenticated class.
+    Permission class for managing Visit objects, 
+    need to be with IsAuthenticated class.
     '''
 
     P_METHODS = ('PUT','PATH','POST')
     D_METHODS = ('PUT','PATH',)
     C_METHODS = ('PUT','PATH','POST','DELETE')
     NOT_ALLOWED= ('PUT','PATH','POST','DELETE')
-
-
+    
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            if request.user.usertype =='p':
+                return True
+            if request.user.usertype =='d':
+                if request.method in SAFE_METHODS:
+                    return True
+            if request.user.usertype =='c' or request.user.is_staff == True:
+                return True
             
+            else:
+                return False
+        else:
+            return False
+
+        
     def has_object_permission(self, request, view, obj):
 
         if request.user.is_authenticated:
@@ -197,9 +251,56 @@ class VisitPermissions(BasePermission):
                 if obj.closed == False and request.method in SAFE_METHODS or self.D_METHODS:
                     return True
                 
-            if request.user.usertype =='c':
-                if request.method in SAFE_METHODS or self.D_METHODS:
+            if request.user.usertype =='c' or request.user.is_staff == True:
+                if request.method in SAFE_METHODS or self.C_METHODS:
                     return True
+            
+            else:
+                return False
+        else:
+            return False
+        
+
+
+class DirectorPermissions(BasePermission):
+    '''
+    Permission class for managing Director objects, 
+    need to be with IsAuthenticated class.
+    '''
+    NOT_ALLOWED = ('PUT','PATH','POST','DELETE')
+    ALLOWED = ('PUT','PATH','DELETE')
+    
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            # todo check if it work correctly p/d
+            if request.user.usertype in ['p','d']:
+                if request.method in SAFE_METHODS:
+                    return True                
+                if request.method in self.NOT_ALLOWED:
+                    raise PermissionDenied(f'Method not allowed')
+                
+            if (request.user.usertype =='c' or request.user.is_staff == True):
+                 if (request.method in SAFE_METHODS or 
+                     request.method in self.ALLOWED):
+                    return True
+            
+            else:
+                return False
+        else:
+            return False
+
+        
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_authenticated:
+            if request.user.usertype in ['p', 'd']:
+                if request.method in SAFE_METHODS:
+                    return True
+                
+            if (request.user.usertype =='c' or request.user.is_staff == True):
+                if (request.method in SAFE_METHODS or 
+                     request.method in self.ALLOWED):
+                    return True
+                
             else:
                 return False
         else:

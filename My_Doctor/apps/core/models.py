@@ -23,7 +23,8 @@ class User(AbstractUser):
     usertype=models.CharField(choices = CHOICES, max_length=1, default='') 
     type_created=models.BooleanField(default=False, editable=False)
     type_updated=models.BooleanField(default=False, editable=False)
-    # first_name  (Heritated from AbstractUser)
+    ## Heritated from AbstractUser
+    # first_name  
     # last_name
     # email
     
@@ -91,9 +92,10 @@ class Doctor(Person):
 
 
 class Director(Person):
-    description=models.CharField(max_length=12)
+    description=models.CharField(max_length=100, default='')
+    private_info=models.CharField(max_length=500, default='')
     # _singleton = models.BooleanField(default=True, editable=False, unique=True)
-    
+     
     class Meta: 
         permissions=[('is_director','Is Director'),]
 
