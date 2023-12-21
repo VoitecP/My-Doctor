@@ -272,14 +272,16 @@ class DirectorPermissions(BasePermission):
     
     def has_permission(self, request, view):
         if request.user.is_authenticated:
-            # todo check if it work correctly p/d
             if request.user.usertype in ['p','d']:
+
                 if request.method in SAFE_METHODS:
-                    return True                
+                    return True            
+                    
                 if request.method in self.NOT_ALLOWED:
                     raise PermissionDenied(f'Method not allowed')
                 
             if (request.user.usertype =='c' or request.user.is_staff == True):
+                 
                  if (request.method in SAFE_METHODS or 
                      request.method in self.ALLOWED):
                     return True
@@ -292,11 +294,13 @@ class DirectorPermissions(BasePermission):
         
     def has_object_permission(self, request, view, obj):
         if request.user.is_authenticated:
+
             if request.user.usertype in ['p', 'd']:
                 if request.method in SAFE_METHODS:
                     return True
                 
             if (request.user.usertype =='c' or request.user.is_staff == True):
+
                 if (request.method in SAFE_METHODS or 
                      request.method in self.ALLOWED):
                     return True

@@ -22,8 +22,12 @@ from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 #####
 
 class DirectorViewset(ModelViewSet):
+    '''
+    Viewset for Director model. Required dynamic serializers 
+    and specyfic permission class for managing action access
+    '''
     permission_classes = [IsAuthenticated, DirectorPermissions]
-    queryset=Director.objects.all()
+    queryset = Director.objects.all()
     
 
     def get_serializer_class(self):
@@ -31,26 +35,15 @@ class DirectorViewset(ModelViewSet):
         is_staff=self.request.user.is_staff
 
         if usertype == 'p' or usertype == 'd':
-            if self.action == 'list':
-                return director_serializers.DirectorListSerializer
-            if self.action in ['retrieve', 'create', 'destroy']:
-                return director_serializers.DirectorRetrieveSerializerForPerson
-            if self.action in ['update','partial_update']:
-                return director_serializers.DirectorRetrieveSerializerForPerson  
+            return director_serializers.DirectorDynamicSerializerForPerson
         
         if usertype == 'c' or is_staff == True:
-            if self.action in ['list', 'create']:
-                return director_serializers.DirectorListSerializer
-            if self.action in ['retrieve', 'destroy']:
-                return director_serializers.DirectorUpdateSerializerForDirector
-            if self.action in ['update','partial_update']:
-                return director_serializers.DirectorUpdateSerializerForDirector  
-
-    # Todo replace in viewdynamic serializers
+            return director_serializers.DirectorDynamicSerializerForDirector
+            
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({
-            'request': self.request,   # exist already
+            'request': self.request,   # exist in default
             'action': self.action,
         })
         return context
@@ -88,3 +81,15 @@ class DirectorCreateView(ListCreateAPIView):
 # class DirectorDeleteView(RetrieveDestroyAPIView):
 #     queryset=Director.objects.all()
 #     serializer_class=director_serializers.DirectorDeleteSerializer
+
+
+
+
+
+# if usertype == 'p' or usertype == 'd':
+#             if self.action in ['list', 'create']:
+#                 return director_serializers.DirectorDynamicSerializerForPerson
+#             if self.action in ['retrieve', 'destroy']:
+#                 return director_serializers.DirectorDynamicSerializerForPerson
+#             if self.action in ['update','partial_update']:
+#                 return director_serializers.DirectorDynamicSerializerForPerson

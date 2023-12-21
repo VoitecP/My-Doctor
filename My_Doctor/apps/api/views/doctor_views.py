@@ -16,8 +16,9 @@ from rest_framework.authentication import SessionAuthentication
 
 
 class DoctorViewSet(ModelViewSet):
-    # queryset=Patient.objects.all()
-    serializer_class=doctor_serializers.DoctorPublicSerializer
+    # queryset=Doctor.objects.all()
+    # serializer_class=doctor_serializers.DoctorPublicSerializer
+    serializer_class=doctor_serializers.DoctorDynamicSerializer
     permission_classes = [IsAuthenticated]
     # http_method_names = ['get','post','retrieve','put','patch']
     
@@ -28,7 +29,24 @@ class DoctorViewSet(ModelViewSet):
             return Doctor.objects.all()
         
         if usertype == 'd':
-            return Doctor.objects.filter(user=self.request.user)
+            # return Doctor.objects.filter(user=self.request.user)
+            return Doctor.objects.all()
 
         if usertype == 'c':
             return Doctor.objects.all()
+        
+        
+
+    def get_serializer_context(self):
+        try:
+            instance = self.get_object()
+        except AssertionError:
+            instance = None
+   
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request,   # exist in default
+            'action': self.action,
+            'instance': instance,
+        })
+        return context

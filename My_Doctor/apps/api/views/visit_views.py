@@ -47,7 +47,7 @@ class VisitViewset(ModelViewSet):
 
         if usertype == 'p':
             if self.action == 'list':
-                # TODO url,  patient/doctor/description/date..
+                # Todo url,  patient/doctor/description/date..
                 return visit_serializers.VisitListSerializerForPatient
             if self.action  in ['retrieve', 'create', 'destroy']:
                 # TODO url   full list
