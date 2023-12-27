@@ -310,3 +310,91 @@ class DirectorPermissions(BasePermission):
         else:
             return False
           
+
+
+
+class DoctorPermissions(BasePermission):
+    '''
+    Permission class for managing Doctor objects, 
+    need to be with IsAuthenticated class.
+    '''
+    # TODO rewrite permissions to view.actions in Views/Viewsets
+    NOT_ALLOWED = ('PUT','PATH','POST','DELETE')
+    ALLOWED = ('PUT','PATH','DELETE')
+    
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            if request.user.usertype in ['p','d']:
+
+                if request.method in SAFE_METHODS:
+                    return True            
+                    
+                if request.method in self.NOT_ALLOWED:
+                    raise PermissionDenied(f'Method not allowed')
+                
+            if (request.user.usertype =='c' or request.user.is_staff == True):
+                 
+                 if (request.method in SAFE_METHODS or 
+                     request.method in self.ALLOWED):
+                    return True
+            
+            else:
+                return False
+        else:
+            return False
+
+        
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_authenticated:
+
+            if request.user.usertype in ['p', 'd']:
+                if request.method in SAFE_METHODS:
+                    return True
+                
+            if (request.user.usertype =='c' or request.user.is_staff == True):
+
+                if (request.method in SAFE_METHODS or 
+                     request.method in self.ALLOWED):
+                    return True
+                
+            else:
+                return False
+        else:
+            return False
+          
+
+
+class UserPermissions(BasePermission):
+    '''
+    Permission class for managing User objects, 
+    need to be with IsAuthenticated class.
+    '''
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            if (request.user.usertype == 'c' or request.user.is_staff):
+                return True
+                          
+            elif view.action in ['list','retrieve','destroy', 
+                                 'update', 'partial_update']:
+                return True
+
+            else:
+                return False          
+        else:
+            return False
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_authenticated:
+            if (request.user.usertype == 'c' or request.user.is_staff):
+                return True
+            
+            elif  (obj == request.user 
+                   and view.action in ['retrierve', 'destroy',
+                                       'update', 'partial_update']):
+                return True
+            
+            else:
+                return False    
+        else:
+            return False
+     

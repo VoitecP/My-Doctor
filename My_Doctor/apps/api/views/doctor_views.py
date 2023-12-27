@@ -16,10 +16,9 @@ from rest_framework.authentication import SessionAuthentication
 
 
 class DoctorViewSet(ModelViewSet):
-    # queryset=Doctor.objects.all()
-    # serializer_class=doctor_serializers.DoctorPublicSerializer
+    
     serializer_class=doctor_serializers.DoctorDynamicSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, DoctorPermissions]
     # http_method_names = ['get','post','retrieve','put','patch']
     
 
@@ -34,7 +33,6 @@ class DoctorViewSet(ModelViewSet):
 
         if usertype == 'c':
             return Doctor.objects.all()
-        
         
 
     def get_serializer_context(self):

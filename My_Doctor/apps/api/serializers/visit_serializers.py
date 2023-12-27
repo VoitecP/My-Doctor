@@ -7,6 +7,27 @@ from .category_serializers import *
 from .file_serializers import VisitImageSerializer
 from rest_framework.reverse import reverse
 
+
+
+
+from apps.api.serializers.serializer_mixins import MappingMixin
+
+
+class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):    
+    pass
+
+
+
+
+class VisitDynamicSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = Visit
+        fields = '__all__'
+
+
+
 #####
 # Visit Serializers for Patient
 #####

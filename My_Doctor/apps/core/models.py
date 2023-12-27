@@ -6,6 +6,8 @@ from django.contrib.auth.models import AbstractUser
 from rest_framework.serializers import ValidationError
 from django.core.validators import RegexValidator
 
+from django.utils import timezone
+
 from apps.core import models_manager
 from apps.core import storage
 
@@ -23,6 +25,7 @@ class User(AbstractUser):
     usertype=models.CharField(choices = CHOICES, max_length=1, default='') 
     type_created=models.BooleanField(default=False, editable=False)
     type_updated=models.BooleanField(default=False, editable=False)
+    # date_created=models.DateTimeField(default=timezone.now, editable=False)
     ## Heritated from AbstractUser
     # first_name  
     # last_name

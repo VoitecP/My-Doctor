@@ -5,6 +5,97 @@ from rest_framework.reverse import reverse
 from apps.api.serializers import user_serializers
 from django.db.models import Sum
 
+from apps.api.serializers.serializer_mixins import MappingMixin
+
+
+class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):    
+    pass
+
+
+class PatientDynamicSerializer(MixinModelSerializer):
+
+    ## Fields for 'List' , 'create'
+    get_full_name=serializers.CharField(label='Full Name', source='full_name', read_only=True)
+    get_url=serializers.SerializerMethodField()
+
+    ## Fields for 'retrieve' , 'destroy', 
+    get_first_name=serializers.CharField(label='First Name', source='user.first_name', read_only=True)
+    get_last_name=serializers.CharField(label='Last Name', source='user.last_name', read_only=True)
+    get_birth_date = serializers.DateField(label='Birth Date', source='birth_date', read_only=True)
+    # Visit related fields
+    get_email=serializers.CharField(label='Email', source='user.email', read_only=True)
+    # Private fields
+    get_adress = serializers.CharField(label='Adress', source='adress', read_only=True)
+      
+    ## Fields for 'update' , 'partial_update'
+    first_name=serializers.CharField(source='user.first_name', max_length=150, default='', allow_blank=True)
+    last_name=serializers.CharField(source='user.last_name',  max_length=150, default='', allow_blank=True)
+    birth_date=serializers.DateField(default='')
+    email=serializers.CharField(source='user.email', max_length=100, default='', allow_blank=True)
+    adress=serializers.CharField(max_length=100, default='', allow_blank=True)
+    
+    mapping={
+        'get_full_name':'Full Name',
+        'get_url':'Link',
+        #
+        'get_first_name':'First Name',
+        'get_last_name':'Last Name',
+        'get_email':'Email',
+        'get_birth_date':'Birth Date',
+        'get_adress':'Adress',     
+    }
+
+    class Meta:
+        model = Patient
+        fields = '__all__'
+
+
+    def __init__(self, *args, **kwargs):
+        context = kwargs.get('context', {})
+        action = context.get('action')
+        instance = context.get('instance', None)
+        request_user = context['request'].user
+
+        if action in ['list','create']:
+
+            fields = ['get_full_name','get_url']
+    
+        if action in ['retrieve','destroy']:
+            if (instance is not None and instance.user == request_user):
+
+                fields = ['get_first_name','get_last_name',
+                          'get_birth_date','get_email', 
+                          'get_adress']
+            else:
+                fields = ['get_first_name', 'get_last_name',
+                          'get_birth_date']
+
+        if action in ['update','partial_update']:
+            if (instance is not None and instance.user == request_user):
+
+                fields = ['first_name','last_name',
+                          'birth_date','email','adress']
+            
+            else:
+                fields = []
+    
+        super().__init__(*args, **kwargs)
+    
+        dynamic = set(fields)
+        all_fields = set(self.fields)
+        for field_pop in all_fields - dynamic:
+            self.fields.pop(field_pop)
+
+    def get_get_url(self, obj):
+        request=self.context.get('request')
+        if request is None:
+            return None
+        return reverse('api:patient-detail', kwargs={'pk': obj.pk}, request=request)
+       
+
+
+
+## Junk serializers
 class PatientPublicSerializer(serializers.ModelSerializer):
     """
     Serializer for Patient's public view

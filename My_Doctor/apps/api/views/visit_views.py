@@ -16,12 +16,101 @@ from rest_framework.serializers import ValidationError
 # Viewsets
 #####
 
+class VisitViewSet(ModelViewSet):
 
-class VisitViewset(ModelViewSet):
+    # TODO None type of user , gives error need permission.
+    # permission_classes=[IsAuthenticated, VisitPermissions]
+    queryset = Visit.objects.all()
+    serializer_class = visit_serializers.VisitDynamicSerializer
+
+    def get_querysett(self):
+        usertype=self.request.user.usertype
+        is_staff=self.request.user.is_staff
+       
+
+        if usertype == 'p':
+            #TODO  replace to filter by id when finished
+            return Visit.objects.filter(patient__pk=id)
+              
+        if usertype == 'd':
+             return Visit.objects.filter(doctor__pk=id)
+           
+        if usertype == 'c' or is_staff == True:
+            return Visit.objects.all()
+        else:
+            return Visit.objects.all()
+
+
+    def get_serializer_classs(self):
+        usertype=self.request.user.usertype
+        is_staff=self.request.user.is_staff
+
+        if usertype == 'p':
+            if self.action == 'list':
+                # Todo url,  patient/doctor/description/date..
+                return visit_serializers.VisitListSerializerForPatient
+            if self.action  in ['retrieve', 'create', 'destroy']:
+                # TODO url   full list
+                # return visit_serializers.VisitViewsetSerializer
+                return visit_serializers.VisitRetrieveSerializerForPatient
+            if self.action in ['update','partial_update']:
+                # return visit_serializers.VisitViewsetSerializer
+                return visit_serializers.VisitUpdateSerializerForPatient   
+            
+            else:
+                return visit_serializers.VisitListSerializerForPatient   
+            
+        if usertype == 'd':
+            if self.action == ['list']:
+                #  url,  patient/doctor/description/date..
+                return visit_serializers.VisitListSerializerForDoctor
+            if self.action  in ['retrieve', 'create', 'destroy']:
+                return visit_serializers.VisitRetrieveSerializerForDoctor
+            if self.action in ['update','partial_update']:
+                return visit_serializers.VisitUpdateSerializerForDoctor
+            
+            else:
+                return visit_serializers.VisitListSerializerForDoctor
+        
+        if usertype == 'c' or is_staff == True:
+            if self.action == 'list':
+                #  url,  patient/doctor/description/date..
+                return visit_serializers.VisitListSerializerForDirector
+            if self.action  in ['retrieve', 'create', 'destroy']:
+                return visit_serializers.VisitRetrieveSerializerForDirector
+            if self.action in ['update','partial_update']:
+                return visit_serializers.VisitUpdateSerializerForDirector
+            
+            else:
+                return visit_serializers.VisitListSerializerForDirector
+        
+        else:
+            return visit_serializers.VisitListSerializerForPatient  # must be default serializer
+
+
+    def get_serializer_context(self):
+        try:
+            instance = self.get_object()
+        except AssertionError:
+            instance = None
+   
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request,   # exist in default
+            'action': self.action,
+            'instance': instance,
+        })
+        return context 
+    
+
+
+
+class VisitViewset2(ModelViewSet):
 
     # TODO None type of user , gives error need permission.
     permission_classes=[IsAuthenticated, VisitPermissions]
     # permission_classes=[AllowAny, VisitPermissions]
+    # queryset = Visit.objects.all()
 
     def get_queryset(self):
         usertype=self.request.user.usertype
@@ -30,11 +119,11 @@ class VisitViewset(ModelViewSet):
 
         if usertype == 'p':
             #TODO  replace to filter by id when finished
-            # return Visit.objects.filter(patient__pk=id)
-            return Visit.objects.all()    
+            return Visit.objects.filter(patient__pk=id)
+              
         if usertype == 'd':
-            #  return Visit.objects.filter(doctor__pk=id)
-            return Visit.objects.all()
+             return Visit.objects.filter(doctor__pk=id)
+           
         if usertype == 'c' or is_staff == True:
             return Visit.objects.all()
         else:

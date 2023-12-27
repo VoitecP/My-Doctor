@@ -1,6 +1,6 @@
 from apps.core.models import User, Patient, Doctor, Director
 from ..serializers import user_serializers
-from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
+from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated, UserPermissions
 from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 from ..permissions import *
 
@@ -14,11 +14,17 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView,UpdateAPIView, CreateAPIView, ListCreateAPIView
 
 
+
+
+
 class UserViewset(ModelViewSet):
     """
     User model List View (filtered list view)
     """
-    permission_classes=[IsAuthenticated]
+
+    serializer_class = user_serializers.UserDynamicSerializer
+    permission_classes=[IsAuthenticated, UserPermissions]
+    # queryset = User.objects.all()
 
     def get_queryset(self):
         usertype=self.request.user.usertype
@@ -33,21 +39,37 @@ class UserViewset(ModelViewSet):
                 return User.objects.filter(id=self.request.user.id)
             if usertype == 'c':
                 return User.objects.all()
-            
-            
-    def get_serializer_class(self):
-        usertype=self.request.user.usertype
-        is_superuser=self.request.user.is_superuser
 
-        if is_superuser == True:
-            return user_serializers.UserPrivateSerializer
-        else:
-            if usertype == 'p':
-                return user_serializers.UserPublicSerializer
-            if usertype == 'd':
-                return user_serializers.UserPublicSerializer
-            if usertype == 'c':
-                return user_serializers.UserPublicSerializer
+
+    def get_serializer_context(self):
+        try:
+            instance = self.get_object()
+        except AssertionError:
+            instance = None
+   
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request,   # exist in default
+            'action': self.action,
+            'instance': instance,
+        })
+        return context    
+        
+            
+            
+    # def get_serializer_class(self):
+    #     usertype=self.request.user.usertype
+    #     is_superuser=self.request.user.is_superuser
+
+    #     if is_superuser == True:
+    #         return user_serializers.UserPrivateSerializer
+    #     else:
+    #         if usertype == 'p':
+    #             return user_serializers.UserPublicSerializer
+    #         if usertype == 'd':
+    #             return user_serializers.UserPublicSerializer
+    #         if usertype == 'c':
+    #             return user_serializers.UserPublicSerializer
         
         
 

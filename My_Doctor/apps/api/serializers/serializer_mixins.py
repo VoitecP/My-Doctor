@@ -2,8 +2,7 @@
 class MappingMixin:
     '''
     Mixin override to representation method to allow
-    to remapping fields {'old':'New'} and pop fields ['a','b'] 
-    with is not need to return
+    to remapping fields {'old':'New'} 
     '''
     # pop_fields=[]
     mapping={}

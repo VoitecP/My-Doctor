@@ -14,20 +14,21 @@ class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):
 
 class DoctorDynamicSerializer(MixinModelSerializer):
 
-    # Fields for 'List' , 'create'
+    ## Fields for 'List' , 'create'
     get_full_name=serializers.CharField(label='Full Name', source='full_name', read_only=True)
     get_url=serializers.SerializerMethodField()
 
-    # Fields for 'retrieve' , 'destroy', 
+    ## Fields for 'retrieve' , 'destroy', 
     get_first_name=serializers.CharField(label='First Name', source='user.first_name', read_only=True)
     get_last_name=serializers.CharField(label='Last Name', source='user.last_name', read_only=True)
-    get_email=serializers.CharField(label='Email', source='user.email', read_only=True)
     get_specialization = serializers.CharField(label='Specialization', source='specialization', read_only=True)
+    # Visit related fields
+    get_email=serializers.CharField(label='Email', source='user.email', read_only=True)
     # Private fields
     get_phone = serializers.CharField(label='Phone', source='phone', read_only=True)
     get_private_field = serializers.CharField(label='Private Field', source='private_field', read_only=True)
     
-    # Fields for 'update' , 'partial_update'
+    ## Fields for 'update' , 'partial_update'
     first_name=serializers.CharField(source='user.first_name', max_length=150, default='', allow_blank=True)
     last_name=serializers.CharField(source='user.last_name',  max_length=150, default='', allow_blank=True)
     email=serializers.CharField(source='user.email', max_length=100, default='', allow_blank=True)
@@ -70,7 +71,7 @@ class DoctorDynamicSerializer(MixinModelSerializer):
                           'get_phone','get_private_field']
             else:
                 fields = ['get_first_name', 'get_last_name',
-                          'get_email','get_specialization']
+                          'get_specialization']
 
         if action in ['update','partial_update']:
             if (instance is not None and instance.user == request_user):
