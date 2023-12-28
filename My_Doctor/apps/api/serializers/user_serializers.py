@@ -41,6 +41,7 @@ class UserDynamicSerializer(MixinModelSerializer):
     username = serializers.CharField(max_length=50, label='Username',
                 validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField(max_length=50, label='Password')
+    change_password = serializers.CharField(label='Change Password',  max_length=50, required = False)
     first_name =  serializers.CharField(max_length=50, label='First Name')
     last_name =  serializers.CharField(max_length=50, label='Last Name')
     email =  serializers.CharField(label='Email')
@@ -65,6 +66,7 @@ class UserDynamicSerializer(MixinModelSerializer):
         extra_kwargs = {
             'username': {'write_only': True},
             'password': {'write_only': True},
+            'change_password': {'write_only': True},
             'first_name': {'write_only': True},
             'last_name': {'write_only': True},
             'email': {'write_only': True},
@@ -103,7 +105,7 @@ class UserDynamicSerializer(MixinModelSerializer):
         if action in ['update','partial_update']:
             if (instance is not None and instance == request_user):
 
-                fields = ['username','password',
+                fields = ['username','change_password',
                           'first_name','last_name','email']
             else:
                 fields = []
@@ -154,9 +156,6 @@ class UserDynamicSerializer(MixinModelSerializer):
        
 
     def get_usertype_choices(self):
-    # def get_usertype_choices(self, *args, **kwargs):
-        # context = kwargs.get('context', {})
-        # request_user = context['request'].user
 
         if Director.objects.exists():
             choices = [
@@ -173,6 +172,12 @@ class UserDynamicSerializer(MixinModelSerializer):
             ]
             return choices
 
+
+    # def to_representation(self, instance):
+    #     data = super().to_representation(instance)
+    #     data.pop('change_password', None)
+    #     return data
+    
        
     def create(self, validated_data):
         user = User()
@@ -188,7 +193,16 @@ class UserDynamicSerializer(MixinModelSerializer):
 
 
     def update(self, instance, validated_data):
-        instance.set_password(validated_data['password'])
+        instance.username = validated_data.get('username', instance.username)
+        
+        change_password = validated_data.get('change_password', None)
+        if change_password:
+            instance.set_password(change_password)
+        validated_data.pop('change_password', None)
+
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.email = validated_data.get('email', instance.email)
         instance.save()
     
         return instance

@@ -23,7 +23,7 @@ class UserViewset(ModelViewSet):
     """
 
     serializer_class = user_serializers.UserDynamicSerializer
-    permission_classes=[IsAuthenticated, UserPermissions]
+    # permission_classes=[IsAuthenticated, UserPermissions]
     # queryset = User.objects.all()
 
     def get_queryset(self):

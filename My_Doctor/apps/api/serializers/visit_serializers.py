@@ -7,9 +7,6 @@ from .category_serializers import *
 from .file_serializers import VisitImageSerializer
 from rest_framework.reverse import reverse
 
-
-
-
 from apps.api.serializers.serializer_mixins import MappingMixin
 
 
@@ -17,14 +14,239 @@ class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):
     pass
 
 
+class VisitDynamicSerializer(MixinModelSerializer):
 
+    ## Fields for 'List'
+    get_title = serializers.CharField(label='Title', source='title', read_only=True)
+    get_url = serializers.SerializerMethodField()
+    get_category = serializers.CharField(label='Category', source='category', read_only = True)
+    get_patient =  serializers.CharField(label='Patient',  source='patient.full_name', read_only=True)
+    get_doctor =  serializers.CharField(label='Doctor',  source='doctor.full_name', read_only=True)
+    # Fields for 'Retrieve'
+    get_date = serializers.DateTimeField(label='Visit Date', source='date', read_only=True)
+    get_url_patient = serializers.SerializerMethodField()
+    get_url_doctor = serializers.SerializerMethodField()
+    get_description = serializers.CharField(label='Description', source='description', read_only=True)
+    get_price = serializers.CharField(label='Price', source='price', read_only=True)
+    # get_closed = serializers.BooleanField(label='Visit Closed', source='closed', read_only=True)
+    get_closed = serializers.SerializerMethodField()
 
-class VisitDynamicSerializer(serializers.ModelSerializer):
+    ## Fields for 'Create'
+    title = serializers.CharField(max_length=100, label='Title')
+    category = serializers.PrimaryKeyRelatedField(label='Category', queryset=Category.objects.all(), allow_null=True, required=False)
+    date = serializers.DateTimeField(label='Date', default=None, allow_null=True, required=False)
+    patient = serializers.PrimaryKeyRelatedField(label='Patient', queryset=Patient.objects.all(), required=True)
+    doctor = serializers.PrimaryKeyRelatedField(label='Doctor', queryset=Doctor.objects.all(), required=True)
+    # Todo : make images fields
+    # image = serializers.ImageField(required=False, allow_null=True)
+    uploaded_images = serializers.ListField(label='Images', child = serializers.ImageField(
+            max_length = 1000000, allow_empty_file = False, use_url = False),
+            write_only=True)
+    description = serializers.CharField(label='Description', max_length=1000, min_length=10)
+    # Fields for 'Update'
+    price = serializers.CharField(label='Price', max_length=10)
+    closed = serializers.BooleanField(label='Visit Closed', default=False)
 
+    mapping = {  
+        'get_title':'title',
+        'get_url':'Link',
+        'get_category':'Category',
+        'get_date':'Visit Date',
+        'get_patient':'Patient Full Name',
+        'get_doctor':'Doctor Full Name',
+        #
+        'get_url_patient':'Patient Link',
+        'get_url_doctor':'Doctor Link',
+        'get_description':'Description',
+        'get_price':'Price',
+        'get_closed':'Visit Closed',
+    }
 
     class Meta:
         model = Visit
         fields = '__all__'
+        extra_kwargs =  {
+                        'title': {'write_only': True},
+                        'category': {'write_only': True},
+                        'date': {'write_only': True},
+                        'patient': {'write_only': True},
+                        'doctor': {'write_only': True},
+                        'description': {'write_only': True},
+                        'price': {'write_only': True},
+                        'closed': {'write_only': True}
+                        }
+
+
+    def __init__(self, *args, **kwargs):
+        context = kwargs.get('context', {})
+        action = context.get('action')
+        instance = context.get('instance', None)
+        request_user = context['request'].user
+
+        if action == 'list':
+            if request_user.usertype == 'p': 
+
+                fields = ['get_title','get_url','get_category',
+                          'get_doctor']
+
+            elif request_user.usertype == 'd':
+
+                fields = ['get_title','get_url','get_category',
+                          'get_patient']
+    
+            elif (request_user.usertype == 'c' 
+                  or request_user.is_staff == True):
+                
+                fields = ['get_title','get_url','get_category',
+                          'get_patient','get_doctor']
+                
+            else:
+                fields = []
+
+        if action == 'create':
+            if request_user.usertype == 'p':
+                
+                fields = ['title','category','date', 
+                          'doctor', 
+                          #'images',
+                          'description']
+            
+            elif request_user.usertype == 'd':
+                fields = []
+
+            elif (request_user.usertype == 'c' 
+                  or request_user.is_staff == True):
+               
+                fields = ['title','category','date', 
+                          'patient','doctor', 
+                          #'images',
+                          'description','price','closed']
+            
+            else:
+                fields = []
+
+        if action in ['retrieve','destroy']:
+            if request_user.usertype == 'p': 
+            
+                fields = ['get_title','get_category','get_date',
+                          'get_doctor','get_url_doctor','get_description',
+                          'get_price','get_closed']
+
+            elif request_user.usertype == 'd':
+
+                fields = ['get_title','get_category','get_date',
+                          'get_patient','get_url_patient','get_description',
+                          'get_price','get_closed']
+
+            elif (request_user.usertype == 'c' 
+                  or request_user.is_staff == True):
+                
+                fields = ['get_title','get_category','get_date',
+                          'get_patient','get_url_patient', 'get_doctor',
+                          'get_url_doctor','get_description','get_price',
+                          'get_closed']
+
+            else:
+                fields - []
+
+        if action in ['update','partial_update']:
+            if request_user.usertype == 'p': 
+        
+                fields = ['title','category','date',  
+                          #'images',
+                          'description']
+            
+            elif request_user.usertype == 'd':
+
+                fields = ['title','category','date',  
+                          #'images',
+                          'description','price','closed']
+
+            elif (request_user.usertype == 'c' 
+                  or request_user.is_staff == True):
+                
+                fields = ['title','category','date', 
+                          'patient','doctor', 
+                          #'images',
+                          'description','price','closed']
+
+            else:
+                fields = []
+    
+        super().__init__(*args, **kwargs)
+        
+        dynamic = set(fields)
+        all_fields = set(self.fields)
+        for field_pop in all_fields - dynamic:
+            self.fields.pop(field_pop)
+
+
+    def get_get_url(self, obj):
+        request=self.context.get('request')
+        if request is None:
+            return None
+        return reverse('api:visit-detail', kwargs={'pk': obj.pk}, request=request)
+    
+
+    def get_get_url_patient(self, obj):
+        request=self.context.get('request')
+        if request is None:
+            return None
+        return reverse('api:patient-detail', kwargs={'pk': obj.patient.pk}, request=request)
+       
+    def get_get_url_doctor(self, obj):
+        request=self.context.get('request')
+        if request is None:
+            return None
+        return reverse('api:doctor-detail', kwargs={'pk': obj.doctor.pk}, request=request)
+       
+    def get_get_closed(self, obj):
+        if obj.closed == True:
+            return 'Yes'
+        else:
+            return 'No'
+
+    def create(self, validated_data):
+        request_user = self.context['request'].user
+        uploaded_images = validated_data.pop('uploaded_images', [])
+
+        visit = Visit()
+        visit.title = validated_data['title']
+        visit.category = validated_data['category']
+        visit.date = validated_data['date']
+        visit.description = validated_data['description']
+        visit.doctor = validated_data['doctor']
+
+        if request_user.usertype == 'p':
+            visit.patient = request_user.patient
+        else:
+            visit.patient = validated_data['patient']    
+
+        visit.save()
+        # for image in uploaded_images:
+        #     VisitImageFile.objects.create(visit=visit, image=image)
+
+        return visit
+    
+
+    def update(self, instance, validated_data):
+        uploaded_images = validated_data.pop('uploaded_images', [])
+
+        instance.title = validated_data.get('title', instance.title)
+        instance.category = validated_data.get('category', instance.category)
+        instance.date = validated_data.get('date', instance.date)
+        instance.patient = validated_data.get('patient', instance.patient)
+        instance.doctor = validated_data.get('doctor', instance.doctor)
+        instance.description = validated_data.get('description', instance.description)
+        instance.price = validated_data.get('price', instance.price)
+        instance.closed = validated_data.get('closed', instance.closed)
+        instance.save()
+
+        # VisitImageFile.objects.filter(visit=instance).delete()  # Clear existing images
+        # for image in uploaded_images:
+        #     VisitImageFile.objects.create(visit=instance, image=image)
+
+        return instance
 
 
 
@@ -565,6 +787,8 @@ class VisitPrivateSerializer(serializers.ModelSerializer):
         for image in uploaded_images:
             VisitImageFile.objects.create(visit=visit, image=image)
         return visit
+    
+    
 
 ##
 

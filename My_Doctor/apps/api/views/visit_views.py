@@ -24,21 +24,20 @@ class VisitViewSet(ModelViewSet):
     serializer_class = visit_serializers.VisitDynamicSerializer
 
     def get_querysett(self):
-        usertype=self.request.user.usertype
-        is_staff=self.request.user.is_staff
-       
+        request_user=self.request.user
 
-        if usertype == 'p':
-            #TODO  replace to filter by id when finished
-            return Visit.objects.filter(patient__pk=id)
-              
-        if usertype == 'd':
-             return Visit.objects.filter(doctor__pk=id)
+        if request_user.usertype == 'p':
+            return Visit.objects.filter(patient__pk=request_user.id)
            
-        if usertype == 'c' or is_staff == True:
+        elif request_user.usertype == 'd':
+            return Visit.objects.filter(doctor__pk=request_user.id)
+           
+        elif (request_user.usertype == 'c' or 
+            request_user.usertype.is_staff == True):
             return Visit.objects.all()
+        
         else:
-            return Visit.objects.all()
+            return Visit.objects.none()
 
 
     def get_serializer_classs(self):
