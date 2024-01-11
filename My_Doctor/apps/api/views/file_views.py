@@ -17,6 +17,76 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIVie
 from rest_framework.serializers import ValidationError
 
 
+class Multiple2Image(ModelViewSet):
+    
+    # serializer_class = file_serializers.MultipleImageSerializer
+    serializer_class = file_serializers.VisitImageDynamicSerializer
+    queryset = VisitImageFile.objects.all()
+
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+
+    #     files = serializer.validated_data.get("files")
+    #     if files:
+    #         for file in files:
+    #             image_file = VisitImageFile(image=file)
+    #             image_file.save()
+    #             #VisitImageFile.objects.create(image=file)
+                
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+    def get_serializer_context(self):
+        try:
+            instance = self.get_object()
+        except AssertionError:
+            instance = None
+   
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request,   # exist in default
+            'action': self.action,
+            'instance': instance,
+        })
+        return context 
+
+# Todo Multiple image not working properly with VisitImage model 
+class MultipleImage(ModelViewSet):
+    
+    # serializer_class = file_serializers.MultipleImageSerializer
+    serializer_class = file_serializers.VisitImageDynamicSerializer
+    queryset = VisitImageFile.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        files = serializer.validated_data.get("files")
+        if files:
+            for file in files:
+                image_file = VisitImageFile(image=file)
+                image_file.save()
+                #VisitImageFile.objects.create(image=file)
+                
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+    def get_serializer_context(self):
+        try:
+            instance = self.get_object()
+        except AssertionError:
+            instance = None
+   
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request,   # exist in default
+            'action': self.action,
+            'instance': instance,
+        })
+        return context 
 
 
 class PatientImageViewset(ModelViewSet):

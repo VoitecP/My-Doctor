@@ -4,6 +4,26 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.core.validators import FileExtensionValidator
 
+def polish_chars(name):
+    '''
+    Polish char replace
+    # TODO
+    '''
+    dict = {'ą': 'a', 
+            'ę': 'e', 
+            'ć': 'c', 
+            'ł': 'l', 
+            'ń': 'n', 
+            'ó': 'o', 
+            'ś': 's', 
+            'ź': 'z', 
+            'ż': 'z'}
+
+    for old, new in dict.items():
+        name = name.replace(old, new)
+
+    return name
+
 
 def make_thumb(self):
     height=200
@@ -38,18 +58,28 @@ def make_thumb(self):
     except IOError:
         pass
     
-   
 
-
-def user_image_path(instance, filename):
+def user_image_path(user, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/images/<filename>
     # return "user_{0}/{1}".format(instance.user.id, filename)
-    return f'user_{instance.user.id}/images/{filename}'
+    return f'user_{user.id}/images/{filename}'
 
-def user_thumb_path(instance, filename):
+def user_thumb_path(user, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/thumbs/<filename>
     # return "user_{0}/{1}".format(instance.user.id, filename)
-    return f'user_{instance.user.id}/thumbs/{filename}'
+    return f'user_{user.id}/thumbs/{filename}'
+
+
+
+# def user_image_path(instance, filename):
+#     # file will be uploaded to MEDIA_ROOT/user_<id>/images/<filename>
+#     # return "user_{0}/{1}".format(instance.user.id, filename)
+#     return f'user_{instance.user.id}/images/{filename}'
+
+# def user_thumb_path(instance, filename):
+#     # file will be uploaded to MEDIA_ROOT/user_<id>/thumbs/<filename>
+#     # return "user_{0}/{1}".format(instance.user.id, filename)
+#     return f'user_{instance.user.id}/thumbs/{filename}'
 
 def ext_validator(self):
     validator=FileExtensionValidator(allowed_extensions=['jpg','png'])

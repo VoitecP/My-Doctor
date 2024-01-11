@@ -4,7 +4,7 @@ from .doctor_serializers import DoctorPublicSerializer, DoctorPrivateSerializer,
 from .patient_serializers import *
 from .category_serializers import *
 #PatientPublicSerializer, PatientPrivateSerializer, PatientVisitSerializer
-from .file_serializers import VisitImageSerializer
+from .file_serializers import VisitImageSerializer, UploadedImagesNestedSerializer
 from rest_framework.reverse import reverse
 
 from apps.api.serializers.serializer_mixins import MappingMixin
@@ -27,9 +27,11 @@ class VisitDynamicSerializer(MixinModelSerializer):
     get_url_patient = serializers.SerializerMethodField()
     get_url_doctor = serializers.SerializerMethodField()
     get_description = serializers.CharField(label='Description', source='description', read_only=True)
+    get_uploaded_images = UploadedImagesNestedSerializer(many=True, read_only=True)
     get_price = serializers.CharField(label='Price', source='price', read_only=True)
     # get_closed = serializers.BooleanField(label='Visit Closed', source='closed', read_only=True)
     get_closed = serializers.SerializerMethodField()
+    # todo images = ProductImageSerializer(many=True, read_only=True)
 
     ## Fields for 'Create'
     title = serializers.CharField(max_length=100, label='Title')
@@ -38,10 +40,13 @@ class VisitDynamicSerializer(MixinModelSerializer):
     patient = serializers.PrimaryKeyRelatedField(label='Patient', queryset=Patient.objects.all(), required=True)
     doctor = serializers.PrimaryKeyRelatedField(label='Doctor', queryset=Doctor.objects.all(), required=True)
     # Todo : make images fields
-    # image = serializers.ImageField(required=False, allow_null=True)
+    # image = serializers.ImageField(required=False, allow_null=True, many=True)
+    # images = ImageFileSerializer(many=True, read_only=True)
+
     uploaded_images = serializers.ListField(label='Images', child = serializers.ImageField(
             max_length = 1000000, allow_empty_file = False, use_url = False),
             write_only=True)
+    
     description = serializers.CharField(label='Description', max_length=1000, min_length=10)
     # Fields for 'Update'
     price = serializers.CharField(label='Price', max_length=10)
@@ -58,6 +63,7 @@ class VisitDynamicSerializer(MixinModelSerializer):
         'get_url_patient':'Patient Link',
         'get_url_doctor':'Doctor Link',
         'get_description':'Description',
+        'get_uploaded_images':'Uploaded Images',
         'get_price':'Price',
         'get_closed':'Visit Closed',
     }
@@ -130,12 +136,14 @@ class VisitDynamicSerializer(MixinModelSerializer):
             
                 fields = ['get_title','get_category','get_date',
                           'get_doctor','get_url_doctor','get_description',
+                          'get_uploaded_images',
                           'get_price','get_closed']
 
             elif request_user.usertype == 'd':
 
                 fields = ['get_title','get_category','get_date',
                           'get_patient','get_url_patient','get_description',
+                          'get_uploaded_images',
                           'get_price','get_closed']
 
             elif (request_user.usertype == 'c' 
@@ -143,7 +151,8 @@ class VisitDynamicSerializer(MixinModelSerializer):
                 
                 fields = ['get_title','get_category','get_date',
                           'get_patient','get_url_patient', 'get_doctor',
-                          'get_url_doctor','get_description','get_price',
+                          'get_url_doctor','get_description',
+                          'get_uploaded_images','get_price',
                           'get_closed']
 
             else:
@@ -210,6 +219,7 @@ class VisitDynamicSerializer(MixinModelSerializer):
         request_user = self.context['request'].user
         uploaded_images = validated_data.pop('uploaded_images', [])
 
+        # visit = Visit.objects.create(**validated_data)
         visit = Visit()
         visit.title = validated_data['title']
         visit.category = validated_data['category']
@@ -223,8 +233,8 @@ class VisitDynamicSerializer(MixinModelSerializer):
             visit.patient = validated_data['patient']    
 
         visit.save()
-        # for image in uploaded_images:
-        #     VisitImageFile.objects.create(visit=visit, image=image)
+        for image in uploaded_images:
+            VisitImageFile.objects.create(visit=visit, image=image)
 
         return visit
     

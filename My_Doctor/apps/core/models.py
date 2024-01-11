@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from apps.core import models_manager
 from apps.core import storage
+from django.db import transaction
 
 class User(AbstractUser):
     PATIENT = 'p'
@@ -108,41 +109,6 @@ class Director(Person):
             raise ValidationError('Only one Director instance is allowed')
         return super(Director, self).save(*args, **kwargs)
 
-    
-##
-
-class ImageFile(models.Model):
-    image=models.ImageField(upload_to=storage.user_image_path, 
-                            validators=[storage.ext_validator], blank=False)
-    thumb=models.ImageField(upload_to=storage.user_thumb_path, blank=False, editable=False)
-    title=models.CharField(max_length=50, blank=False, default=None)
-            
-    class Meta:
-        abstract=True
-
-
-    def save(self, *args, **kwargs):
-        storage.make_thumb(self)
-        return super(ImageFile, self).save(*args, **kwargs)
-    
-
-
-    
-
-    @property
-    def image_url(self):
-        return self.image.url
-    
-    @property
-    def thumb_url(self):
-        return self.thumb.url
-    
-
-
-
-    
-
-
 
 
 class Category(models.Model):
@@ -173,8 +139,13 @@ class Visit(models.Model):
     patient=models.ForeignKey(Patient, models.PROTECT, default=None)
     doctor=models.ForeignKey(Doctor, models.PROTECT, default=None)
     category=models.ForeignKey(Category,models.PROTECT,null=True,blank=True, default=None)
+    
     image=models.ImageField(upload_to=storage.user_image_path, 
                             validators=[storage.ext_validator], blank=True, default='')
+   
+    # visit = models.ForeignKey(VisitImageFile,models.CASCADE,null=True, blank=True, default=None)
+    
+    
     description=models.TextField()
     price=models.CharField(max_length=10)
     closed=models.BooleanField(default=False)
@@ -202,14 +173,45 @@ class Visit(models.Model):
         return self.get_absolute_url()
 
 
+class ImageFile(models.Model):
+    image=models.ImageField(upload_to=storage.user_image_path, 
+                            validators=[storage.ext_validator], blank=False)
+    thumb=models.ImageField(upload_to=storage.user_thumb_path, blank=True, editable=True)
+    # title=models.CharField(max_length=50, blank=False, default=None)
+            
+    class Meta:
+        abstract=True
+
+
+    def save(self, *args, **kwargs):
+
+        user = kwargs.pop('user', None)
+        # storage.user_image_path.user = user
+        # storage.user_thumb_path.user = user
+
+        # storage.user_image_path(self, user)
+        # storage.user_thumb_path(self, user)
+        # todo in admin panel user was as model
+        storage.user_image_path
+        storage.user_thumb_path
+        storage.make_thumb(self)
+        return super(ImageFile, self).save(*args, **kwargs)
+
+
+    @property
+    def image_url(self):
+        return self.image.url
+    
+    @property
+    def thumb_url(self):
+        return self.thumb.url
+    
+
+
+
 
 class VisitImageFile(ImageFile):
-    visit=models.ForeignKey(Visit, related_name='images', on_delete=models.CASCADE)
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    visit = models.ForeignKey(Visit,models.CASCADE,null=True, blank=True, default=None)
     
-     
-    class Meta: 
-        unique_together = ['visit', 'title']
-        ordering = ['title']
     
-    def __str__(self):
-        return f'{self.visit}, {self.title}'

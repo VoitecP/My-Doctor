@@ -36,8 +36,12 @@ class SummaryVisitView(APIView):
     """
     permission_classes = [IsAuthenticated] #  , IsDoctorCreated]
 
-    summary=Visit.objects.aggregate(sum=Sum('price'))
-    total=Visit.objects.count()
+    try:
+        summary=Visit.objects.aggregate(sum=Sum('price'))
+        total=Visit.objects.count()
+    except:
+        summary=None
+        total=None
     
     def get(self, request, format=None):
 
