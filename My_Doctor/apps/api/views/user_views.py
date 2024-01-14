@@ -1,23 +1,21 @@
-from apps.core.models import User, Patient, Doctor, Director
-from ..serializers import user_serializers
-from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated, UserPermissions
-from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
-from ..permissions import *
-
 from django.contrib.auth import login, logout, authenticate
 from rest_framework import status
-from rest_framework.viewsets import GenericViewSet,  ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.serializers import ValidationError
-from rest_framework.response import Response  
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView,UpdateAPIView, CreateAPIView, ListCreateAPIView
+from rest_framework.response import Response 
+from rest_framework.serializers import ValidationError
+from rest_framework.viewsets import GenericViewSet,  ReadOnlyModelViewSet, ModelViewSet
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 
+from ..serializers import user_serializers
+from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated, UserPermissions
+from ..permissions import *
+from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 from .view_mixins import ContextModelViewSet
+from apps.core.models import User
 
 
-
-class UserViewset(ContextModelViewSet):
+class UserViewSet(ContextModelViewSet):
     """
     User model List View (filtered list view)
     """

@@ -1,6 +1,9 @@
-from apps.core.models import Category
 from rest_framework import serializers
-# from apps.api.serializers import UserPublicSerializer
+
+from apps.core.models import Category
+
+
+# TODO CAtegory serializers
 
 
 class CategorySerializer(serializers.ModelSerializer):

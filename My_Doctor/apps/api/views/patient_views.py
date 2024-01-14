@@ -1,19 +1,14 @@
-from apps.core.models import *
-from ..serializers import *
-from ..permissions import *
-from rest_framework import status
-from rest_framework.viewsets import  ModelViewSet
-from .view_mixins import ContextModelViewSet
-
-
-from rest_framework.response import Response  
-from rest_framework.decorators import action
-
 # from django.contrib.auth import logout as django_logout
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
 from rest_framework.authentication import SessionAuthentication
-from ..permissions import IsDoctorCreated, IsPatientCreated
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response  
+from rest_framework.viewsets import  ModelViewSet
+
+from ..permissions import *
+from ..serializers import *
+from .view_mixins import ContextModelViewSet
+from apps.core.models import *
 
 
 class PatientViewSet(ContextModelViewSet):

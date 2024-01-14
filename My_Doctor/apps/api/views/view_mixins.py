@@ -1,19 +1,18 @@
-from apps.core.models import User, Patient, Doctor, Director, Category
+from django.shortcuts import get_object_or_404
+from django.views.generic.detail import SingleObjectMixin
+from rest_framework.viewsets import   ModelViewSet
+
 from ..serializers.patient_serializers import PatientUpdateSerializer
 from ..serializers.doctor_serializers import DoctorUpdateSerializer
 from ..serializers.director_serializers import DirectorUpdateSerializer
 from ..serializers.category_serializers import CategorySerializer
-from django.shortcuts import get_object_or_404
-from django.views.generic.detail import SingleObjectMixin
+from apps.core.models import User, Patient, Doctor, Director, Category
 
-from rest_framework.viewsets import   ModelViewSet
 
 # class UUIDMixin(SingleObjectMixin):
     
 #     def get_object(self):
 #         return self.model.objects.get(id=self.kwargs.get("id"))
-
-
 
 class ContextMixin:
     def get_serializer_context(self):

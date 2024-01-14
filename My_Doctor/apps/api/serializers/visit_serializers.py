@@ -1,20 +1,15 @@
-from apps.core.models import Visit, VisitImageFile, User, Patient, Doctor
 from rest_framework import serializers
-from .doctor_serializers import DoctorPublicSerializer, DoctorPrivateSerializer, DoctorVisitSerializer
-from .patient_serializers import *
-from .category_serializers import *
-#PatientPublicSerializer, PatientPrivateSerializer, PatientVisitSerializer
-from .file_serializers import VisitImageSerializer, UploadedImagesNestedSerializer
 from rest_framework.reverse import reverse
 
-from apps.api.serializers.serializer_mixins import MappingMixin
+from apps.core.models import Doctor, Patient,  Visit, VisitImageFile
+from .doctor_serializers import DoctorPublicSerializer, DoctorPrivateSerializer, DoctorVisitSerializer
+from .patient_serializers import *  # todo remove when removing junk serializers
+from .category_serializers import *
+from .file_serializers import VisitImageSerializer, UploadedImagesNestedSerializer
+from .serializer_mixins import MappingModelSerializer
 
 
-class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):    
-    pass
-
-
-class VisitDynamicSerializer(MixinModelSerializer):
+class VisitDynamicSerializer(MappingModelSerializer):
 
     ## Fields for 'List'
     get_title = serializers.CharField(label='Title', source='title', read_only=True)
@@ -198,17 +193,20 @@ class VisitDynamicSerializer(MixinModelSerializer):
             return None
         return reverse('api:patient-detail', kwargs={'pk': obj.patient.pk}, request=request)
        
+
     def get_get_url_doctor(self, obj):
         request=self.context.get('request')
         if request is None:
             return None
         return reverse('api:doctor-detail', kwargs={'pk': obj.doctor.pk}, request=request)
        
+
     def get_get_closed(self, obj):
         if obj.closed == True:
             return 'Yes'
         else:
             return 'No'
+
 
     def create(self, validated_data):
         request_user = self.context['request'].user
@@ -249,7 +247,6 @@ class VisitDynamicSerializer(MixinModelSerializer):
         instance.save()
 
         return instance
-
 
 
 #####

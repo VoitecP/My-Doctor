@@ -1,18 +1,12 @@
-from apps.core.models import Doctor
 from rest_framework import serializers
-
 from rest_framework.reverse import reverse
 
-# from apps.api.serializers import UserPublicSerializer, UserPrivateSerializer, UserVisitSerializer
+from apps.core.models import Doctor
 from apps.api.serializers import user_serializers
-from apps.api.serializers.serializer_mixins import MappingMixin
+from .serializer_mixins import MappingModelSerializer
 
 
-class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):    
-    pass
-
-
-class DoctorDynamicSerializer(MixinModelSerializer):
+class DoctorDynamicSerializer(MappingModelSerializer):
 
     ## Fields for 'List' , 'create'
     get_full_name=serializers.CharField(label='Full Name', source='full_name', read_only=True)

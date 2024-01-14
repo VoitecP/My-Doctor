@@ -1,8 +1,9 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
-from apps.core.models import Patient, User, Doctor, Director
-from rest_framework.reverse import reverse
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission, SAFE_METHODS, IsAuthenticated
+from rest_framework.reverse import reverse
+
+from apps.core.models import Patient, User, Doctor, Director
+
 
 class BaseObjectPermission(BasePermission):
 

@@ -1,18 +1,17 @@
-from apps.core.models import Visit, Patient, Doctor, Director
-from ..serializers import visit_serializers
-from ..permissions import *
-# from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
-# from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
-
-
-from rest_framework.response import Response  
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView,UpdateAPIView, CreateAPIView, ListCreateAPIView
+from rest_framework.response import Response  
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.viewsets import ModelViewSet, GenericViewSet,  ReadOnlyModelViewSet
 from rest_framework.serializers import ValidationError
 
+from ..permissions import *
+from ..serializers import visit_serializers
 from .view_mixins import ContextModelViewSet
+from apps.core.models import Visit
+# from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
+# from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
+
 
 #####
 # Viewsets
@@ -36,7 +35,6 @@ class VisitViewSet(ContextModelViewSet):
             
         elif (user.usertype == 'c' or user.is_staff == True):
             return Visit.objects.all()
-            
         else:
             return Visit.objects.none()
 

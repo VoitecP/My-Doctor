@@ -1,26 +1,18 @@
-from apps.core.models import User, Patient, Director
-
-
 from django.utils import timezone
-from datetime import timedelta
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 from rest_framework.validators import UniqueValidator
-
 
 # Removed
 # from dj_rest_auth.serializers import UserDetailsSerializer
 # from dj_rest_auth.registration.serializers import RegisterSerializer
 
-
-from apps.api.serializers.serializer_mixins import MappingMixin
-
-
-class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):    
-    pass
+from apps.core.models import Director, User
+from .serializer_mixins import MappingModelSerializer
 
 
-class UserDynamicSerializer(MixinModelSerializer):
+
+class UserDynamicSerializer(MappingModelSerializer):
 
     ## Fields for 'List' 
     get_full_name = serializers.SerializerMethodField()

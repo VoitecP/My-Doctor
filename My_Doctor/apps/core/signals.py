@@ -1,7 +1,8 @@
-from django.db.models.signals import post_save
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from .models import User, Patient, Doctor, Director, VisitImageFile
+
+from .models import (Doctor, Director, Patient, 
+                     User, VisitImageFile)
 
 
 def create_usertype(sender, instance, created, **kwargs):
@@ -32,19 +33,13 @@ post_save.connect(update_usertype, sender=Patient)
 post_save.connect(update_usertype, sender=Doctor)
 post_save.connect(update_usertype, sender=Director)
 
-@receiver(pre_save, sender=VisitImageFile)
-def get_user_image_path(sender, instance, **kwargs):
+
+# @receiver(pre_save, sender=VisitImageFile)
+# def get_user_image_path(sender, instance, **kwargs):
+#         ...
+#         print('signals')
     
-        print('signals')
-        print(kwargs)
        
-
-# pre_save.connect(get_user_image_path, sender=VisitImageFile)
-
-@receiver(pre_save, sender=VisitImageFile)
-def get_user_thumb_path(sender, instance, **kwargs):
-    
-        ...
-
-
-# pre_save.connect(get_user_thumb_path, sender=VisitImageFile)
+# @receiver(pre_save, sender=VisitImageFile)
+# def get_user_thumb_path(sender, instance, **kwargs):
+#         ...

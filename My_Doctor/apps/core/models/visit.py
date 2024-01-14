@@ -1,15 +1,9 @@
-import uuid, datetime
+import uuid
+
 from django.db import models
-from django.utils.crypto import get_random_string as rnd
 
-
-from apps.core import models_manager
-from apps.core import storage
-
-
-from .person import Doctor, Patient, Director
-from .category import Category
-
+from apps.core.models import (Category, Doctor, Patient, 
+                              models_manager, storage)
 
 
 class Visit(models.Model):
@@ -18,14 +12,12 @@ class Visit(models.Model):
     date=models.DateTimeField(default=None, null=True, blank=True)    
     patient=models.ForeignKey(Patient, models.PROTECT, default=None)
     doctor=models.ForeignKey(Doctor, models.PROTECT, default=None)
-    category=models.ForeignKey(Category,models.PROTECT,null=True,blank=True, default=None)
-    
-    image=models.ImageField(upload_to=storage.user_image_path, 
-                            validators=[storage.ext_validator], blank=True, default='')
-   
-    # visit = models.ForeignKey(VisitImageFile,models.CASCADE,null=True, blank=True, default=None)
-    
-    
+    category=models.ForeignKey(
+        Category,models.PROTECT,
+        null=True,blank=True, default=None)    
+    image=models.ImageField(
+        upload_to=storage.user_image_path, validators=[storage.ext_validator], 
+        blank=True, default='')
     description=models.TextField()
     price=models.CharField(max_length=10)
     closed=models.BooleanField(default=False)
@@ -36,8 +28,6 @@ class Visit(models.Model):
     category_objects=models_manager.VisitCategorySummary()
     doctor_objects=models_manager.VisitDoctorSummary()
     
-
-
     class Meta:
         ordering=('date',)
 
@@ -46,6 +36,7 @@ class Visit(models.Model):
         return f' Visit: {format[0:10]} - {self.title}'
     
     def get_absolute_url(self):
+        # Todo Url check, or delete
         return f"/api/visit-test/{self.pk}/"
     
     @property

@@ -1,10 +1,6 @@
-from apps.core.models import Visit
 from rest_framework import serializers
-from django.db.models import Sum, Aggregate
 
-from ..serializers import visit_serializers
-from .doctor_serializers import DoctorPublicSerializer, DoctorPrivateSerializer, DoctorVisitSerializer
-from .patient_serializers import PatientPublicSerializer, PatientPrivateSerializer 
+from apps.core.models import Visit
 
 
 class VisitYearSummarySerializer(serializers.ModelSerializer):

@@ -1,28 +1,21 @@
-from apps.core.models import  Director
-from ..serializers import director_serializers
-from ..permissions import *
-from rest_framework import status
-from rest_framework.viewsets import   ModelViewSet
-from .view_mixins import ContextModelViewSet
+from rest_framework.generics import (
+    RetrieveUpdateAPIView, RetrieveDestroyAPIView, 
+    ListCreateAPIView)
 from rest_framework.serializers import ValidationError
-from .view_mixins import ContextModelViewSet
-
 from rest_framework.response import Response  
-from rest_framework.decorators import action
-
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, ListCreateAPIView
+from apps.core.models import  Director
+from ..permissions import *
 from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
+from ..serializers import director_serializers
+from .view_mixins import ContextModelViewSet
 
-from django.shortcuts import get_object_or_404
-from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 
 #####
 # Viewsets
 
-
-class DirectorViewset(ContextModelViewSet):
+class DirectorViewSet(ContextModelViewSet):
     '''
     Viewset for Director model. Required dynamic serializers 
     and specyfic permission class for managing action access

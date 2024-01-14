@@ -10,9 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from pathlib import Path
-from decouple import config
 import os, sys
+
+from pathlib import Path
+
+from decouple import config
+
 
 # Add for specific apps path
 PROJECT_ROOT = os.path.dirname(__file__)
@@ -181,7 +184,7 @@ REST_FRAMEWORK = {
 
     
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        ## Correct order for auth
+        ## Correct order for authentication
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
@@ -220,11 +223,14 @@ SPECTACULAR_SETTINGS = {
 
 
 REST_AUTH = {
-
-    
+ 
 }
 
-# Disabled
+####
+### Disabled
+####
+
+
 # REST_USE_JWT = True
 
 # JWT_AUTH_COOKIE = 'my-app-auth'

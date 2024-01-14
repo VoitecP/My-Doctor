@@ -1,19 +1,17 @@
-from apps.core.models import *
+# from django.contrib.auth import logout as django_logout
+from rest_framework import status
+from rest_framework.generics import (
+    RetrieveUpdateAPIView, RetrieveDestroyAPIView, 
+    ListCreateAPIView, DestroyAPIView)
+from rest_framework.response import Response  
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.serializers import ValidationError
+from rest_framework.viewsets import ModelViewSet
+
 from ..serializers import file_serializers
 from ..permissions import *
-from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
 from .view_mixins import ContextModelViewSet
-from rest_framework.response import Response  
-
-
-# from django.contrib.auth import logout as django_logout
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
-from rest_framework.authentication import SessionAuthentication
-
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, ListCreateAPIView, DestroyAPIView
-from rest_framework.serializers import ValidationError
+from apps.core.models import *
 
 
 class Multiple2Image(ContextModelViewSet):
@@ -62,7 +60,7 @@ class MultipleImage(ContextModelViewSet):
 
     
 
-class PatientImageViewset(ModelViewSet):
+class PatientImageViewSet(ModelViewSet):
    
     serializer_class=file_serializers.PatientImageSerializer
     permission_classes = [IsAuthenticated]

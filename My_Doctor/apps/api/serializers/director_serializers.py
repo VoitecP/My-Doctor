@@ -1,20 +1,12 @@
-from apps.core.models import Director, User
-
-from rest_framework.permissions import SAFE_METHODS
 from rest_framework import serializers
-from rest_framework.response import Response 
+from rest_framework.reverse import reverse
 from rest_framework.serializers import ValidationError
 
-from apps.api.serializers import  user_serializers
-from apps.api.serializers.serializer_mixins import MappingMixin
-from rest_framework.reverse import reverse
+from apps.core.models import Director, User
+from .serializer_mixins import MappingModelSerializer
 
 
-class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):    
-    pass
-
-
-class DirectorDynamicSerializerForPerson(MixinModelSerializer):
+class DirectorDynamicSerializerForPerson(MappingModelSerializer):
 
     # Fields for 'List' , 'create'
     full_name=serializers.CharField(label='Full Name', read_only=True)
@@ -64,7 +56,7 @@ class DirectorDynamicSerializerForPerson(MixinModelSerializer):
         return reverse('api:director-detail', kwargs={"pk": obj.pk}, request=request)
 
 
-class DirectorDynamicSerializerForDirector(MixinModelSerializer):
+class DirectorDynamicSerializerForDirector(MappingModelSerializer):
 
     # Fields for 'List' , 'create'
     full_name=serializers.CharField(label='Full Name', read_only=True)
@@ -196,7 +188,7 @@ class DirectorCreateSerializer(serializers.ModelSerializer):
 
 
 
-class DirectorListSerializer(MixinModelSerializer):
+class DirectorListSerializer(MappingModelSerializer):
     url=serializers.SerializerMethodField()
     full_name=serializers.SerializerMethodField()
 
@@ -227,7 +219,7 @@ class DirectorListSerializer(MixinModelSerializer):
  
 
 
-class DirectorRetrieveSerializerForPerson(MixinModelSerializer):
+class DirectorRetrieveSerializerForPerson(MappingModelSerializer):
 
     full_name=serializers.SerializerMethodField()
     phone=serializers.SerializerMethodField()

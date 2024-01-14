@@ -1,11 +1,12 @@
-from django.db import models #Value, Manager
-from django.db.models.functions import Coalesce
-from collections import OrderedDict
+# from collections import OrderedDict
 
-from django.db.models.query import QuerySet
+from django.db import models 
+from django.db.models.functions import Coalesce
+# from django.db.models.query import QuerySet
 
 
 class VisitYearSummary(models.Manager):
+    
     def get_queryset(self):
         queryset = (super().get_queryset()
                     .values('date__year')
@@ -18,6 +19,7 @@ class VisitYearSummary(models.Manager):
     
 
 class VisitMonthSummary(models.Manager):
+    
     def get_queryset(self):
         queryset = (super().get_queryset()
                     .values('date__month','date__year')
@@ -33,6 +35,7 @@ class VisitMonthSummary(models.Manager):
     
 
 class VisitMonthSummary(models.Manager):
+    
     def get_queryset(self):
         queryset = (super().get_queryset()
                     .values('date__month','date__year')
@@ -46,22 +49,29 @@ class VisitMonthSummary(models.Manager):
                     )
         return queryset	
 
+
 class VisitCategorySummary(models.Manager):
+    
     def get_queryset(self):
         queryset=(super().get_queryset()
-                .annotate(category_name=Coalesce('category__name', models.Value('-No Category-')))
+                .annotate(category_name=Coalesce(
+                    'category__name', 
+                    models.Value('-No Category-')
+                    ))
                 .order_by('category')
                 .values('category_name')
                 .annotate(total=models.Count('price'))
                 .annotate(sum=models.Sum('price'))
                 .order_by('-category')
-                .values('category_name','total','sum')
+                .values('category_name',
+                        'total',
+                        'sum')
                 )
         return queryset
     
 
-
 class VisitDoctorSummary(models.Manager):
+    
     def get_queryset(self):
         queryset=(super().get_queryset()
                 .values('doctor_id',

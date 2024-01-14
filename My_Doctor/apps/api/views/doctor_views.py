@@ -1,17 +1,9 @@
-from apps.core.models import *
-from ..serializers import doctor_serializers
-from ..permissions import *
-from rest_framework import status
-from rest_framework.viewsets import ModelViewSet
-
-
-from rest_framework.response import Response  
-
-
 # from django.contrib.auth import logout as django_logout
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from rest_framework.authentication import SessionAuthentication
+from apps.core.models import *
+from ..permissions import *
+from ..serializers import doctor_serializers
 from .view_mixins import ContextModelViewSet
 
 

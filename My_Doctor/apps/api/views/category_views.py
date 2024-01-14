@@ -1,21 +1,22 @@
+from rest_framework.response import Response 
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.generics import (
+    RetrieveUpdateAPIView, RetrieveDestroyAPIView, 
+    ListCreateAPIView, DestroyAPIView)
+from rest_framework.serializers import ValidationError
+
 from apps.core.models import Category
 from ..serializers import category_serializers
 from ..permissions import CategoryPermissions, IsDirector, IsDirectorOrReadOnly
 from .view_mixins import CategoryQuerysetMixin, CategorySerializerMixin
-from rest_framework import status
-
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.response import Response 
-from rest_framework.exceptions import MethodNotAllowed 
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, ListCreateAPIView, DestroyAPIView
-from rest_framework.serializers import ValidationError
 from .view_mixins import ContextModelViewSet
+
+
 #####
 # Viewsets
 #####
 
-class CategoryViewset(ContextModelViewSet):
+class CategoryViewSet(ContextModelViewSet):
   
     permission_classes=[IsAuthenticated, CategoryPermissions]
 

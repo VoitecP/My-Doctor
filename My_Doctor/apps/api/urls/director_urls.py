@@ -1,17 +1,8 @@
-from ..views import director_views
-from django.urls import path, include 
-# from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-# router=DefaultRouter()
-# router.register(r'director', director_views.DirectorViewset, basename='director-list')
+from ..views import director_views
+
 
 urlpatterns =[
-    # path('',include(router.urls)),
-    ## Disable create, or only for admin ##
     path('create/',director_views.DirectorCreateView.as_view(), name='director-create'),
-   # todo removed serializers so removed views
-    # path('director/<uuid:pk>/update/',director_views.DirectorUpdateView.as_view(), name='director-update'),
-    # path('director/<uuid:pk>/delete/',director_views.DirectorDeleteView.as_view(), name='director-delete'),
-# 
-
-]
+   ]

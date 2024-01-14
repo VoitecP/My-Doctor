@@ -1,12 +1,13 @@
+from django.db.models import Sum
 from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
 from rest_framework.views import APIView
+from rest_framework.response import Response  
+from rest_framework.permissions import IsAuthenticated
+
 from apps.api.serializers import summary_serializers
 from apps.core.models import Visit
-from rest_framework.response import Response  
-
-from django.db.models import Sum
-from rest_framework.permissions import IsAuthenticated
 # from ..permissions import IsDoctorCreated
+
 
 class SummaryYearVisitListView(ReadOnlyModelViewSet):
     queryset=Visit.year_objects.all()

@@ -1,18 +1,13 @@
-from apps.core.models import VisitImageFile, ImageFile, Visit
 from rest_framework import serializers
-# from apps.api.serializers import UserPublicSerializer, UserPrivateSerializer, UserVisitSerializer
-
 from rest_framework.reverse import reverse
-
-from rest_framework.response import Response 
 from rest_framework.serializers import ValidationError
-from apps.api.serializers.serializer_mixins import MappingMixin
+
+from apps.core.models import VisitImageFile, Visit
+from .serializer_mixins import MappingModelSerializer
 
 
-class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):    
-    pass
 
-class VisitImageDynamicSerializer(MixinModelSerializer):
+class VisitImageDynamicSerializer(MappingModelSerializer):
 
     # Fields for 'List', 'Retrieve'
     get_visit_title = serializers.SerializerMethodField()
@@ -130,7 +125,7 @@ class VisitImageDynamicSerializer(MixinModelSerializer):
         return visitimagefile
     
     
-class UploadedImagesNestedSerializer(MixinModelSerializer):
+class UploadedImagesNestedSerializer(MappingModelSerializer):
     
     get_image_url=serializers.SerializerMethodField()
     get_thumb_url=serializers.SerializerMethodField()
