@@ -6,11 +6,33 @@ from ..serializers.category_serializers import CategorySerializer
 from django.shortcuts import get_object_or_404
 from django.views.generic.detail import SingleObjectMixin
 
+from rest_framework.viewsets import   ModelViewSet
+
 # class UUIDMixin(SingleObjectMixin):
     
 #     def get_object(self):
 #         return self.model.objects.get(id=self.kwargs.get("id"))
 
+
+
+class ContextMixin:
+    def get_serializer_context(self):
+            try:
+                instance = self.get_object()
+            except:
+                instance = None
+    
+            context = super().get_serializer_context()
+            context.update({
+                'request': self.request,   # exist in default
+                'action': self.action,
+                'instance': instance,
+            })
+            return context 
+
+
+
+####
 
 class UserQuerysetMixin:
 
@@ -69,3 +91,13 @@ class VisitQuerysetMixin:
         # if
         return super().get_queryset()
     
+
+
+# Todo
+## clean Mixins
+###
+
+class ContextModelViewSet(ContextMixin, ModelViewSet):
+    pass
+
+

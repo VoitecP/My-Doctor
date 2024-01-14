@@ -79,8 +79,9 @@ class DirectorDynamicSerializerForDirector(MixinModelSerializer):
     get_private_info=serializers.CharField(label='Personal Info', source='private_info', read_only=True)
     
     # Fields for  'update','partial_update'
+    # Todo replace user for user link:
     user = serializers.PrimaryKeyRelatedField(read_only=True)
-    first_name=serializers.CharField( source='user.first_name', max_length=150, default='', allow_blank=True)
+    first_name=serializers.CharField(source='user.first_name', max_length=150, default='', allow_blank=True)
     last_name=serializers.CharField(source='user.last_name',  max_length=150, default='', allow_blank=True)
     email=serializers.CharField(source='user.email', max_length=100, default='', allow_blank=True)
     # phone   - heritated from Person/Director model

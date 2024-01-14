@@ -10,27 +10,26 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView, ListCreateAPIView, DestroyAPIView
 from rest_framework.serializers import ValidationError
-
+from .view_mixins import ContextModelViewSet
 #####
 # Viewsets
 #####
 
-class CategoryViewset(ModelViewSet):
+class CategoryViewset(ContextModelViewSet):
   
     permission_classes=[IsAuthenticated, CategoryPermissions]
 
     def get_queryset(self):
             return Category.objects.all()
         
-
     def get_serializer_class(self):
-        usertype=self.request.user.usertype
-        is_staff=self.request.user.is_staff
-
-        if usertype == 'c' or is_staff == True:
+        user=self.request.user
+       
+        if user.usertype == 'c' or user.is_staff:
             return category_serializers.CategoryDirectorSerializer
         else:
             return category_serializers.CategorySerializer
+
 
     
 #####

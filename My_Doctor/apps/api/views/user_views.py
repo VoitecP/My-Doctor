@@ -13,68 +13,28 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIView,UpdateAPIView, CreateAPIView, ListCreateAPIView
 
+from .view_mixins import ContextModelViewSet
 
 
 
-
-class UserViewset(ModelViewSet):
+class UserViewset(ContextModelViewSet):
     """
     User model List View (filtered list view)
     """
 
     serializer_class = user_serializers.UserDynamicSerializer
     # permission_classes=[IsAuthenticated, UserPermissions]
-    # queryset = User.objects.all()
-
+            
     def get_queryset(self):
-        usertype=self.request.user.usertype
-        is_superuser=self.request.user.is_superuser
+        user=self.request.user
 
-        if is_superuser == True:
+        if user.usertype == 'p':
+            return User.objects.filter(id=user.id)
+        if user.usertype == 'd':
+            return User.objects.filter(id=user.id)
+        if user.usertype == 'c' or user.is_staff:
             return User.objects.all()
-        else:
-            if usertype == 'p':
-                return User.objects.filter(id=self.request.user.id)
-            if usertype == 'd':
-                return User.objects.filter(id=self.request.user.id)
-            if usertype == 'c':
-                return User.objects.all()
 
-
-    def get_serializer_context(self):
-        try:
-            instance = self.get_object()
-        except AssertionError:
-            instance = None
-   
-        context = super().get_serializer_context()
-        context.update({
-            'request': self.request,   # exist in default
-            'action': self.action,
-            'instance': instance,
-        })
-        return context    
-        
-            
-            
-    # def get_serializer_class(self):
-    #     usertype=self.request.user.usertype
-    #     is_superuser=self.request.user.is_superuser
-
-    #     if is_superuser == True:
-    #         return user_serializers.UserPrivateSerializer
-    #     else:
-    #         if usertype == 'p':
-    #             return user_serializers.UserPublicSerializer
-    #         if usertype == 'd':
-    #             return user_serializers.UserPublicSerializer
-    #         if usertype == 'c':
-    #             return user_serializers.UserPublicSerializer
-        
-        
-
-
-      
 
 class UserAuthView(GenericViewSet):
     """

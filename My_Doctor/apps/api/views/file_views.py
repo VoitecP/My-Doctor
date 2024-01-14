@@ -3,8 +3,7 @@ from ..serializers import file_serializers
 from ..permissions import *
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
-
-
+from .view_mixins import ContextModelViewSet
 from rest_framework.response import Response  
 
 
@@ -17,7 +16,7 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIVie
 from rest_framework.serializers import ValidationError
 
 
-class Multiple2Image(ModelViewSet):
+class Multiple2Image(ContextModelViewSet):
     
     # serializer_class = file_serializers.MultipleImageSerializer
     serializer_class = file_serializers.VisitImageDynamicSerializer
@@ -38,22 +37,9 @@ class Multiple2Image(ModelViewSet):
     #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-    def get_serializer_context(self):
-        try:
-            instance = self.get_object()
-        except AssertionError:
-            instance = None
-   
-        context = super().get_serializer_context()
-        context.update({
-            'request': self.request,   # exist in default
-            'action': self.action,
-            'instance': instance,
-        })
-        return context 
 
 # Todo Multiple image not working properly with VisitImage model 
-class MultipleImage(ModelViewSet):
+class MultipleImage(ContextModelViewSet):
     
     # serializer_class = file_serializers.MultipleImageSerializer
     serializer_class = file_serializers.VisitImageDynamicSerializer
@@ -74,20 +60,7 @@ class MultipleImage(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
-    def get_serializer_context(self):
-        try:
-            instance = self.get_object()
-        except AssertionError:
-            instance = None
-   
-        context = super().get_serializer_context()
-        context.update({
-            'request': self.request,   # exist in default
-            'action': self.action,
-            'instance': instance,
-        })
-        return context 
-
+    
 
 class PatientImageViewset(ModelViewSet):
    

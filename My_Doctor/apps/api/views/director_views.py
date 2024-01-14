@@ -3,8 +3,9 @@ from ..serializers import director_serializers
 from ..permissions import *
 from rest_framework import status
 from rest_framework.viewsets import   ModelViewSet
+from .view_mixins import ContextModelViewSet
 from rest_framework.serializers import ValidationError
-
+from .view_mixins import ContextModelViewSet
 
 from rest_framework.response import Response  
 from rest_framework.decorators import action
@@ -19,9 +20,9 @@ from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 
 #####
 # Viewsets
-#####
 
-class DirectorViewset(ModelViewSet):
+
+class DirectorViewset(ContextModelViewSet):
     '''
     Viewset for Director model. Required dynamic serializers 
     and specyfic permission class for managing action access
@@ -29,27 +30,17 @@ class DirectorViewset(ModelViewSet):
     permission_classes = [IsAuthenticated, DirectorPermissions]
     queryset = Director.objects.all()
     
-
     def get_serializer_class(self):
-        usertype=self.request.user.usertype
-        is_staff=self.request.user.is_staff
-
-        if usertype == 'p' or usertype == 'd':
+        user=self.request.user
+    
+        if user.usertype in ['p','d']:
             return director_serializers.DirectorDynamicSerializerForPerson
         
-        if usertype == 'c' or is_staff == True:
+        if user.usertype == 'c' or user.is_staff:
             return director_serializers.DirectorDynamicSerializerForDirector
             
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context.update({
-            'request': self.request,   # exist in default
-            'action': self.action,
-        })
-        return context
+
     
-
-
 
 #####
 # ApiViews

@@ -14,22 +14,22 @@ class MixinModelSerializer(MappingMixin, serializers.ModelSerializer):
 
 class VisitImageDynamicSerializer(MixinModelSerializer):
 
+    # Fields for 'List', 'Retrieve'
+    get_visit_title = serializers.SerializerMethodField()
+    get_visit_url = serializers.SerializerMethodField()
     get_visit_image_url = serializers.SerializerMethodField()
     get_image_url=serializers.SerializerMethodField()
     get_thumb_url=serializers.SerializerMethodField()
-    
-    
+    # 'Fields for 'Create'
     visit = serializers.PrimaryKeyRelatedField(label='Visit', queryset=Visit.objects.all(), required=True)
     image = serializers.ImageField()
     
-    
-    
- 
     mapping = {  
+        'get_visit_title':'Visit Title',
+        'get_visit_url':'Visit Link',
         'get_visit_image_url':'Visit Image',
         'get_image_url':'Image Link',
-        'get_thumb_url':'Thumbnail Link',
-        
+        'get_thumb_url':'Thumbnail Link',   
     }
 
     class Meta:
@@ -44,44 +44,59 @@ class VisitImageDynamicSerializer(MixinModelSerializer):
     def __init__(self, *args, **kwargs):
         context = kwargs.get('context', {})
         action = context.get('action')
-        instance = context.get('instance', None)
         request_user = context['request'].user
         self.fields['visit'].queryset = Visit.objects.filter(patient_id=request_user.id)
+        
+        self.fields['image'].upload_to = f'user_{request_user.id}/images/'
+        self.fields['thumb'].upload_to = f'user_{request_user.id}/images/'
 
         if action in ['list']:
             # if request_user.usertype == 'p': 
-
-            fields = ['get_visit_image_url']
+            fields = ['get_visit_title','get_visit_image_url']
 
         if action in ['create']:
-
             fields = ['image','visit']
 
         if action in ['retrieve','destroy']:
-           
-            fields = ['get_image_url']
-
-
+            fields = ['get_visit_title', 'get_visit_url',
+                      'get_image_url','get_thumb_url']
         
         if action in ['update','partial_update']:
             fields = []
 
-    
-
         super().__init__(*args, **kwargs)
-        
         dynamic = set(fields)
         all_fields = set(self.fields)
+
         for field_pop in all_fields - dynamic:
             self.fields.pop(field_pop)
 
+
+    def get_get_visit_title(self, obj):
+        title = getattr(obj.visit, 'title', None)
+
+        if title is not None:
+            return obj.visit.title
+        else: 
+            return 'None'
+
+
+    def get_get_visit_url(self, obj):
+        request=self.context.get('request')
+        visit = getattr(obj, 'visit', None)
+
+        if visit is None:
+            return 'None'
+        return reverse('api:visit-detail', kwargs={'pk': visit.pk}, request=request)
+
+        
     def get_get_visit_image_url(self, obj):
         request=self.context.get('request')
+
         if request is None:
             return None
         return reverse('api:image-detail', kwargs={'pk': obj.pk}, request=request)
     
-
 
     def get_get_image_url(self, obj):
         if obj.image:
@@ -92,7 +107,6 @@ class VisitImageDynamicSerializer(MixinModelSerializer):
                 return obj.image_url
         else:
             return 'None'
-
 
         
     def get_get_thumb_url(self, obj):
@@ -106,25 +120,32 @@ class VisitImageDynamicSerializer(MixinModelSerializer):
             return 'None'
 
 
-class UploadedImagesNestedSerializer(MixinModelSerializer):
+    def create(self, validated_data):
+    
+        request_user = self.context['request'].user
+        visitimagefile = VisitImageFile(**validated_data)
+        visitimagefile.user = request_user
+        visitimagefile.save()
 
+        return visitimagefile
+    
+    
+class UploadedImagesNestedSerializer(MixinModelSerializer):
+    
     get_image_url=serializers.SerializerMethodField()
     get_thumb_url=serializers.SerializerMethodField()
 
     mapping = {  
         'get_image_url':'Image Link',
-        'get_thumb_url':'Thumbnail Link',
-        
+        'get_thumb_url':'Thumbnail Link',      
     } 
-
     class Meta:
         model = VisitImageFile
         fields = ['get_image_url', 'get_thumb_url']
-        # fields = '__all__'
 
     def get_get_image_url(self, obj):
         if obj.image:
-            request = self.context.get('request')
+            request = self.context.get('request', None)
             if request:
                 return request.build_absolute_uri(obj.image_url)
             else:
@@ -132,11 +153,9 @@ class UploadedImagesNestedSerializer(MixinModelSerializer):
         else:
             return 'None'
 
-
-        
     def get_get_thumb_url(self, obj):
         if obj.thumb:
-            request = self.context.get('request')
+            request = self.context.get('request', None)
             if request:
                 return request.build_absolute_uri(obj.thumb_url)
             else:

@@ -12,10 +12,10 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from rest_framework.authentication import SessionAuthentication
+from .view_mixins import ContextModelViewSet
 
 
-
-class DoctorViewSet(ModelViewSet):
+class DoctorViewSet(ContextModelViewSet):
     
     serializer_class=doctor_serializers.DoctorDynamicSerializer
     permission_classes = [IsAuthenticated, DoctorPermissions]
@@ -23,28 +23,15 @@ class DoctorViewSet(ModelViewSet):
     
 
     def get_queryset(self):
-        usertype=self.request.user.usertype
-        if usertype == 'p':         # filter by visit
+        user = self.request.user
+
+        if user.usertype == 'p':         # filter by visit
+            return Doctor.objects.all()
+        if user.usertype == 'd':
+            return Doctor.objects.filter(user=user)
+            #return Doctor.objects.all()
+        if user.usertype == 'c':
             return Doctor.objects.all()
         
-        if usertype == 'd':
-            # return Doctor.objects.filter(user=self.request.user)
-            return Doctor.objects.all()
 
-        if usertype == 'c':
-            return Doctor.objects.all()
-        
-
-    def get_serializer_context(self):
-        try:
-            instance = self.get_object()
-        except AssertionError:
-            instance = None
-   
-        context = super().get_serializer_context()
-        context.update({
-            'request': self.request,   # exist in default
-            'action': self.action,
-            'instance': instance,
-        })
-        return context
+    

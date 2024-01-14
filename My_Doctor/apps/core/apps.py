@@ -10,6 +10,11 @@ class CoreConfig(AppConfig):
     # signals config
 
     def ready(self):
-
+        
         import apps.core.signals
         #from . import signals
+
+        # from django.db.models.signals import pre_save
+        # from .models import VisitImageFile
+        # pre_save.connect(apps.core.signals.get_user_image_path, sender=VisitImageFile)
+        # pre_save.connect(apps.core.signals.get_user_thumb_path, sender=VisitImageFile)

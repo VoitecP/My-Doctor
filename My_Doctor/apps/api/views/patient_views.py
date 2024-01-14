@@ -3,6 +3,7 @@ from ..serializers import *
 from ..permissions import *
 from rest_framework import status
 from rest_framework.viewsets import  ModelViewSet
+from .view_mixins import ContextModelViewSet
 
 
 from rest_framework.response import Response  
@@ -15,39 +16,23 @@ from rest_framework.authentication import SessionAuthentication
 from ..permissions import IsDoctorCreated, IsPatientCreated
 
 
-class PatientViewSet(ModelViewSet):
+class PatientViewSet(ContextModelViewSet):
     
     serializer_class=patient_serializers.PatientDynamicSerializer
     permission_classes = [IsAuthenticated]
-    # http_method_names = ['get','post','retrieve','put','patch']
-    
 
     def get_queryset(self):
-        usertype=self.request.user.usertype
-        if usertype == 'p':         # filter by visit
+        user = self.request.user
+    
+        if user.usertype == 'p':         # filter by visit
+            return Patient.objects.all()
+        if user.usertype == 'd':
+            return Patient.objects.filter(user=user)
+            #return Patient.objects.all()
+        if user.usertype == 'c' or user.is_staff:
             return Patient.objects.all()
         
-        if usertype == 'd':
-            # return Patient.objects.filter(user=self.request.user)
-            return Patient.objects.all()
-
-        if usertype == 'c':
-            return Patient.objects.all()
         
-        
-    def get_serializer_context(self):
-        try:
-            instance = self.get_object()
-        except AssertionError:
-            instance = None
-   
-        context = super().get_serializer_context()
-        context.update({
-            'request': self.request,   # exist in default
-            'action': self.action,
-            'instance': instance,
-        })
-        return context
 
 
 # Junk Viewset

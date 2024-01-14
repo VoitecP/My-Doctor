@@ -59,27 +59,13 @@ def make_thumb(self):
         pass
     
 
-def user_image_path(user, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/images/<filename>
-    # return "user_{0}/{1}".format(instance.user.id, filename)
-    return f'user_{user.id}/images/{filename}'
+def user_image_path(instance, filename):
+    user_id = getattr(instance.user, 'id', None)
+    return f'user_{user_id}/images/{filename}'
 
-def user_thumb_path(user, filename):
-    # file will be uploaded to MEDIA_ROOT/user_<id>/thumbs/<filename>
-    # return "user_{0}/{1}".format(instance.user.id, filename)
-    return f'user_{user.id}/thumbs/{filename}'
-
-
-
-# def user_image_path(instance, filename):
-#     # file will be uploaded to MEDIA_ROOT/user_<id>/images/<filename>
-#     # return "user_{0}/{1}".format(instance.user.id, filename)
-#     return f'user_{instance.user.id}/images/{filename}'
-
-# def user_thumb_path(instance, filename):
-#     # file will be uploaded to MEDIA_ROOT/user_<id>/thumbs/<filename>
-#     # return "user_{0}/{1}".format(instance.user.id, filename)
-#     return f'user_{instance.user.id}/thumbs/{filename}'
+def user_thumb_path(instance, filename):
+    user_id = getattr(instance.user, 'id', None)
+    return f'user_{user_id}/thumbs/{filename}'
 
 def ext_validator(self):
     validator=FileExtensionValidator(allowed_extensions=['jpg','png'])

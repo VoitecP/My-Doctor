@@ -12,11 +12,13 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIVie
 from rest_framework.viewsets import ModelViewSet, GenericViewSet,  ReadOnlyModelViewSet
 from rest_framework.serializers import ValidationError
 
+from .view_mixins import ContextModelViewSet
+
 #####
 # Viewsets
 #####
 
-class VisitViewSet(ModelViewSet):
+class VisitViewSet(ContextModelViewSet):
 
     # TODO None type of user , gives error need permission.
     # permission_classes=[IsAuthenticated, VisitPermissions]
@@ -24,18 +26,17 @@ class VisitViewSet(ModelViewSet):
     serializer_class = visit_serializers.VisitDynamicSerializer
 
     def get_querysett(self):
-        request_user=self.request.user
+        user=self.request.user
 
-        if request_user.usertype == 'p':
-            return Visit.objects.filter(patient__pk=request_user.id)
-           
-        elif request_user.usertype == 'd':
-            return Visit.objects.filter(doctor__pk=request_user.id)
-           
-        elif (request_user.usertype == 'c' or 
-            request_user.usertype.is_staff == True):
+        if user.usertype == 'p':
+            return Visit.objects.filter(patient__pk=user.id)
+            
+        elif user.usertype == 'd':
+            return Visit.objects.filter(doctor__pk=user.id)
+            
+        elif (user.usertype == 'c' or user.is_staff == True):
             return Visit.objects.all()
-        
+            
         else:
             return Visit.objects.none()
 
@@ -87,22 +88,8 @@ class VisitViewSet(ModelViewSet):
             return visit_serializers.VisitListSerializerForPatient  # must be default serializer
 
 
-    def get_serializer_context(self):
-        try:
-            instance = self.get_object()
-        except AssertionError:
-            instance = None
-   
-        context = super().get_serializer_context()
-        context.update({
-            'request': self.request,   # exist in default
-            'action': self.action,
-            'instance': instance,
-        })
-        return context 
+
     
-
-
 
 class VisitViewset2(ModelViewSet):
 
