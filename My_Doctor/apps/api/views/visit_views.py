@@ -20,7 +20,7 @@ from apps.core.models import Visit
 class VisitViewSet(ContextModelViewSet):
 
     # TODO None type of user , gives error need permission.
-    # permission_classes=[IsAuthenticated, VisitPermissions]
+    permission_classes=[IsAuthenticated, VisitPermissions]
     queryset = Visit.objects.all()
     serializer_class = visit_serializers.VisitDynamicSerializer
 

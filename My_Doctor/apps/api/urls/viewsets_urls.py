@@ -5,7 +5,7 @@ from ..views import (
     CategoryViewSet , DirectorViewSet, DoctorViewSet,
     Multiple2Image,PatientViewSet, PatientImageViewSet, 
     UserViewSet, VisitViewSet
-    )
+                     )
 
 
 router=DefaultRouter()
@@ -20,7 +20,9 @@ router.register(r'image', Multiple2Image, basename='image')
 router.register(r'user', UserViewSet, basename='user')
 
 
-# app_name='api'
+# app_name='apps.api'
+app_name='api' 
+
 urlpatterns =[
     path('',include(router.urls)),
     ]

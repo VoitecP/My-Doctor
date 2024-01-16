@@ -11,6 +11,7 @@ class DoctorViewSet(ContextModelViewSet):
     
     serializer_class=doctor_serializers.DoctorDynamicSerializer
     permission_classes = [IsAuthenticated, DoctorPermissions]
+    # permission_classes = [DoctorPermissions]
     # http_method_names = ['get','post','retrieve','put','patch']
     
 
@@ -22,8 +23,9 @@ class DoctorViewSet(ContextModelViewSet):
         if user.usertype == 'd':
             return Doctor.objects.filter(user=user)
             #return Doctor.objects.all()
-        if user.usertype == 'c':
+        if user.usertype == 'c' or user.is_staff:
             return Doctor.objects.all()
+        
         
 
     

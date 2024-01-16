@@ -14,7 +14,7 @@ from .serializer_mixins import MappingModelSerializer
 
 class UserDynamicSerializer(MappingModelSerializer):
 
-    ## Fields for 'List' 
+    ## Fields for 'list' 
     get_full_name = serializers.SerializerMethodField()
     get_url=serializers.SerializerMethodField()
     
@@ -29,7 +29,7 @@ class UserDynamicSerializer(MappingModelSerializer):
     get_date_created=serializers.DateTimeField(label='Date Created', source='date_joined', format='%d-%m-%Y %H:%M:%S', read_only=True)
     get_account_duration=serializers.SerializerMethodField()
 
-    ## Fields for 'Create'
+    ## Fields for 'create'
     username = serializers.CharField(max_length=50, label='Username',
                 validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField(max_length=50, label='Password')
@@ -95,7 +95,8 @@ class UserDynamicSerializer(MappingModelSerializer):
                 fields = ['get_first_name', 'get_last_name', 'get_usertype']
 
         if action in ['update','partial_update']:
-            if (instance is not None and instance == request_user):
+            if (instance is not None and (
+                instance == request_user or request_user.is_staff)):
 
                 fields = ['username','change_password',
                           'first_name','last_name','email']
@@ -103,7 +104,6 @@ class UserDynamicSerializer(MappingModelSerializer):
                 fields = []
     
         super().__init__(*args, **kwargs)
-        # self.fields['usertype'].choices = self.get_usertype_choices(*args, **kwargs)
         self.fields['usertype'].choices = self.get_usertype_choices()
 
         dynamic = set(fields)

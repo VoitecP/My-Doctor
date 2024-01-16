@@ -1,8 +1,8 @@
 import uuid
 from django.db import models
 
-from ..models import Visit, User
-from apps.core import storage
+# from ..models import Visit, User
+from apps.core.models import storage, Visit
 
 
 class ImageFile(models.Model):

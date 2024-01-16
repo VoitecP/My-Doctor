@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from apps.core.models import  Director
 from ..permissions import *
-from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
+# from apps.core.permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated
 from ..serializers import director_serializers
 from .view_mixins import ContextModelViewSet
 
@@ -41,7 +41,7 @@ class DirectorViewSet(ContextModelViewSet):
 class DirectorCreateView(ListCreateAPIView):
     queryset=Director.objects.all()
     #serializer_class=director_serializers.DirectorCreateSerializer
-    permission_classes = [IsAuthenticated,DirectorSingletonPermission]
+    # permission_classes = [IsAuthenticated,DirectorSingletonPermission]
 
     def get_serializer_class(self):
         return director_serializers.DirectorCreateSerializer

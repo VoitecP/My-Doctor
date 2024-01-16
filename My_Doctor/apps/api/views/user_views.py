@@ -8,7 +8,7 @@ from rest_framework.viewsets import GenericViewSet,  ReadOnlyModelViewSet, Model
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 
 from ..serializers import user_serializers
-from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated, UserPermissions
+# from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated, UserPermissions
 from ..permissions import *
 from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
 from .view_mixins import ContextModelViewSet
@@ -21,7 +21,7 @@ class UserViewSet(ContextModelViewSet):
     """
 
     serializer_class = user_serializers.UserDynamicSerializer
-    # permission_classes=[IsAuthenticated, UserPermissions]
+    permission_classes=[IsAuthenticated, UserPermissions]
             
     def get_queryset(self):
         user=self.request.user
@@ -108,7 +108,7 @@ class UserTypeCreateView(UserQuerysetMixin, UserSerializerMixin, ListCreateAPIVi
     # TODO: When Usertype is created in signals, (later should be confirmed by email,
     # TODO: User should be redirect or blocked ; to be only able to update profile
     # This view is not need, onle user type update view
-    permission_classes = [IsAuthenticated, IsNotUserUpdated] #, IsAdminUser]   it can make errors
+    # permission_classes = [IsAuthenticated, IsNotUserUpdated] #, IsAdminUser]   it can make errors
 
     def perform_create(self, serializer):
         try:
@@ -122,7 +122,7 @@ class UserTypeUpdateView(UserObjectMixin, UserSerializerMixin,  RetrieveUpdateAP
     """
     View for Update Patient/Doctor/Director model
     """
-    permission_classes = [IsAuthenticated, IsUserUpdated]
+    # permission_classes = [IsAuthenticated, IsUserUpdated]
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)

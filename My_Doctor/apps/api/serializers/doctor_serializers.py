@@ -58,7 +58,8 @@ class DoctorDynamicSerializer(MappingModelSerializer):
             fields = ['get_full_name','get_url']
     
         if action in ['retrieve','destroy']:
-            if (instance is not None and instance.user == request_user):
+            if (instance is not None 
+                and (instance.user == request_user or request_user.is_staff)):
 
                 fields = ['get_first_name','get_last_name',
                           'get_email','get_specialization', 
@@ -68,13 +69,14 @@ class DoctorDynamicSerializer(MappingModelSerializer):
                           'get_specialization']
 
         if action in ['update','partial_update']:
-            if (instance is not None and instance.user == request_user):
+            if (instance is not None 
+                and (instance.user == request_user or request_user.is_staff)):
 
                 fields = ['first_name','last_name','email','phone',
                         'specialization','private_field']
             
             else:
-                fields = []
+                fields = ['first_name']
     
         super().__init__(*args, **kwargs)
     

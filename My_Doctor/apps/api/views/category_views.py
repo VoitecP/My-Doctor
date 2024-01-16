@@ -7,7 +7,8 @@ from rest_framework.serializers import ValidationError
 
 from apps.core.models import Category
 from ..serializers import category_serializers
-from ..permissions import CategoryPermissions, IsDirector, IsDirectorOrReadOnly
+# from ..permissions import CategoryPermissions, IsDirector, IsDirectorOrReadOnly
+from ..permissions import *
 from .view_mixins import CategoryQuerysetMixin, CategorySerializerMixin
 from .view_mixins import ContextModelViewSet
 
@@ -25,7 +26,7 @@ class CategoryViewSet(ContextModelViewSet):
         
     def get_serializer_class(self):
         user=self.request.user
-       
+       # Todoa add link fields to model in serializers
         if user.usertype == 'c' or user.is_staff:
             return category_serializers.CategoryDirectorSerializer
         else:
@@ -42,7 +43,7 @@ class CategoryCreateView(ListCreateAPIView):
     """
     View for create Category model
     """
-    permission_classes = [IsAdminUser, IsDirector] 
+    #permission_classes = [IsAdminUser, IsDirector] 
 
 
     def get_queryset(self):
@@ -63,7 +64,7 @@ class CategoryUpdateView(CategoryQuerysetMixin, CategorySerializerMixin, Retriev
     """
     View for update Category model
     """
-    permission_classes=[IsAdminUser, IsDirector]
+    # permission_classes=[IsAdminUser, IsDirector]
 
     # def put(self, request, *args, **kwargs):
     #     return self.update(request, *args, **kwargs)            
@@ -73,7 +74,7 @@ class CategoryDeleteView(CategoryQuerysetMixin, CategorySerializerMixin, Retriev
     """
     View for pernament delete User model
     """
-    permission_classes = [IsAdminUser, IsDirector]
+    # permission_classes = [IsAdminUser, IsDirector]
     
     def delete(self, request, *args, **kwargs):
         try:
