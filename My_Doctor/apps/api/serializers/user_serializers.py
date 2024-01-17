@@ -8,11 +8,11 @@ from rest_framework.validators import UniqueValidator
 # from dj_rest_auth.registration.serializers import RegisterSerializer
 
 from apps.core.models import Director, User
-from .serializer_mixins import MappingModelSerializer
+from .serializer_mixins import MappingModelSerializer, DynamicModelSerializer
 
 
 
-class UserDynamicSerializer(MappingModelSerializer):
+class UserDynamicSerializer(DynamicModelSerializer):
 
     ## Fields for 'list' 
     get_full_name = serializers.SerializerMethodField()
@@ -65,11 +65,7 @@ class UserDynamicSerializer(MappingModelSerializer):
         }
 
 
-    def __init__(self, *args, **kwargs):
-        context = kwargs.get('context', {})
-        action = context.get('action')
-        instance = context.get('instance', None)
-        request_user = context['request'].user
+    def get_dynamic_fields(self, instance, action, request_user):
 
         if action == 'list':
             fields = ['get_full_name','get_url']
@@ -103,13 +99,11 @@ class UserDynamicSerializer(MappingModelSerializer):
             else:
                 fields = []
     
-        super().__init__(*args, **kwargs)
-        self.fields['usertype'].choices = self.get_usertype_choices()
+        return fields
 
-        dynamic = set(fields)
-        all_fields = set(self.fields)
-        for field_pop in all_fields - dynamic:
-            self.fields.pop(field_pop)
+
+    def perform_init(self, context):
+        self.fields['usertype'].choices = self.get_usertype_choices()
 
             
     def get_get_full_name(self, obj):

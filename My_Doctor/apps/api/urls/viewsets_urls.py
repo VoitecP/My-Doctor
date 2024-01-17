@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from ..views import (
     CategoryViewSet , DirectorViewSet, DoctorViewSet,
-    Multiple2Image,PatientViewSet, PatientImageViewSet, 
+    VisitImageViewSet,PatientViewSet, PatientImageViewSet, 
     UserViewSet, VisitViewSet
                      )
 
@@ -15,8 +15,7 @@ router.register(r'category',  CategoryViewSet, basename='category')
 router.register(r'director', DirectorViewSet, basename='director')
 router.register(r'doctor', DoctorViewSet, basename='doctor')
 router.register(r'patient', PatientViewSet, basename='patient')
-# router.register(r'image', PatientImageViewSet, basename='image')
-router.register(r'image', Multiple2Image, basename='image')
+router.register(r'image', VisitImageViewSet, basename='image')
 router.register(r'user', UserViewSet, basename='user')
 
 

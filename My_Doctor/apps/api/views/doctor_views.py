@@ -20,11 +20,14 @@ class DoctorViewSet(ContextModelViewSet):
 
         if user.usertype == 'p':         # filter by visit
             return Doctor.objects.all()
+        
         if user.usertype == 'd':
             return Doctor.objects.filter(user=user)
-            #return Doctor.objects.all()
+        
         if user.usertype == 'c' or user.is_staff:
             return Doctor.objects.all()
+        
+        return Doctor.objects.none()
         
         
 

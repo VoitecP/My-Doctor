@@ -35,6 +35,7 @@ class VisitViewSet(ContextModelViewSet):
             
         elif (user.usertype == 'c' or user.is_staff == True):
             return Visit.objects.all()
+        
         else:
             return Visit.objects.none()
 

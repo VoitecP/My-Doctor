@@ -6,10 +6,10 @@ from .doctor_serializers import DoctorPublicSerializer, DoctorPrivateSerializer,
 from .patient_serializers import *  # todo remove when removing junk serializers
 from .category_serializers import *
 from .file_serializers import VisitImageSerializer, UploadedImagesNestedSerializer
-from .serializer_mixins import MappingModelSerializer
+from .serializer_mixins import MappingModelSerializer, DynamicModelSerializer
 
 
-class VisitDynamicSerializer(MappingModelSerializer):
+class VisitDynamicSerializer(DynamicModelSerializer):
 
     ## Fields for 'List'
     get_title = serializers.CharField(label='Title', source='title', read_only=True)
@@ -34,7 +34,7 @@ class VisitDynamicSerializer(MappingModelSerializer):
     patient = serializers.PrimaryKeyRelatedField(label='Patient', queryset=Patient.objects.all(), required=True)
     doctor = serializers.PrimaryKeyRelatedField(label='Doctor', queryset=Doctor.objects.all(), required=True)   
     uploaded_images = serializers.ListField(label='Uploaded Images', child = serializers.ImageField(
-            max_length = 5, allow_empty_file = False, use_url = False),
+            max_length = 100, allow_empty_file = False, use_url = False),
             write_only=True)
     
     description = serializers.CharField(label='Description', max_length=1000, min_length=10)
@@ -73,11 +73,8 @@ class VisitDynamicSerializer(MappingModelSerializer):
                         }
 
 
-    def __init__(self, *args, **kwargs):
-        context = kwargs.get('context', {})
-        action = context.get('action')
-        instance = context.get('instance', None)
-        request_user = context['request'].user
+    def get_dynamic_fields(self, instance, action, request_user):
+        fields = []
 
         if action == 'list':
             if request_user.usertype == 'p': 
@@ -172,13 +169,8 @@ class VisitDynamicSerializer(MappingModelSerializer):
             else:
                 fields = []
     
-        super().__init__(*args, **kwargs)
+        return fields
         
-        dynamic = set(fields)
-        all_fields = set(self.fields)
-        for field_pop in all_fields - dynamic:
-            self.fields.pop(field_pop)
-
 
     def get_get_url(self, obj):
         request=self.context.get('request')
@@ -189,23 +181,22 @@ class VisitDynamicSerializer(MappingModelSerializer):
 
     def get_get_url_patient(self, obj):
         request=self.context.get('request')
-        if request is None:
+        if not request:
             return None
         return reverse('api:patient-detail', kwargs={'pk': obj.patient.pk}, request=request)
        
 
     def get_get_url_doctor(self, obj):
         request=self.context.get('request')
-        if request is None:
+        if not request :
             return None
         return reverse('api:doctor-detail', kwargs={'pk': obj.doctor.pk}, request=request)
        
 
     def get_get_closed(self, obj):
-        if obj.closed == True:
+        if obj.closed:
             return 'Yes'
-        else:
-            return 'No'
+        return 'No'
 
 
     def create(self, validated_data):
@@ -227,7 +218,11 @@ class VisitDynamicSerializer(MappingModelSerializer):
 
         visit.save()
         for image in uploaded_images:
-            VisitImageFile.objects.create(visit=visit, image=image)
+            visitimagefile = VisitImageFile()
+            visitimagefile.visit = visit
+            visitimagefile.image = image
+            # visitimagefile.user = request_user
+            visitimagefile.save()
 
         return visit
     

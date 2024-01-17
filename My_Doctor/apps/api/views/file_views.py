@@ -9,35 +9,34 @@ from rest_framework.serializers import ValidationError
 from rest_framework.viewsets import ModelViewSet
 
 from ..serializers import file_serializers
-from ..permissions import *
+from ..permissions import FilePermissions
 from .view_mixins import ContextModelViewSet
 from apps.core.models import *
 
 
-class Multiple2Image(ContextModelViewSet):
+class VisitImageViewSet(ContextModelViewSet):
     
-    # serializer_class = file_serializers.MultipleImageSerializer
     serializer_class = file_serializers.VisitImageDynamicSerializer
-    queryset = VisitImageFile.objects.all()
+    permission_classes = [IsAuthenticated, FilePermissions]
+    
+    def get_queryset(self):
+        user=self.request.user
 
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-
-    #     files = serializer.validated_data.get("files")
-    #     if files:
-    #         for file in files:
-    #             image_file = VisitImageFile(image=file)
-    #             image_file.save()
-    #             #VisitImageFile.objects.create(image=file)
-                
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        if user.usertype == 'p':
+            return VisitImageFile.objects.filter(visit__patient__pk=user.id)
+            
+        elif user.usertype == 'd':
+            return VisitImageFile.objects.filter(visit__doctor__pk=user.id)
+            
+        elif (user.usertype == 'c' or user.is_staff):
+            return VisitImageFile.objects.all()
+        
+        return Visit.objects.none()
 
 
 
 # Todo Multiple image not working properly with VisitImage model 
-class MultipleImage(ContextModelViewSet):
+class VisitImageViewSet2(ContextModelViewSet):
     
     # serializer_class = file_serializers.MultipleImageSerializer
     serializer_class = file_serializers.VisitImageDynamicSerializer

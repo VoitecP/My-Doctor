@@ -60,14 +60,17 @@ def make_thumb(self):
     
 
 def user_image_path(instance, filename):
-    user_id = getattr(instance.user, 'id', None)
+    user = getattr(instance, 'user', None)
+    user_id = getattr(user, 'id', 'None')
     return f'user_{user_id}/images/{filename}'
 
 def user_thumb_path(instance, filename):
-    user_id = getattr(instance.user, 'id', None)
+    user = getattr(instance, 'user', None)
+    user_id = getattr(user, 'id', 'None')
     return f'user_{user_id}/thumbs/{filename}'
 
 def ext_validator(self):
     validator=FileExtensionValidator(allowed_extensions=['jpg','png'])
     return validator
+
 

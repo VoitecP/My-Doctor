@@ -3,11 +3,11 @@ from rest_framework.reverse import reverse
 from rest_framework.serializers import ValidationError
 
 from apps.core.models import VisitImageFile, Visit
-from .serializer_mixins import MappingModelSerializer
+from .serializer_mixins import MappingModelSerializer, DynamicModelSerializer, reverse_url
 
 
 
-class VisitImageDynamicSerializer(MappingModelSerializer):
+class VisitImageDynamicSerializer(DynamicModelSerializer):
 
     # Fields for 'List', 'Retrieve'
     get_visit_title = serializers.SerializerMethodField()
@@ -36,15 +36,9 @@ class VisitImageDynamicSerializer(MappingModelSerializer):
                         }        
         
 
-    def __init__(self, *args, **kwargs):
-        context = kwargs.get('context', {})
-        action = context.get('action')
-        request_user = context['request'].user
-        self.fields['visit'].queryset = Visit.objects.filter(patient_id=request_user.id)
-        
-        self.fields['image'].upload_to = f'user_{request_user.id}/images/'
-        self.fields['thumb'].upload_to = f'user_{request_user.id}/images/'
-
+    def get_dynamic_fields(self, instance, action, request_user):
+        fields = []
+  
         if action in ['list']:
             # if request_user.usertype == 'p': 
             fields = ['get_visit_title','get_visit_image_url']
@@ -59,49 +53,41 @@ class VisitImageDynamicSerializer(MappingModelSerializer):
         if action in ['update','partial_update']:
             fields = []
 
-        super().__init__(*args, **kwargs)
-        dynamic = set(fields)
-        all_fields = set(self.fields)
-
-        for field_pop in all_fields - dynamic:
-            self.fields.pop(field_pop)
+        return fields
+    
+    def perform_init(self, context):
+        request_user = getattr(context['request'], 'user', None)
+        user_id = getattr(request_user, 'id', 'None')
+        self.fields['visit'].queryset = Visit.objects.filter(patient_id=user_id)
+        # self.fields['image'].upload_to = f'user_{user_id}/images/'
+        # self.fields['thumb'].upload_to = f'user_{user_id}/images/'
 
 
     def get_get_visit_title(self, obj):
         title = getattr(obj.visit, 'title', None)
-
-        if title is not None:
-            return obj.visit.title
-        else: 
-            return 'None'
-
+        return title
+       
 
     def get_get_visit_url(self, obj):
-        request=self.context.get('request')
+        request=self.context.get('request', {})
         visit = getattr(obj, 'visit', None)
-
-        if visit is None:
-            return 'None'
+        if not visit:
+            return None
         return reverse('api:visit-detail', kwargs={'pk': visit.pk}, request=request)
 
         
     def get_get_visit_image_url(self, obj):
-        request=self.context.get('request')
-
-        if request is None:
-            return None
-        return reverse('api:image-detail', kwargs={'pk': obj.pk}, request=request)
+        return reverse_url(self,obj,name='image')
+        
     
 
     def get_get_image_url(self, obj):
         if obj.image:
-            request = self.context.get('request')
+            request = self.context.get('request',{})
             if request:
                 return request.build_absolute_uri(obj.image_url)
-            else:
-                return obj.image_url
-        else:
-            return 'None'
+            return obj.image_url
+        return None
 
         
     def get_get_thumb_url(self, obj):
@@ -109,10 +95,8 @@ class VisitImageDynamicSerializer(MappingModelSerializer):
             request = self.context.get('request')
             if request:
                 return request.build_absolute_uri(obj.thumb_url)
-            else:
-                return obj.thumb_url
-        else:
-            return 'None'
+            return obj.thumb_url
+        return None
 
 
     def create(self, validated_data):
@@ -143,20 +127,16 @@ class UploadedImagesNestedSerializer(MappingModelSerializer):
             request = self.context.get('request', None)
             if request:
                 return request.build_absolute_uri(obj.image_url)
-            else:
-                return obj.image_url
-        else:
-            return 'None'
+            return obj.image_url
+        return None
 
     def get_get_thumb_url(self, obj):
         if obj.thumb:
             request = self.context.get('request', None)
             if request:
                 return request.build_absolute_uri(obj.thumb_url)
-            else:
-                return obj.thumb_url
-        else:
-            return 'None'
+            return obj.thumb_url
+        return None
 
 
 ###########

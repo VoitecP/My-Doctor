@@ -9,11 +9,6 @@ from ..serializers.category_serializers import CategorySerializer
 from apps.core.models import User, Patient, Doctor, Director, Category
 
 
-# class UUIDMixin(SingleObjectMixin):
-    
-#     def get_object(self):
-#         return self.model.objects.get(id=self.kwargs.get("id"))
-
 class ContextMixin:
     def get_serializer_context(self):
             try:

@@ -1,12 +1,10 @@
 from rest_framework import serializers
-from rest_framework.reverse import reverse
 
 from apps.core.models import Doctor
 from apps.api.serializers import user_serializers
-from .serializer_mixins import MappingModelSerializer
+from .serializer_mixins import MappingModelSerializer, DynamicModelSerializer, reverse_url
 
-
-class DoctorDynamicSerializer(MappingModelSerializer):
+class DoctorDynamicSerializer(DynamicModelSerializer):
 
     ## Fields for 'List' , 'create'
     get_full_name=serializers.CharField(label='Full Name', source='full_name', read_only=True)
@@ -47,11 +45,8 @@ class DoctorDynamicSerializer(MappingModelSerializer):
         fields = '__all__'
 
 
-    def __init__(self, *args, **kwargs):
-        context = kwargs.get('context', {})
-        action = context.get('action')
-        instance = context.get('instance', None)
-        request_user = context['request'].user
+    def get_dynamic_fields(self, instance, action, request_user):
+        fields = []
 
         if action in ['list','create']:
 
@@ -78,18 +73,12 @@ class DoctorDynamicSerializer(MappingModelSerializer):
             else:
                 fields = ['first_name']
     
-        super().__init__(*args, **kwargs)
-    
-        dynamic = set(fields)
-        all_fields = set(self.fields)
-        for field_pop in all_fields - dynamic:
-            self.fields.pop(field_pop)
+        return fields
 
     def get_get_url(self, obj):
-        request=self.context.get('request')
-        if request is None:
-            return None
-        return reverse('api:doctor-detail', kwargs={'pk': obj.pk}, request=request)
+        return reverse_url(self, obj)
+
+
     
 
 ## Junk serializers   

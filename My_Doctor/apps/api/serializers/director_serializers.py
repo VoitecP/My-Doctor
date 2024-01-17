@@ -3,14 +3,13 @@ from rest_framework.reverse import reverse
 from rest_framework.serializers import ValidationError
 
 from apps.core.models import Director, User
-from .serializer_mixins import MappingModelSerializer
+from .serializer_mixins import MappingModelSerializer, DynamicModelSerializer, reverse_url
 
-
-class DirectorDynamicSerializerForPerson(MappingModelSerializer):
+class DirectorDynamicSerializerForPerson(DynamicModelSerializer):
 
     # Fields for 'List' , 'create'
-    full_name=serializers.CharField(label='Full Name', read_only=True)
-    url=serializers.SerializerMethodField()
+    get_full_name=serializers.CharField(label='Full Name',source='full_name', read_only=True)
+    get_url=serializers.SerializerMethodField()
 
     # Fields for 'retrieve' , 'destroy', 'update' , 'partial_update'
     get_first_name=serializers.CharField(label='First Name', source='user.first_name', read_only=True)
@@ -18,8 +17,8 @@ class DirectorDynamicSerializerForPerson(MappingModelSerializer):
     get_description=serializers.CharField(label='Description', source='description', read_only=True)
     
     mapping={
-        'full_name':'Full Name',
-        'url':'Link',
+        'get_full_name':'Full Name',
+        'get_url':'Link',
         'description':'Description',
         'get_first_name': 'First Name',
         'get_last_name': 'Last Name',
@@ -31,36 +30,27 @@ class DirectorDynamicSerializerForPerson(MappingModelSerializer):
         fields='__all__'
 
 
-    def __init__(self, *args, **kwargs):
-        context = kwargs.get('context', {})
-        action = context.get('action')
+    def get_dynamic_fields(self, instance, action, request_user):
+        fields = []
 
         if action in ['list','create']:
-            fields = ['full_name','url']
+            fields = ['get_full_name','get_url']
         
         if action in ['retrieve','destroy','update','partial_update']:
             fields = ['get_first_name', 'get_last_name','get_description']
 
-        super().__init__(*args, **kwargs)
-    
-        dynamic = set(fields)
-        all_fields = set(self.fields)
-        for field_pop in all_fields - dynamic:
-            self.fields.pop(field_pop)
+        return fields
 
 
-    def get_url(self, obj):
-        request=self.context.get('request')
-        if request is None:
-            return None
-        return reverse('api:director-detail', kwargs={"pk": obj.pk}, request=request)
+    def get_get_url(self, obj):
+        return reverse_url(self, obj)
 
 
-class DirectorDynamicSerializerForDirector(MappingModelSerializer):
+class DirectorDynamicSerializerForDirector(DynamicModelSerializer):
 
     # Fields for 'List' , 'create'
-    full_name=serializers.CharField(label='Full Name', read_only=True)
-    url=serializers.SerializerMethodField()
+    get_full_name=serializers.CharField(label='Full Name',source='full_name', read_only=True)
+    get_url=serializers.SerializerMethodField()
 
     # Fields for 'retrieve' , 'destroy'
     get_first_name=serializers.CharField(label='First Name', source='user.first_name', read_only=True)
@@ -81,8 +71,8 @@ class DirectorDynamicSerializerForDirector(MappingModelSerializer):
     # private_info
 
     mapping={
-        'full_name':'Full Name',
-        'url':'Link',
+        'get_full_name':'Full Name',
+        'get_url':'Link',
         #
         'get_first_name':'First Name',
         'get_last_name':'Last Name',
@@ -97,13 +87,11 @@ class DirectorDynamicSerializerForDirector(MappingModelSerializer):
         fields = '__all__'
 
 
-    def __init__(self, *args, **kwargs):
-        context = kwargs.get('context', {})
-        #action = context.get('action')
-        action = context['action']
+    def get_dynamic_fields(self, instance, action, request_user):
+        fields = []
 
         if action in ['list','create']:
-            fields=['full_name','url']
+            fields=['get_full_name','get_url']
         
         if action in ['retrieve','destroy']:
             fields=[
@@ -117,21 +105,11 @@ class DirectorDynamicSerializerForDirector(MappingModelSerializer):
                 'email','phone','description','private_info'
             ]
 
-        super().__init__(*args, **kwargs)
+        return fields
     
-        dynamic = set(fields)
-        all_fields = set(self.fields)
-        for field_pop in all_fields - dynamic:
-            self.fields.pop(field_pop)
-
-
     # Serializer Method fields
-    def get_url(self, obj):
-        request=self.context.get('request')
-        if request is None:
-            return None
-        return reverse('api:director-detail', kwargs={"pk": obj.pk}, request=request)
-
+    def get_get_url(self, obj):
+        return reverse_url(self, obj)
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', None)

@@ -31,7 +31,8 @@ class DirectorViewSet(ContextModelViewSet):
         
         if user.usertype == 'c' or user.is_staff:
             return director_serializers.DirectorDynamicSerializerForDirector
-            
+
+    
 
     
 

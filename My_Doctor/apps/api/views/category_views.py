@@ -6,7 +6,9 @@ from rest_framework.generics import (
 from rest_framework.serializers import ValidationError
 
 from apps.core.models import Category
-from ..serializers import category_serializers
+from ..serializers import category_serializers 
+from ..serializers import CategoryDynamicSerializer
+
 # from ..permissions import CategoryPermissions, IsDirector, IsDirectorOrReadOnly
 from ..permissions import *
 from .view_mixins import CategoryQuerysetMixin, CategorySerializerMixin
@@ -19,12 +21,15 @@ from .view_mixins import ContextModelViewSet
 
 class CategoryViewSet(ContextModelViewSet):
   
+    serializer_class = CategoryDynamicSerializer
     permission_classes=[IsAuthenticated, CategoryPermissions]
 
     def get_queryset(self):
             return Category.objects.all()
         
-    def get_serializer_class(self):
+
+    
+    def get_serializerr_class(self):
         user=self.request.user
        # Todoa add link fields to model in serializers
         if user.usertype == 'c' or user.is_staff:

@@ -14,7 +14,7 @@ from apps.core.models import *
 class PatientViewSet(ContextModelViewSet):
     
     serializer_class=patient_serializers.PatientDynamicSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, PatientPermissions]
 
     def get_queryset(self):
         user = self.request.user
