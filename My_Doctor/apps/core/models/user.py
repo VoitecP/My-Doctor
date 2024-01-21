@@ -5,16 +5,14 @@ from django.db import models
 
 
 class User(AbstractUser):
-    PATIENT = 'p'
-    DOCTOR = 'd'
-    DIRECTOR = 'c'
-    CHOICES = [
-        (PATIENT, 'Patient'),
-        (DOCTOR, 'Doctor'),
-        #(DIRECTOR, 'Director'), 
-        ]
+
+    CHOICES = {
+        'p':'Patient',
+        'd': 'Doctor',
+        'c': 'Director', 
+    }
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    usertype=models.CharField(choices = CHOICES, max_length=1, default='') 
+    usertype=models.CharField(choices = CHOICES.items(), max_length=1, default='') 
     type_created=models.BooleanField(default=False, editable=False)
     type_updated=models.BooleanField(default=False, editable=False)
     ## Heritated from AbstractUser

@@ -31,7 +31,6 @@ class DoctorDynamicSerializer(DynamicModelSerializer):
     mapping={
         'get_full_name':'Full Name',
         'get_url':'Link',
-        #
         'get_first_name':'First Name',
         'get_last_name':'Last Name',
         'get_email':'Email',
@@ -45,35 +44,32 @@ class DoctorDynamicSerializer(DynamicModelSerializer):
         fields = '__all__'
 
 
-    def get_dynamic_fields(self, instance, action, request_user):
-        fields = []
-
-        if action in ['list','create']:
-
-            fields = ['get_full_name','get_url']
     
-        if action in ['retrieve','destroy']:
-            if (instance is not None 
-                and (instance.user == request_user or request_user.is_staff)):
-
-                fields = ['get_first_name','get_last_name',
+    def get_dynamic_fields(self, instance, custom_action, request_user):
+        fields = set()
+        owner = bool(instance is not None 
+                and (instance.user == request_user or request_user.is_staff))
+        
+        if custom_action in ['list','create']:
+            fields = {'get_full_name','get_url'}
+    
+        if custom_action in ['retrieve','destroy']:
+            if owner:
+                fields = {'get_first_name','get_last_name',
                           'get_email','get_specialization', 
-                          'get_phone','get_private_field']
+                          'get_phone','get_private_field'}
             else:
-                fields = ['get_first_name', 'get_last_name',
-                          'get_specialization']
-
-        if action in ['update','partial_update']:
-            if (instance is not None 
-                and (instance.user == request_user or request_user.is_staff)):
-
-                fields = ['first_name','last_name','email','phone',
-                        'specialization','private_field']
-            
+                fields = {'get_first_name', 'get_last_name',
+                          'get_specialization'
+}
+        if custom_action in ['update','partial_update']:
+            if owner:
+                fields = {'first_name','last_name','email','phone',
+                        'specialization','private_field'}
             else:
-                fields = ['first_name']
-    
+                fields = {'first_name'}
         return fields
+
 
     def get_get_url(self, obj):
         return reverse_url(self, obj)

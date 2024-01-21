@@ -11,18 +11,22 @@ from apps.core.models import User, Patient, Doctor, Director, Category
 
 class ContextMixin:
     def get_serializer_context(self):
-            try:
-                instance = self.get_object()
-            except:
-                instance = None
-    
-            context = super().get_serializer_context()
-            context.update({
-                'request': self.request,   # exist in default
-                'action': self.action,
-                'instance': instance,
-            })
-            return context 
+        # is_viewset = False
+        # if issubclass(self.__class__, ModelViewSet):
+        #     is_viewset = True
+        try:
+            instance = self.get_object()
+        except:
+            instance = None
+        action = getattr(self, 'action', None)
+        context = super().get_serializer_context()
+        context.update({
+            'request': self.request,   # exist in default
+            'action': action,
+            'instance': instance,
+            # 'is_viewset': is_viewset,
+        })
+        return context 
 
 
 

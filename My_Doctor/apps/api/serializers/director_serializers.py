@@ -29,16 +29,14 @@ class DirectorDynamicSerializerForPerson(DynamicModelSerializer):
         model= Director
         fields='__all__'
 
+    def get_dynamic_fields(self, instance, custom_action, request_user):
+        fields = set()
 
-    def get_dynamic_fields(self, instance, action, request_user):
-        fields = []
-
-        if action in ['list','create']:
-            fields = ['get_full_name','get_url']
+        if custom_action in ['list','create']:
+            fields = {'get_full_name','get_url'}
         
-        if action in ['retrieve','destroy','update','partial_update']:
-            fields = ['get_first_name', 'get_last_name','get_description']
-
+        if custom_action in ['retrieve','destroy','update','partial_update']:
+            fields = {'get_first_name', 'get_last_name','get_description'}
         return fields
 
 
@@ -87,36 +85,36 @@ class DirectorDynamicSerializerForDirector(DynamicModelSerializer):
         fields = '__all__'
 
 
-    def get_dynamic_fields(self, instance, action, request_user):
-        fields = []
 
-        if action in ['list','create']:
-            fields=['get_full_name','get_url']
+    def get_dynamic_fields(self, instance, custom_action, request_user):
+        fields = set()
+
+        if custom_action in ['list','create']:
+            fields = {'get_full_name','get_url'}
         
-        if action in ['retrieve','destroy']:
-            fields=[
+        if custom_action in ['retrieve','destroy']:
+            fields = {
                 'get_first_name', 'get_last_name','get_email',
                 'get_phone','get_description','get_private_info'
-            ]
+            }    
 
-        if action in ['update','partial_update']:
-            fields=[
+        if custom_action in ['update','partial_update']:
+            fields = {
                 'user','first_name','last_name',
                 'email','phone','description','private_info'
-            ]
-
+            }
         return fields
     
-    # Serializer Method fields
+    
     def get_get_url(self, obj):
         return reverse_url(self, obj)
+
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', None)
         first_name = user_data.get('first_name', instance.user.first_name)
         last_name = user_data.get('last_name', instance.user.last_name)
         email=user_data.get('email', instance.user.email)
-        
         user_def={
             'first_name': first_name,
             'last_name': last_name,
@@ -127,7 +125,6 @@ class DirectorDynamicSerializerForDirector(DynamicModelSerializer):
         phone=validated_data.get('phone', instance.phone)
         description = validated_data.get('description', instance.description)
         private_info = validated_data.get('private_info', instance.private_info)
-
         director_def={
             'phone': phone,
             'description': description,

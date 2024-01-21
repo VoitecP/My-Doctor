@@ -31,48 +31,34 @@ class CategoryDynamicSerializer(DynamicModelSerializer):
                         'description': {'write_only': True},
                         }
 
-    def get_dynamic_fields(self, instance, action, request_user):
-        fields = []
+    
+    def get_dynamic_fields(self, instance, custom_action, request_user):
+        fields = set()
+        director = bool(request_user.is_staff or request_user.usertype == 'c')
+        list_fields = {'get_url','get_name', 'get_related_visit_count'}
+        retrieve_fields = {'get_name','get_description', 'get_related_visit_count'}
+        
+        if custom_action == 'list':
+            if director:
+                fields = list_fields
+            else:
+                fields = list_fields - {'get_related_visit_count'}
 
-        if action == 'list':
-            if (request_user.is_staff or 
-                request_user.usertype == 'c'):
+        if custom_action == 'create':
+            if director:
+                fields = {'name','description'}
 
-                fields = ['get_url','get_name',
-                          'get_related_visit_count']
-            fields = ['get_url','get_name']
+        if custom_action in ['retrieve','destroy']:
+            if director:
+                fields = retrieve_fields
+            else:
+                fields = retrieve_fields - {'get_related_visit_count'}
 
-        if action == 'create':
-            if (request_user.is_staff or 
-                request_user.usertype == 'c'):
-
-                fields = ['name','description']
-            fields = []
-
-        if action in ['retrieve','destroy']:
-            if (request_user.is_staff  or 
-                request_user.usertype == 'c'):
-            
-                fields = ['get_name','get_description',
-                          'get_related_visit_count']
-            fields = ['get_name','get_description']
-
-        if action in ['update','partial_update']:
-            if (request_user.is_staff  or 
-                request_user.usertype == 'c'):
-            
-                fields = ['name','description']
-            fields = []
-
+        if custom_action in ['update','partial_update']:
+            if director:
+                fields = {'name','description'}
         return fields
 
-
-    # def get_get_url(self, obj):
-    #     request=self.context.get('request')
-    #     class_name = self.Meta.model.__name__.lower()
-    #     if not request:
-    #         return None
-    #     return reverse(f'api:{class_name}-detail', kwargs={"pk": obj.pk}, request=request)
 
     def get_get_url(self, obj):
         return reverse_url(self, obj)
@@ -81,7 +67,6 @@ class CategoryDynamicSerializer(DynamicModelSerializer):
         return ''
     
     def get_get_description(self, obj):
-
         return ''
     
     def get_get_related_visit_count(self, obj):

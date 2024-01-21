@@ -14,7 +14,8 @@ class Visit(models.Model):
     doctor=models.ForeignKey(Doctor, models.PROTECT, default=None)
     category=models.ForeignKey(
         Category,models.PROTECT,
-        null=True,blank=True, default=None)    
+        null=True,blank=True, default=None)
+    # description=models.TextField()    
     image=models.ImageField(
         upload_to=storage.user_image_path, validators=[storage.ext_validator], 
         blank=True, default='')

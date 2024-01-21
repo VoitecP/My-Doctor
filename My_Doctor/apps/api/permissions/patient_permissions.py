@@ -20,14 +20,14 @@ class PatientPermissions(BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
         if user.is_authenticated:
-            if (obj == user or user.is_staff):
+            if (obj.user == user or user.is_staff):
                 return True
             
-            elif  (obj == user 
+            elif  (obj.user == user 
                    and view.action in ['retrieve', 'destroy',
                                        'update', 'partial_update']):
                 return True
             
-            elif (user.usertype == 'c' 
+            elif (user.usertype in ['d','c'] 
                   and view.action in ['retrieve']):
                 return True

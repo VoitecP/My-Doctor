@@ -6,7 +6,6 @@ from apps.core.models import VisitImageFile, Visit
 from .serializer_mixins import MappingModelSerializer, DynamicModelSerializer, reverse_url
 
 
-
 class VisitImageDynamicSerializer(DynamicModelSerializer):
 
     # Fields for 'List', 'Retrieve'
@@ -26,7 +25,6 @@ class VisitImageDynamicSerializer(DynamicModelSerializer):
         'get_image_url':'Image Link',
         'get_thumb_url':'Thumbnail Link',   
     }
-
     class Meta:
         model = VisitImageFile  
         fields = '__all__'
@@ -35,26 +33,26 @@ class VisitImageDynamicSerializer(DynamicModelSerializer):
                         'image': {'write_only': True},
                         }        
         
-
-    def get_dynamic_fields(self, instance, action, request_user):
-        fields = []
   
-        if action in ['list']:
-            # if request_user.usertype == 'p': 
-            fields = ['get_visit_title','get_visit_image_url']
+    def get_dynamic_fields(self, instance, custom_action, request_user):
+        fields = set()
 
-        if action in ['create']:
-            fields = ['image','visit']
+        if custom_action == 'list':
+            fields = {'get_visit_title','get_visit_image_url'}
 
-        if action in ['retrieve','destroy']:
-            fields = ['get_visit_title', 'get_visit_url',
-                      'get_image_url','get_thumb_url']
+        if custom_action =='create':
+            fields = {'image','visit'}
+
+        if custom_action in ['retrieve','destroy']:
+            fields = {'get_visit_title', 'get_visit_url',
+                      'get_image_url','get_thumb_url'}
         
-        if action in ['update','partial_update']:
-            fields = []
+        if custom_action in {'update','partial_update'}:
+            pass
 
         return fields
     
+
     def perform_init(self, context):
         request_user = getattr(context['request'], 'user', None)
         user_id = getattr(request_user, 'id', 'None')
@@ -100,12 +98,10 @@ class VisitImageDynamicSerializer(DynamicModelSerializer):
 
 
     def create(self, validated_data):
-    
         request_user = self.context['request'].user
         visitimagefile = VisitImageFile(**validated_data)
         visitimagefile.user = request_user
         visitimagefile.save()
-
         return visitimagefile
     
     
@@ -139,31 +135,6 @@ class UploadedImagesNestedSerializer(MappingModelSerializer):
         return None
 
 
-###########
-
-# class ProductImageSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ProImage
-#         fields = ["id", "product", "image"]
-
-
-# class ProductSerializer(serializers.ModelSerializer):
-#     images = ProductImageSerializer(many=True, read_only=True)
-#     uploaded_images = serializers.ListField(
-#         child = serializers.ImageField(max_length = 1000000, allow_empty_file = False, use_url = False),
-#         write_only=True)
-    
-#     class Meta:
-#         model = Product
-#         fields = [ "id", "name", "description", "inventory", "price", "images", "uploaded_images"]
-    
-    
-#     def create(self, validated_data):
-#         uploaded_images = validated_data.pop("uploaded_images")
-#         product = Product.objects.create(**validated_data)
-#         for image in uploaded_images:
-#             newproduct_image = ProImage.objects.create(product=product, image=image)
-#         return product
 
 ###########
 class MultipleImageSerializer(serializers.Serializer):

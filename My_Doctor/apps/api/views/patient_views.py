@@ -20,9 +20,9 @@ class PatientViewSet(ContextModelViewSet):
         user = self.request.user
     
         if user.usertype == 'p':         # filter by visit
-            return Patient.objects.all()
-        if user.usertype == 'd':
             return Patient.objects.filter(user=user)
+        if user.usertype == 'd':
+            return Patient.objects.filter(visit__doctor__user=user).distinct()
             #return Patient.objects.all()
         if user.usertype == 'c' or user.is_staff:
             return Patient.objects.all()

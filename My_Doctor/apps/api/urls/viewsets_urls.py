@@ -19,8 +19,9 @@ router.register(r'image', VisitImageViewSet, basename='image')
 router.register(r'user', UserViewSet, basename='user')
 
 
-# app_name='apps.api'
-app_name='api' 
+app_name='apps.api-vs'
+
+#app_name='api' 
 
 urlpatterns =[
     path('',include(router.urls)),

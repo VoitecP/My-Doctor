@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from ..serializers.serializer_mixins import DynamicMixin
 
 
 class VisitPermissions(BasePermission):
@@ -8,28 +9,40 @@ class VisitPermissions(BasePermission):
     '''
     def has_permission(self, request, view):
         user = request.user
-        if user.is_authenticated:
+        method = request.method
+        action = getattr(view, 'action', None)
 
+
+        if user.is_authenticated:
             if user.usertype in ['p','c'] or user.is_staff:
                 return True
             
-            if view.action in ['list','retrieve','destroy', 
-                                 'update', 'partial_update']:
+            # if (action user.usertype == 'd' 
+            #     and (action  and action not 'create')):
+            #     return True
+
+
+            if (action in ['list','retrieve',
+                                'destroy', 'update',
+                                'partial_update'] 
+                or method in ['GET','DELETE','PUT','PATCH']):
                 return True
             
         
     def has_object_permission(self, request, view, obj):
         user = request.user
+        method = request.method
+        action = getattr(view, 'action', None)
+        
         if user.is_authenticated:
-
             if user.usertype in ['p','d']:
-                if obj.closed and view.action in ['list','retrieve']:
+                if (obj.closed and action in ['list','retrieve']
+                    or method == 'GET'):
                     return True
-                
                 if not obj.closed:
                     return True
                 
-            if request.user.usertype =='c' or request.user.is_staff:
+            if user.usertype =='c' or user.is_staff:
                     return True
             
             

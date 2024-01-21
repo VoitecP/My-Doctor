@@ -4,7 +4,7 @@ from rest_framework.reverse import reverse
 
 from apps.api.serializers import user_serializers
 from apps.core.models import Patient, Visit
-from .serializer_mixins import  DynamicModelSerializer
+from .serializer_mixins import  DynamicModelSerializer, reverse_url
 
 
 class PatientDynamicSerializer(DynamicModelSerializer):
@@ -45,40 +45,33 @@ class PatientDynamicSerializer(DynamicModelSerializer):
         fields = '__all__'
 
 
-    def get_dynamic_fields(self, instance, action, request_user):
-        fields = []
-        if action in ['list','create']:
-            fields = ['get_full_name','get_url']
-    
-        if action in ['retrieve','destroy']:
-            if (instance is not None and instance.user == request_user):
-
-                fields = ['get_first_name','get_last_name',
+    def get_dynamic_fields(self, instance, custom_action, request_user):
+        fields = set()
+        owner = bool(instance and instance.user == request_user)
+        retrieve_fields = {'get_first_name','get_last_name',
                           'get_birth_date','get_email', 
-                          'get_adress']
-            else:
-                fields = ['get_first_name', 'get_last_name',
-                          'get_birth_date']
-
-        if action in ['update','partial_update']:
-            if (instance is not None and instance.user == request_user):
-
-                fields = ['first_name','last_name',
-                          'birth_date','email','adress']
-            
-            else:
-                fields = []
+                          'get_adress'}
+        update_fields = {'first_name','last_name',
+                         'birth_date','email',
+                         'adress'}
+        
+        if custom_action in ['list','create']:
+            fields = {'get_full_name','get_url'}
     
+        if custom_action in ['retrieve','destroy']:
+            if owner:
+                fields = retrieve_fields
+            else:
+                fields = retrieve_fields - {'get_email','get_adress'}
+
+        if custom_action in ['update','partial_update']:
+            if owner:
+                fields = update_fields
         return fields
         
 
     def get_get_url(self, obj):
-        request=self.context.get('request')
-        if request is None:
-            return None
-        return reverse('api:patient-detail', kwargs={'pk': obj.pk}, request=request)
-
-
+        return reverse_url(self, obj)
 
 
 ## Junk serializers

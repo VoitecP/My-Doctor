@@ -1,9 +1,10 @@
 from django.urls import path
 
-from ..views import patient_views
-
+from ..views.patient_views import *
 
 urlpatterns =[
-    # path('',include(router.urls)),
+    # path('', VisitListCreateView.as_view(), name='list-visit-view'),
+    # path('<uuid:pk>/',VisitAPIView.as_view(), name='instance-visit-view'),
     ]
+    
 
