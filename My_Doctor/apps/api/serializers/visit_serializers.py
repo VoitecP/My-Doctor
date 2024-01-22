@@ -98,7 +98,7 @@ class VisitDynamicSerializer(DynamicModelSerializer):
             elif director:
                     fields = list_fields 
             
-        if custom_action == 'create':
+        elif custom_action == 'create':
             if patient:
                     fields = create_fields - {'patient', 'price',
                                               'closed'}
@@ -107,7 +107,7 @@ class VisitDynamicSerializer(DynamicModelSerializer):
             elif director:            
                     fields = create_fields
 
-        if custom_action  in ['retrieve','destroy']:
+        elif custom_action  in ['retrieve','destroy']:
             if patient:
                     fields = retrieve_fields - {'get_patient', 'get_url_patient'}                                           
             elif doctor:
@@ -115,7 +115,7 @@ class VisitDynamicSerializer(DynamicModelSerializer):
             elif director:
                     fields = retrieve_fields
         
-        if custom_action in ['update','partiral_update'] :
+        elif custom_action in ['update','partiral_update'] :
             if patient: 
                     fields = update_fields - {'patient', 'doctor',
                                               'price', 'closed'}

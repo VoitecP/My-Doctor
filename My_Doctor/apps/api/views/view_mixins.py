@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic.detail import SingleObjectMixin
 from rest_framework.viewsets import   ModelViewSet
+from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from ..serializers.patient_serializers import PatientUpdateSerializer
 from ..serializers.doctor_serializers import DoctorUpdateSerializer
@@ -11,26 +12,39 @@ from apps.core.models import User, Patient, Doctor, Director, Category
 
 class ContextMixin:
     def get_serializer_context(self):
-        # is_viewset = False
-        # if issubclass(self.__class__, ModelViewSet):
-        #     is_viewset = True
         try:
             instance = self.get_object()
         except:
             instance = None
         action = getattr(self, 'action', None)
+        request_method = getattr(self.request, 'method', '')
         context = super().get_serializer_context()
+        custom_action = self.get_custom_action(instance, action, request_method)
         context.update({
             'request': self.request,   # exist in default
             'action': action,
             'instance': instance,
-            # 'is_viewset': is_viewset,
+            'custom_action': custom_action,
         })
         return context 
+    
+    def get_custom_action(self, instance, action, request_method):
 
-
-
-####
+        if action:
+            return action
+        if bool(request_method == 'GET' and not instance):
+            return 'list'
+        if bool(request_method == 'POST' and not instance):
+            return 'create'
+        if bool(request_method == 'GET' and instance):
+            return 'retrieve'
+        if bool(request_method == 'DELETE' and instance):
+            return 'destroy'
+        if bool(request_method == 'PUT' and instance):
+            return 'update'
+        if bool(request_method == 'PATCH' and instance):
+            return 'partial_update'
+        return ''
 
 class UserQuerysetMixin:
 
@@ -99,3 +113,9 @@ class ContextModelViewSet(ContextMixin, ModelViewSet):
     pass
 
 
+class ContextListCreateAPIView(ContextMixin, ListCreateAPIView):
+    pass
+
+
+class ContextAPIView(ContextMixin, RetrieveUpdateDestroyAPIView):
+    pass

@@ -58,13 +58,13 @@ class PatientDynamicSerializer(DynamicModelSerializer):
         if custom_action in ['list','create']:
             fields = {'get_full_name','get_url'}
     
-        if custom_action in ['retrieve','destroy']:
+        elif custom_action in ['retrieve','destroy']:
             if owner:
                 fields = retrieve_fields
             else:
                 fields = retrieve_fields - {'get_email','get_adress'}
 
-        if custom_action in ['update','partial_update']:
+        elif custom_action in ['update','partial_update']:
             if owner:
                 fields = update_fields
         return fields

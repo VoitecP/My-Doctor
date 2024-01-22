@@ -4,30 +4,48 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response  
 from rest_framework.viewsets import  ModelViewSet
+from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from ..permissions import *
 from ..serializers import *
-from .view_mixins import ContextModelViewSet
+from ..serializers.patient_serializers import PatientDynamicSerializer
+from .view_mixins import (ContextListCreateAPIView, 
+                          ContextAPIView, ContextModelViewSet) 
 from apps.core.models import *
 
 
-class PatientViewSet(ContextModelViewSet):
-    
-    serializer_class=patient_serializers.PatientDynamicSerializer
+class PatientMixin:
+
     permission_classes = [IsAuthenticated, PatientPermissions]
+    serializer_class = PatientDynamicSerializer
 
     def get_queryset(self):
         user = self.request.user
-    
-        if user.usertype == 'p':         # filter by visit
+        if user.usertype == 'p':         
             return Patient.objects.filter(user=user)
-        if user.usertype == 'd':
+        elif user.usertype == 'd':
             return Patient.objects.filter(visit__doctor__user=user).distinct()
             #return Patient.objects.all()
-        if user.usertype == 'c' or user.is_staff:
+        elif user.usertype == 'c' or user.is_staff:
             return Patient.objects.all()
-        
-        
+        return Patient.objects.none()
+
+
+class PatientViewSet(PatientMixin, ContextModelViewSet): 
+    
+    pass
+
+    
+class PatientListCreateView(PatientMixin, ContextListCreateAPIView):
+    """
+    """
+    pass
+
+
+class PatientAPIView(PatientMixin, ContextAPIView):
+    """
+    """
+    pass
 
 
 # Junk Viewset

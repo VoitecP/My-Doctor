@@ -1,9 +1,8 @@
-from django.urls import path, include 
+from django.urls import path
+from ..views.doctor_views import *
 
-from ..views import doctor_views
 
-
-urlpatterns =[
-    # path('',include(router.urls)),
-    # path('profile-update/',doctor_views.UserProfileUpdateView.as_view(), name='user-profile-update'), 
+urlpatterns = [
+    path('', DoctorListCreateView.as_view(), name='list-doctor-view'),
+    path('<uuid:pk>/',DoctorAPIView.as_view(), name='instance-doctor-view'),
     ]

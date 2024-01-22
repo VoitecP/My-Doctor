@@ -53,7 +53,7 @@ class DoctorDynamicSerializer(DynamicModelSerializer):
         if custom_action in ['list','create']:
             fields = {'get_full_name','get_url'}
     
-        if custom_action in ['retrieve','destroy']:
+        elif custom_action in ['retrieve','destroy']:
             if owner:
                 fields = {'get_first_name','get_last_name',
                           'get_email','get_specialization', 
@@ -62,7 +62,7 @@ class DoctorDynamicSerializer(DynamicModelSerializer):
                 fields = {'get_first_name', 'get_last_name',
                           'get_specialization'
 }
-        if custom_action in ['update','partial_update']:
+        elif custom_action in ['update','partial_update']:
             if owner:
                 fields = {'first_name','last_name','email','phone',
                         'specialization','private_field'}

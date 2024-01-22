@@ -56,14 +56,14 @@ class UserDynamicSerializer(DynamicModelSerializer):
             'last_name': {'write_only': True},
             'email': {'write_only': True},
         }
-        
+
+
     def get_dynamic_fields(self, instance, custom_action, request_user):
         fields = set()
         director = bool(request_user.is_staff or request_user.usertype == 'c')
         owner = bool(instance and instance == request_user)
-        owner_or_staff = bool(instance  
-                        and (instance == request_user
-                                or request_user.is_staff))
+        owner_or_staff = bool(instance and (instance == request_user
+                                                or request_user.is_staff))
         
         create_fields = {'username','password',
                          'usertype','first_name',
@@ -76,21 +76,20 @@ class UserDynamicSerializer(DynamicModelSerializer):
         if custom_action == 'list':
                 fields = {'get_full_name','get_url'}
 
-        if custom_action == 'create':
+        elif custom_action == 'create':
             if director:
                     fields = create_fields
     
-        if custom_action in ['retrieve','destroy']: 
+        elif custom_action in ['retrieve','destroy']: 
             if owner:
                     fields = retrieve_fields 
             else:
-                    fields = {'get_first_name', 'get_last_name', 
-                            'get_usertype'}
+                    fields = {'get_first_name', 'get_last_name', 'get_usertype'}
 
-        if custom_action in ['update','partial_update']:
+        elif custom_action in ['update','partial_update']:
             if owner_or_staff:
-                    fields = (create_fields.update({'change_password'})
-                               - {'usertype','password'})
+                    fields = create_fields - {'usertype','password'} | {'change_password'}
+                   
         return fields
 
 

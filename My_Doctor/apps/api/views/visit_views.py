@@ -3,13 +3,17 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..permissions import VisitPermissions
 from ..serializers import VisitDynamicSerializer
-from .view_mixins import ContextModelViewSet, ContextMixin
+from .view_mixins import (ContextListCreateAPIView, 
+                          ContextAPIView, ContextModelViewSet) 
 from apps.core.models import Visit
 
 
-class QuerysetMixin:
+class VisitMixin:
 
-    def perform_queryset(self):
+    permission_classes=[IsAuthenticated, VisitPermissions]
+    serializer_class = VisitDynamicSerializer
+
+    def get_queryset(self):
         user=self.request.user
         if user.usertype == 'p':
             return Visit.objects.filter(patient__user=user)
@@ -20,38 +24,22 @@ class QuerysetMixin:
         return Visit.objects.none()
 
 
-
-class VisitViewSet(QuerysetMixin, ContextModelViewSet):
+class VisitViewSet(VisitMixin, ContextModelViewSet):
     """
     """
-    permission_classes=[IsAuthenticated, VisitPermissions]
-    serializer_class = VisitDynamicSerializer
-
-    def get_queryset(self):
-        return self.perform_queryset()
-    
+    pass
     
 
-class VisitListCreateView(ContextMixin, QuerysetMixin, 
-                          ListCreateAPIView):
+class VisitListCreateView(VisitMixin, ContextListCreateAPIView):
     """
     """
-    permission_classes = [IsAuthenticated, VisitPermissions] 
-    serializer_class = VisitDynamicSerializer
-
-    def get_queryset(self):
-        return self.perform_queryset()
-    
+    pass
 
     
-class VisitAPIView(ContextMixin, QuerysetMixin, 
-                   RetrieveUpdateDestroyAPIView):
+class VisitAPIView(VisitMixin, ContextAPIView):
     """
     """
-    permission_classes = [IsAuthenticated, VisitPermissions]
-    serializer_class = VisitDynamicSerializer
-
-    def get_queryset(self):
-        return self.perform_queryset()
+    pass
 
 
+   

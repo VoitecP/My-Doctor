@@ -5,35 +5,53 @@ from rest_framework.generics import RetrieveUpdateAPIView, RetrieveDestroyAPIVie
 from rest_framework.response import Response 
 from rest_framework.serializers import ValidationError
 from rest_framework.viewsets import GenericViewSet,  ReadOnlyModelViewSet, ModelViewSet
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, AllowAny 
+from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from ..serializers import user_serializers
+from ..serializers.user_serializers import UserDynamicSerializer
 # from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated, UserPermissions
 from ..permissions import *
-from .view_mixins import UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
-from .view_mixins import ContextModelViewSet
+from .view_mixins import ContextMixin, UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
+from .view_mixins import (ContextListCreateAPIView, 
+                          ContextAPIView, ContextModelViewSet) 
 from apps.core.models import User
 
 
-class UserViewSet(ContextModelViewSet):
+class UserMixin:
+
+    permission_classes=[IsAuthenticated, UserPermissions]
+    serializer_class = UserDynamicSerializer
+
+    def get_queryset(self):
+        user=self.request.user
+        if user.usertype == 'p':
+            return User.objects.filter(id=user.id)
+        elif user.usertype == 'd':
+            return User.objects.filter(id=user.id)
+        elif (user.usertype == 'c' or user.is_staff):
+            return User.objects.all()
+        return User.objects.none()
+
+
+class UserViewSet(UserMixin, ContextModelViewSet):
     """
     User model List View (filtered list view)
     """
+    pass
 
-    serializer_class = user_serializers.UserDynamicSerializer
-    permission_classes=[IsAuthenticated, UserPermissions]
-            
-    def get_queryset(self):
-        user=self.request.user
-
-        if user.usertype == 'p':
-            return User.objects.filter(id=user.id)
-        if user.usertype == 'd':
-            return User.objects.filter(id=user.id)
-        if user.usertype == 'c' or user.is_staff:
-            return User.objects.all()
+class UserListCreateView(UserMixin, ContextListCreateAPIView):
+    """
+    """
+    pass
 
 
+class UserAPIView(UserMixin, ContextAPIView):
+    """
+    """
+    pass
+
+    
 class UserAuthView(GenericViewSet):
     """
     View for User Login, Logout
@@ -92,7 +110,7 @@ class UserUpdateView(UserObjectMixin, RetrieveUpdateAPIView):
     """
     View for update User model
     """
-    permission_classes=[IsAuthenticated, IsAdminUser]
+    permission_classes=[IsAuthenticated]
         
     def get_serializer_class(self):
         return user_serializers.UserUpdateSerializer

@@ -13,35 +13,36 @@ from ..serializers import CategoryDynamicSerializer
 from ..permissions import *
 from .view_mixins import CategoryQuerysetMixin, CategorySerializerMixin
 from .view_mixins import ContextModelViewSet
+from .view_mixins import ContextMixin, ContextModelViewSet 
+from .view_mixins import (ContextListCreateAPIView, 
+                          ContextAPIView, ContextModelViewSet) 
 
+class CategoryMixin:
 
-#####
+    permission_classes = [IsAuthenticated, CategoryPermissions]
+    queryset = Category.objects.all()
+    serializer_class = CategoryDynamicSerializer
+    
+    # def get_queryset(self):
+    #     return Category.objects.all()
 # Viewsets
 #####
 
-class CategoryViewSet(ContextModelViewSet):
-  
-    serializer_class = CategoryDynamicSerializer
-    permission_classes=[IsAuthenticated, CategoryPermissions]
+class CategoryViewSet(CategoryMixin, ContextModelViewSet):
+    '''
+    '''
+    pass
 
-    def get_queryset(self):
-            return Category.objects.all()
-        
-
-    
-    def get_serializerr_class(self):
-        user=self.request.user
-       # Todoa add link fields to model in serializers
-        if user.usertype == 'c' or user.is_staff:
-            return category_serializers.CategoryDirectorSerializer
-        else:
-            return category_serializers.CategorySerializer
+class CategoryListCreateView(CategoryMixin, ContextListCreateAPIView):
+    """
+    """
+    pass
 
 
-    
-#####
-# API Views
-#####        
+class CategoryAPIView(CategoryMixin, ContextAPIView):
+    """
+    """
+    pass
 
 
 class CategoryCreateView(ListCreateAPIView):

@@ -40,14 +40,14 @@ class VisitImageDynamicSerializer(DynamicModelSerializer):
         if custom_action == 'list':
             fields = {'get_visit_title','get_visit_image_url'}
 
-        if custom_action =='create':
+        elif custom_action =='create':
             fields = {'image','visit'}
 
-        if custom_action in ['retrieve','destroy']:
+        elif custom_action in ['retrieve','destroy']:
             fields = {'get_visit_title', 'get_visit_url',
                       'get_image_url','get_thumb_url'}
         
-        if custom_action in {'update','partial_update'}:
+        elif custom_action in {'update','partial_update'}:
             pass
 
         return fields

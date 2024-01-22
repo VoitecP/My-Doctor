@@ -35,7 +35,7 @@ class DirectorDynamicSerializerForPerson(DynamicModelSerializer):
         if custom_action in ['list','create']:
             fields = {'get_full_name','get_url'}
         
-        if custom_action in ['retrieve','destroy','update','partial_update']:
+        elif custom_action in ['retrieve','destroy','update','partial_update']:
             fields = {'get_first_name', 'get_last_name','get_description'}
         return fields
 
