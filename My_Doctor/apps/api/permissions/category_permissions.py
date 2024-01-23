@@ -17,10 +17,10 @@ class CategoryPermissions(BasePermission):
                 return True    
                        
             elif (user.usertype in ['p','d'] 
-                   and view.action in ['list','retrieve']):
+                   and custom_action in ['list','retrieve']):
                 return True
            
-           
+
     def has_object_permission(self, request, view, obj):
         user = request.user
         action = getattr(view, 'action', None)
@@ -33,6 +33,6 @@ class CategoryPermissions(BasePermission):
                 return True  
             
             elif (user.usertype in ['p','d'] 
-                   and view.action in ['list','retrieve']):
+                   and custom_action in ['list','retrieve']):
                 return True
 

@@ -9,12 +9,12 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 from ..serializers import user_serializers
-from ..serializers.user_serializers import UserDynamicSerializer
+from ..serializers.user_serializers import UserDynamicSerializer, UserManageDynamicSerializer
 # from ..permissions import IsDoctorCreated, IsPatientCreated, IsNotUserUpdated, UserPermissions
 from ..permissions import *
 from .view_mixins import ContextMixin, UserQuerysetMixin, UserObjectMixin, UserSerializerMixin
-from .view_mixins import (ContextListCreateAPIView, 
-                          ContextAPIView, ContextModelViewSet) 
+from .view_mixins import (ContextCreateAPIView, ContextUpdateAPIView, ContextListCreateAPIView, 
+                          ContextAPIView, ContextModelViewSet, ContextDestroyAPIView) 
 from apps.core.models import User
 
 
@@ -25,9 +25,7 @@ class UserMixin:
 
     def get_queryset(self):
         user=self.request.user
-        if user.usertype == 'p':
-            return User.objects.filter(id=user.id)
-        elif user.usertype == 'd':
+        if user.usertype in ['p','d']:
             return User.objects.filter(id=user.id)
         elif (user.usertype == 'c' or user.is_staff):
             return User.objects.all()
@@ -52,6 +50,33 @@ class UserAPIView(UserMixin, ContextAPIView):
     pass
 
     
+class UserCreateAPIView(ContextCreateAPIView):
+
+    permission_classes = [AllowAny]
+    serializer_class  = UserManageDynamicSerializer
+    queryset = User.objects.none()
+
+    
+    
+
+class UserUpdateAPIView(ContextUpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserManageDynamicSerializer
+
+    def get_queryset(self):
+            user=self.request.user
+            return User.objects.filter(id=user.id)
+
+
+class UserDestroyAPIView(ContextDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserManageDynamicSerializer
+
+    def get_queryset(self):
+            user=self.request.user
+            return User.objects.filter(id=user.id)
+
+
 class UserAuthView(GenericViewSet):
     """
     View for User Login, Logout
@@ -119,31 +144,9 @@ class UserUpdateView(UserObjectMixin, RetrieveUpdateAPIView):
     #     return self.partial_update(request, *args, **kwargs)
 
 
-class UserTypeCreateView(UserQuerysetMixin, UserSerializerMixin, ListCreateAPIView):
-    """
-    View for create Patient/Doctor/Director model
-    """
-    # TODO: When Usertype is created in signals, (later should be confirmed by email,
-    # TODO: User should be redirect or blocked ; to be only able to update profile
-    # This view is not need, onle user type update view
-    # permission_classes = [IsAuthenticated, IsNotUserUpdated] #, IsAdminUser]   it can make errors
-
-    def perform_create(self, serializer):
-        try:
-            serializer.save(user=self.request.user)
-            return Response({"detail": "Success"})
-        except:
-            raise ValidationError({"detail": "Operation not allowed"})
         
     
-class UserTypeUpdateView(UserObjectMixin, UserSerializerMixin,  RetrieveUpdateAPIView): 
-    """
-    View for Update Patient/Doctor/Director model
-    """
-    # permission_classes = [IsAuthenticated, IsUserUpdated]
 
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
 
 
 class UserPernamentDeleteView(UserSerializerMixin, UserObjectMixin, RetrieveDestroyAPIView): 

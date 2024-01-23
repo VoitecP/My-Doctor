@@ -22,15 +22,26 @@ class MappingMixin:
     to remapping fields {'old':'New'} 
     '''
     mapping={}
+    pop_fields=set()
 
     def to_representation(self, instance):   
-            serializer = super().to_representation(instance)
-            if hasattr(self, 'mapping'):
+        serializer = super().to_representation(instance)
+        self.perform_to_representation(serializer)
+        if hasattr(self, 'pop_fields'):
+            if self.pop_fields:
+                for field in self.pop_fields:
+                    # if field in serializer:
+                    serializer.pop(field, None)
+        if hasattr(self, 'mapping'):
+            if self.mapping:
                 for old, new in self.mapping.items():
-                    if old in serializer:
-                        serializer[new] = serializer.pop(old, None)
-            return serializer
-    
+                    # if old in serializer:
+                    serializer[new] = serializer.pop(old, None)
+        return serializer
+
+
+    def perform_to_representation(self, serializer):
+        return serializer
     
 class DynamicMixin:
 

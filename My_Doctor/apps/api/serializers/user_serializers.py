@@ -30,7 +30,7 @@ class UserDynamicSerializer(DynamicModelSerializer):
     change_password = serializers.CharField(label='Change Password',  max_length=50, required = False)
     first_name =  serializers.CharField(max_length=50, label='First Name')
     last_name =  serializers.CharField(max_length=50, label='Last Name')
-    email =  serializers.CharField(label='Email')
+    email =  serializers.EmailField(label='Email')
     usertype = serializers.ChoiceField(label='User Type', choices=[])
 
     mapping = {
@@ -95,7 +95,7 @@ class UserDynamicSerializer(DynamicModelSerializer):
 
     def perform_init(self, context):
         self.fields['usertype'].choices = self.get_usertype_choices()
-
+        
 
     def get_get_full_name(self, obj):
         return f'{obj.first_name} {obj.last_name}'
@@ -161,8 +161,132 @@ class UserDynamicSerializer(DynamicModelSerializer):
         return instance
     
 
+class UserManageDynamicSerializer(DynamicModelSerializer):
+    #
+    get_username = serializers.CharField(label='User name', source='username', read_only=True)
+    get_first_name=serializers.CharField(label='First Name', source='first_name', read_only=True)
+    get_last_name=serializers.CharField(label='Last Name', source='last_name', read_only=True)
+    get_email=serializers.CharField(label='Email', source='email', read_only=True)
+    get_usertype = serializers.SerializerMethodField()
+    #
+    username = serializers.CharField(max_length=50, label='Username',
+                validators=[UniqueValidator(queryset=User.objects.all())])
+    password = serializers.CharField(max_length=50, label='Password')
+    change_password = serializers.CharField(label='Change Password',  max_length=50, required = False)
+    first_name =  serializers.CharField(max_length=50, label='First Name')
+    last_name =  serializers.CharField(max_length=50, label='Last Name')
+    email =  serializers.EmailField(label='Email')
+    usertype = serializers.ChoiceField(label='User Type', choices=[])
+    pop_fields = {'password'}
+
+    class Meta:
+        model = User
+        fields = '__all__'
+        extra_kwargs = {
+            'username': {'write_only': True},
+            'password': {'write_only': True},
+            'change_password': {'write_only': True},
+            'first_name': {'write_only': True},
+            'last_name': {'write_only': True},
+            'email': {'write_only': True},
+        }
+
+    def perform_init(self, context):
+        self.fields['usertype'].choices = self.get_usertype_choices()
+        custom_action = context.get('custom_action', None)
+        self.mapping = self.get_mapping_fields(custom_action)
+
+    def perform_to_representation(self, serializer):
+        key = serializer['usertype']
+        value = self.fields['usertype'].choices.get(key)
+        serializer['usertype'] = value
+        return serializer
+    
+    def get_dynamic_fields(self, instance, custom_action, request_user):
+        fields = set()
+        #owner = bool(instance and instance == request_user)
+        owner = bool(instance == request_user)
+        create_fields = {'username','password',
+                         'usertype','first_name',
+                         'last_name','email'}
+        retrieve_fields = {'get_username','get_first_name',
+                          'get_last_name', 'get_email',
+                          'get_usertype', 'get_date_created',
+                          'get_account_duration'}
+        if custom_action == 'create':
+            fields = create_fields
+    
+        elif custom_action in ['retrieve','destroy']:
+            if owner:
+                fields = retrieve_fields
+
+        elif custom_action in ['update','partial_update']:
+            if owner:
+                fields = create_fields - {'usertype','password'} | {'change_password'}          
+        
+        return fields
 
 
+    def get_mapping_fields(self, custom_action):
+        retrieve_mapping = {
+            'get_username': 'Username',
+            'get_first_name':'First Name',
+            'get_last_name':'Last Name',
+            'get_email':'Email',
+            'get_usertype':'User Type',
+            }
+        create_mapping = {
+            'username': 'Username',
+            'first_name':'First Name',
+            'last_name':'Last Name',
+            'email':'Email',
+            'usertype':'User Type',
+            }
+        if custom_action in 'create':
+            return create_mapping
+        return retrieve_mapping
+
+
+    def get_usertype_choices(self):
+        choices = {
+        'p':'Patient',
+        'd': 'Doctor',
+        'c': 'Director', 
+        }
+        if Director.objects.exists():
+            choices.pop('c')
+            return choices.items()
+        return choices.items()
+    
+
+    def get_get_usertype(self, obj):
+        return User.CHOICES.get(obj.usertype, 'Is Staff')
+
+
+    def create(self, validated_data):
+        user = User()
+        user.username = validated_data['username']
+        user.first_name = validated_data['first_name']
+        user.last_name = validated_data['last_name']
+        user.email=  validated_data['email']  
+        user.usertype = validated_data['usertype']
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+    
+
+    def update(self, instance, validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        change_password = validated_data.get('change_password', None)
+        if change_password:
+            instance.set_password(change_password)
+        validated_data.pop('change_password', None)
+
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.email = validated_data.get('email', instance.email)
+        instance.save()
+        return instance
 
 # for DRF-auth
 # # class CustomUserRegisterSerializer(RegisterSerializer, serializers.ModelSerializer):

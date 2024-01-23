@@ -1,7 +1,10 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic.detail import SingleObjectMixin
 from rest_framework.viewsets import   ModelViewSet
-from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import  (CreateAPIView, 
+            ListCreateAPIView, RetrieveUpdateAPIView, DestroyAPIView, 
+            RetrieveDestroyAPIView,
+            RetrieveUpdateDestroyAPIView)
 
 from ..serializers.patient_serializers import PatientUpdateSerializer
 from ..serializers.doctor_serializers import DoctorUpdateSerializer
@@ -118,4 +121,16 @@ class ContextListCreateAPIView(ContextMixin, ListCreateAPIView):
 
 
 class ContextAPIView(ContextMixin, RetrieveUpdateDestroyAPIView):
+    pass
+
+
+class ContextCreateAPIView(ContextMixin, CreateAPIView):
+    pass
+
+
+class ContextUpdateAPIView(ContextMixin, RetrieveUpdateAPIView):
+    pass
+
+
+class ContextDestroyAPIView(ContextMixin, RetrieveDestroyAPIView):
     pass
