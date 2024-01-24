@@ -5,5 +5,5 @@ from .file_views import *
 from .patient_views import *
 from .summary_views import *
 from .user_views import *
-from .view_mixins import *
+#from .view_mixins import *
 from .visit_views import *

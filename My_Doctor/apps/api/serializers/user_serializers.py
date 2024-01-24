@@ -6,23 +6,22 @@ from rest_framework.validators import UniqueValidator
 # from dj_rest_auth.serializers import UserDetailsSerializer
 # from dj_rest_auth.registration.serializers import RegisterSerializer
 
-from apps.core.models import Director, User
 from .serializer_mixins import  DynamicModelSerializer, reverse_url
-
+from apps.core.models import Director, User
 
 class UserDynamicSerializer(DynamicModelSerializer):
     ## Fields for 'list' 
     get_full_name = serializers.SerializerMethodField()
-    get_url=serializers.SerializerMethodField()
+    get_url = serializers.SerializerMethodField()
     ## Fields for 'retrieve' , 'destroy', 
-    get_first_name=serializers.CharField(label='First Name', source='first_name', read_only=True)
-    get_last_name=serializers.CharField(label='Last Name', source='last_name', read_only=True)
+    get_first_name = serializers.CharField(label='First Name', source='first_name', read_only=True)
+    get_last_name = serializers.CharField(label='Last Name', source='last_name', read_only=True)
     # Private fields
-    get_email=serializers.CharField(label='Email', source='email', read_only=True)
+    get_email = serializers.CharField(label='Email', source='email', read_only=True)
     get_username = serializers.CharField(label='User name', source='username', read_only=True)
     get_usertype = serializers.SerializerMethodField()
-    get_date_created=serializers.DateTimeField(label='Date Created', source='date_joined', format='%d-%m-%Y %H:%M:%S', read_only=True)
-    get_account_duration=serializers.SerializerMethodField()
+    get_date_created = serializers.DateTimeField(label='Date Created', source='date_joined', format='%d-%m-%Y %H:%M:%S', read_only=True)
+    get_account_duration = serializers.SerializerMethodField()
     ## Fields for 'create'
     username = serializers.CharField(max_length=50, label='Username',
                 validators=[UniqueValidator(queryset=User.objects.all())])
@@ -179,6 +178,20 @@ class UserManageDynamicSerializer(DynamicModelSerializer):
     usertype = serializers.ChoiceField(label='User Type', choices=[])
     pop_fields = {'password'}
 
+    mapping = {
+            'get_username': 'Username',
+            'get_first_name':'First Name',
+            'get_last_name':'Last Name',
+            'get_email':'Email',
+            'get_usertype':'User Type',
+            #
+            # 'username': 'Username',
+            # 'first_name':'First Name',
+            # 'last_name':'Last Name',
+            # 'email':'Email',
+            # 'usertype':'User Type',
+    }
+       
     class Meta:
         model = User
         fields = '__all__'
@@ -193,18 +206,18 @@ class UserManageDynamicSerializer(DynamicModelSerializer):
 
     def perform_init(self, context):
         self.fields['usertype'].choices = self.get_usertype_choices()
-        custom_action = context.get('custom_action', None)
-        self.mapping = self.get_mapping_fields(custom_action)
+        
 
     def perform_to_representation(self, serializer):
-        key = serializer['usertype']
-        value = self.fields['usertype'].choices.get(key)
-        serializer['usertype'] = value
+        key = serializer.get('usertype', None)
+        if key:
+            value = self.fields['usertype'].choices.get(key, None)
+            serializer['usertype'] = value
         return serializer
     
+
     def get_dynamic_fields(self, instance, custom_action, request_user):
         fields = set()
-        #owner = bool(instance and instance == request_user)
         owner = bool(instance == request_user)
         create_fields = {'username','password',
                          'usertype','first_name',
@@ -214,7 +227,8 @@ class UserManageDynamicSerializer(DynamicModelSerializer):
                           'get_usertype', 'get_date_created',
                           'get_account_duration'}
         if custom_action == 'create':
-            fields = create_fields
+            if not request_user.is_authenticated:
+                fields = create_fields
     
         elif custom_action in ['retrieve','destroy']:
             if owner:
@@ -225,26 +239,6 @@ class UserManageDynamicSerializer(DynamicModelSerializer):
                 fields = create_fields - {'usertype','password'} | {'change_password'}          
         
         return fields
-
-
-    def get_mapping_fields(self, custom_action):
-        retrieve_mapping = {
-            'get_username': 'Username',
-            'get_first_name':'First Name',
-            'get_last_name':'Last Name',
-            'get_email':'Email',
-            'get_usertype':'User Type',
-            }
-        create_mapping = {
-            'username': 'Username',
-            'first_name':'First Name',
-            'last_name':'Last Name',
-            'email':'Email',
-            'usertype':'User Type',
-            }
-        if custom_action in 'create':
-            return create_mapping
-        return retrieve_mapping
 
 
     def get_usertype_choices(self):
@@ -288,6 +282,8 @@ class UserManageDynamicSerializer(DynamicModelSerializer):
         instance.save()
         return instance
 
+
+# Todo for DRF-Auth
 # for DRF-auth
 # # class CustomUserRegisterSerializer(RegisterSerializer, serializers.ModelSerializer):
 # class CustomUserRegisterSerializer(serializers.ModelSerializer):
@@ -311,245 +307,12 @@ class UserManageDynamicSerializer(DynamicModelSerializer):
     
 
 
-class UserRegisterSerializer(serializers.ModelSerializer):
-    """
-    Serializer for register user
-    """
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'first_name', 
-                  'last_name', 'usertype' ,'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def create(self, validated_data):
-        user = User()
-        user.username = validated_data['username']
-        user.email=  validated_data['email']
-        user.first_name = validated_data['first_name']
-        user.last_name = validated_data['last_name']
-        user.usertype = validated_data['usertype']
-        # TODO , if admin.is_staff  user.usertype= user.DIRECTOR or just another view for director.
-        
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-    
-
-    ## TODO make simplifier
-    # def create_user(self, validated_data, is_staff=False):
-    #     usertype = validated_data.get('usertype', None)
-    #     if is_staff:
-    #         usertype = User.DIRECTOR if usertype == User.ADMIN else usertype
-    #     user = User.objects.create_user(**validated_data, usertype=usertype)
-    #     return user
-
-    # def create(self, validated_data):
-    #     return self.create_user(validated_data)
-
-    # def create(self, validated_data):
-    #     user = User.objects.create(
-    #         username=validated_data['username']
-    #     )
-    #     user.set_password(validated_data['password'])
-    #     user.save()
-    #     return user
-
 
     
 
-# class CreateUser(APIView):
-#     permission_classes = [AllowAny]
-
-#     def post(self, request, format='json'):
-#         print(request.data)
-#         data = request.data
-#         reg_serializer = RegisterUserSerializer(data=data)
-#         if reg_serializer.is_valid():
-#             password = reg_serializer.validated_data.get('password')
-#             reg_serializer.validated_data['password']=make_password(password)
-#             new_user = reg_serializer.save()
-#             if new_user:
-#                 return Response(status=status.HTTP_201_CREATED)
-#         return Response(reg_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
 
-##
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'password')
-
-    def create(self, validated_data):
-        user = User(
-            username=validated_data['username']
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-
-
-######
-#####
-    
-    ###  Junk serializers
-class UserPublicSerializer(serializers.ModelSerializer):
-    """
-    All users can view this fields
-    """
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name']
-        # fields = '__all__'
-
-
-class UserPrivateSerializer(serializers.ModelSerializer):
-    """
-    Only logged user can view these fields , self fields.
-    """
-    class Meta:
-        model = User
-        # fields = '__all__'
-        fields = ['id','first_name', 'last_name', 'email','usertype']
-
-
-class UserVisitSerializer(serializers.ModelSerializer):
-    '''
-    Serializer for doctor/ related visit view
-    '''
-    class Meta:
-        model = User
-        # fields = '__all__'
-        # Dynamic field serializer ??
-        fields = ['first_name', 'last_name', 'email']
-
-
-###
-
-class LoginUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for login
-    """
-    username = serializers.CharField(write_only=True, required=True)
-    password = serializers.CharField(write_only=True, required=True)
-    
-    class Meta:
-        model = User
-        fields = ['username', 'password']
-
-
-class UserUpdateSerializer(serializers.ModelSerializer):
-    """
-    Serializer for update user fields
-    """
-    class Meta:
-        model = User
-        # fields = '__all__'
-        extra_kwargs = {'password': {'write_only': True}}
-        fields = ['first_name', 'last_name', 'email']
-
-
-class DeleteUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for delete user
-    """
-    class Meta:
-        model = User
-        fields = '__all__'
-
-
-# for DRF-auth
-# # class CustomUserRegisterSerializer(RegisterSerializer, serializers.ModelSerializer):
-# class CustomUserRegisterSerializer(serializers.ModelSerializer):
-#     """
-#     Serializer for Register User, mixin with dj_rest_auth app
-#     """
-
-#     class Meta:
-#         model = User
-#         fields = ['username','email','usertype','password']
-
-#     def custom_signup(self, request, user):
-#         user.username = self.validated_data['username']
-#         user.email = self.validated_data['email']
-#         user.usertype = self.validated_data['usertype']
-#         user.password = self.validated_data['password']
-#         user.password2 = self.validated_data['password2']
-#         user.save()
-#         return user
     
     
-
-
-class UserRegisterSerializer(serializers.ModelSerializer):
-    """
-    Serializer for register user
-    """
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'first_name', 
-                  'last_name', 'usertype' ,'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def create(self, validated_data):
-        user = User()
-        user.username = validated_data['username']
-        user.email=  validated_data['email']
-        user.first_name = validated_data['first_name']
-        user.last_name = validated_data['last_name']
-        user.usertype = validated_data['usertype']
-        # TODO , if admin.is_staff  user.usertype= user.DIRECTOR or just another view for director.
-        
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-    
-    # def create(self, validated_data):
-    #     user = User.objects.create(
-    #         username=validated_data['username']
-    #     )
-    #     user.set_password(validated_data['password'])
-    #     user.save()
-    #     return user
-
-
-    # def create(self, validated_data):
-    #     user = User(
-    #         username=validated_data['username']
-    #     )
-    #     user.set_password(validated_data['password'])
-    #     user.save()
-    #     return user
-
-# lass CreateUser(APIView):
-#     permission_classes = [AllowAny]
-
-#     def post(self, request, format='json'):
-#         print(request.data)
-#         data = request.data
-#         reg_serializer = RegisterUserSerializer(data=data)
-#         if reg_serializer.is_valid():
-#             password = reg_serializer.validated_data.get('password')
-#             reg_serializer.validated_data['password']=make_password(password)
-#             new_user = reg_serializer.save()
-#             if new_user:
-#                 return Response(status=status.HTTP_201_CREATED)
-#         return Response(reg_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-
-
-##
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'password')
-
-    def create(self, validated_data):
-        user = User(
-            username=validated_data['username']
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user

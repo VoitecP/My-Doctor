@@ -1,14 +1,11 @@
 from django.urls import path
 
-from ..views.visit_views import *
-
-# app_name='apps.api'
-# app_name='api' 
+from ..views import visit_views 
 
 
 urlpatterns =[ 
-    path('', VisitListCreateView.as_view(), name='list-visit-view'),
-    path('<uuid:pk>/',VisitAPIView.as_view(), name='instance-visit-view'),
+    path('', visit_views.VisitListCreateView.as_view(), name='list-visit-view'),
+    path('<uuid:pk>/', visit_views.VisitAPIView.as_view(), name='instance-visit-view'),
     ]
 
 

@@ -1,10 +1,10 @@
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from ..permissions import VisitPermissions
 from ..serializers import VisitDynamicSerializer
-from .view_mixins import (ContextListCreateAPIView, 
-                          ContextAPIView, ContextModelViewSet) 
+from ..views.view_mixins  import (ContextListCreateAPIView, 
+                                ContextAPIView, 
+                                ContextModelViewSet) 
 from apps.core.models import Visit
 
 

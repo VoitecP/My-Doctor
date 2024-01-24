@@ -1,16 +1,10 @@
-# from django.contrib.auth import logout as django_logout
-from rest_framework.generics import  ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 
-from apps.core.models import *
-from ..permissions import *
-from ..serializers import doctor_serializers
-from ..serializers.doctor_serializers import DoctorDynamicSerializer
-from .view_mixins import ContextModelViewSet
-
-from .view_mixins import ContextMixin, ContextModelViewSet
-from .view_mixins import (ContextListCreateAPIView, 
-                          ContextAPIView, ContextModelViewSet)  
+from ..permissions import DoctorPermissions
+from ..serializers import DoctorDynamicSerializer
+from ..views.view_mixins  import (ContextAPIView, ContextListCreateAPIView, 
+                     ContextModelViewSet)  
+from apps.core.models import Doctor
 
 
 class DoctorMixin:

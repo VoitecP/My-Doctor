@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .serializer_mixins import DynamicModelSerializer, reverse_url
 
+from ..serializers.serializer_mixins import DynamicModelSerializer, reverse_url
 from apps.core.models import Category, Visit
 
 
@@ -25,9 +25,9 @@ class CategoryDynamicSerializer(DynamicModelSerializer):
         model = Category
         fields = '__all__'
         extra_kwargs =  {
-                        'name': {'write_only': True},
-                        'description': {'write_only': True},
-                        }
+            'name': {'write_only': True},
+            'description': {'write_only': True},
+        }
 
     
     def get_dynamic_fields(self, instance, custom_action, request_user):
@@ -66,36 +66,4 @@ class CategoryDynamicSerializer(DynamicModelSerializer):
         queryset = Visit.objects.filter(category=obj).count()
         return queryset
     
-    
-####
-        
-class CategorySerializer(serializers.ModelSerializer):
-    """
-    Serializer for Doctors and Patients
-    """
-    class Meta:
-        model = Category
-        fields = ['id','name','description']
-
-
-    
-class CategoryDirectorSerializer(serializers.ModelSerializer):
-    # TODO field with count of visits per category etc..
-    """
-    Serializer for creating Category
-    """
-    class Meta:
-        model = Category
-        fields = ['id','name','description']
-        
-
-    # def perform_create(self, validated_data):
-    #     category = Category.objects.create(
-    #         validated_data['name'], 
-    #         validated_data['description'])
-    #     category.name = validated_data['name']
-    #     category.description = validated_data['description']
-    #     # category.is_valid() # checks
-    #     category.save()
-    #     return category
-    
+  

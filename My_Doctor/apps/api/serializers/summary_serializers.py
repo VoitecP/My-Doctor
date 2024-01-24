@@ -56,5 +56,5 @@ class VisitDoctorSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Visit
         fields =['id','name','surname','total','sum']
-        # fields =['id','sum']
+    
 

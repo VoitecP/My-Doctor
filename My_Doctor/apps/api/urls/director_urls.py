@@ -1,9 +1,9 @@
 from django.urls import path
 
-from ..views.director_views import *
+from ..views import director_views 
 
 
 urlpatterns =[
-    path('', DirectorListCreateView.as_view(), name='list-dicrector-view'),
-    path('<uuid:pk>/',DirectorAPIView.as_view(), name='instance-director-view'),
+    path('', director_views.DirectorListCreateView.as_view(), name='list-dicrector-view'),
+    path('<uuid:pk>/', director_views.DirectorAPIView.as_view(), name='instance-director-view'),
    ]

@@ -1,20 +1,18 @@
 from django.db.models import Sum
-from rest_framework.viewsets import ReadOnlyModelViewSet, GenericViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response  
 from rest_framework.permissions import IsAuthenticated
 
 from apps.api.serializers import summary_serializers
 from apps.core.models import Visit
-# from ..permissions import IsDoctorCreated
 
 
+# Todo Permission class for Director or admin
 class SummaryYearVisitListView(ReadOnlyModelViewSet):
     queryset=Visit.year_objects.all()
     serializer_class=summary_serializers.VisitYearSummarySerializer
-    #permission_classes = [IsAuthenticated] #  , IsDoctorCreated]       No other perm_class
-    # http_method_names = ['get']
-
+    
 
 class SummaryMonthVisitListView(ReadOnlyModelViewSet):
     queryset=Visit.month_objects.all()
@@ -35,7 +33,7 @@ class SummaryVisitView(APIView):
     """
     Return a summary view
     """
-    permission_classes = [IsAuthenticated] #  , IsDoctorCreated]
+    permission_classes = [IsAuthenticated] 
 
     try:
         summary = Visit.objects.aggregate(sum=Sum('price'))

@@ -30,19 +30,20 @@ class MappingMixin:
         if hasattr(self, 'pop_fields'):
             if self.pop_fields:
                 for field in self.pop_fields:
-                    # if field in serializer:
-                    serializer.pop(field, None)
+                    if field in serializer:
+                        serializer.pop(field, None)
         if hasattr(self, 'mapping'):
             if self.mapping:
                 for old, new in self.mapping.items():
-                    # if old in serializer:
-                    serializer[new] = serializer.pop(old, None)
+                    if old in serializer:
+                        serializer[new] = serializer.pop(old, None)
         return serializer
 
 
     def perform_to_representation(self, serializer):
         return serializer
     
+
 class DynamicMixin:
 
     def __init__(self, *args, **kwargs):
@@ -71,6 +72,7 @@ class DynamicMixin:
 
 class MappingModelSerializer(MappingMixin, ModelSerializer):    
     pass
+
 
 class DynamicModelSerializer(MappingMixin, DynamicMixin, ModelSerializer):    
     pass

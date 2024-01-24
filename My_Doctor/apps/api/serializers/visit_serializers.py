@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
-from apps.core.models import Category, Doctor, Patient,  Visit, VisitImageFile
 from .file_serializers import  UploadedImagesNestedSerializer
 from .serializer_mixins import DynamicModelSerializer, reverse_url
+from apps.core.models import (Category, Doctor, Patient,  
+                              Visit, VisitImageFile)
 
 
 class VisitDynamicSerializer(DynamicModelSerializer):

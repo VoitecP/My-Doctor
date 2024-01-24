@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from apps.core.models import Doctor
-from apps.api.serializers import user_serializers
-from .serializer_mixins import MappingModelSerializer, DynamicModelSerializer, reverse_url
+from ..serializers.serializer_mixins import DynamicModelSerializer, reverse_url
+from apps.core.models import Doctor, User
+
 
 class DoctorDynamicSerializer(DynamicModelSerializer):
 
@@ -42,9 +42,15 @@ class DoctorDynamicSerializer(DynamicModelSerializer):
     class Meta:
         model = Doctor
         fields = '__all__'
+        extra_kwargs =  {
+            'first_name': {'write_only': True},
+            'last_name': {'write_only': True},
+            'email': {'write_only': True},
+            'phone': {'write_only': True},
+            'specialization': {'write_only': True},
+            'private_field': {'write_only': True},
+        }
 
-
-    
     def get_dynamic_fields(self, instance, custom_action, request_user):
         fields = set()
         owner = bool(instance is not None 
@@ -74,80 +80,27 @@ class DoctorDynamicSerializer(DynamicModelSerializer):
     def get_get_url(self, obj):
         return reverse_url(self, obj)
 
-
     
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+        first_name = user_data.get('first_name', instance.user.first_name)
+        last_name = user_data.get('last_name', instance.user.last_name)
+        email = user_data.get('email', instance.user.email)
+        user_def = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'email':email,
+        }
+        User.objects.update_or_create(id=instance.user.id, defaults=user_def)
 
-## Junk serializers   
-
-class DoctorPublicSerializer(serializers.ModelSerializer):
-    """
-    All users can view this fields
-    """
-    tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    user = user_serializers.UserPublicSerializer(read_only=True)
-    
-    class Meta:
-        model = Doctor
-        fields = ['user','specialization','tracks']
-        # fields = '__all__'
-         
-
-class DoctorPrivateSerializer(serializers.ModelSerializer):
-    """
-    Only logged user can view these fields , self fields.
-    """
-    tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    user = user_serializers.UserPrivateSerializer(read_only=True)
-    
-    class Meta:
-        model = Doctor
-        fields = ['user','specialization','private_field','tracks']
-
-
-class DoctorVisitSerializer(serializers.ModelSerializer):
-    """
-    Only connected thru common visit can see these fields
-    """
-
-    first_name=serializers.SerializerMethodField(label='first name', read_only=True)
-    last_name=serializers.SerializerMethodField(label='last name', read_only=True)
-    email=serializers.SerializerMethodField(read_only=True)
-    #url=
-
-    
-    class Meta:
-        model = Doctor
-        fields = ['first_name','last_name', 'email','specialization']
-
-    # def get_url(self, obj):
-    #     return obj.url
-    
-    def get_first_name(self, obj):
-        return obj.user.first_name
-    
-    def get_last_name(self, obj):
-        return obj.user.last_name
-    
-    def get_email(self, obj):
-        return obj.user.email
-
-
-
-    
-
-
-
-
-
-
-
-class DoctorUpdateSerializer(serializers.ModelSerializer):
-    tracks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    
-    class Meta:
-        model = Doctor
-        fields = ['tracks','specialization', 'private_field','phone']
-        # fields = '__all__'
-
-
-
+        phone = validated_data.get('phone', instance.phone)
+        specialization = validated_data.get('specialization', instance.specialization)
+        private_field = validated_data.get('private_field', instance.private_field)
+        doctor_def = {
+            'phone': phone,
+            'specializaion': specialization,
+            'private_field': private_field,
+        }
+        doctor, created = Doctor.objects.update_or_create(user=instance.user, 
+                                                              defaults=doctor_def)
+        return doctor

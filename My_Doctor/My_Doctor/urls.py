@@ -26,26 +26,26 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 #                                PasswordResetView, PasswordResetConfirmView)
 
 from apps.api import urls
+#from apps.core import urls
 from apps.api.urls import viewsets_urls
 
 
 static_files = static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# app_name = 'core'
 app_name='apps.core'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
     # Core API aplication
     path('api/', include(urls, namespace='base-api')),
-    path('api-viewset/', include(viewsets_urls, namespace='viewset-api')),
-
+    #path('core/', include(urls, namespace='core')),
+    path('api-viewset/', include(viewsets_urls, namespace='viewset-api')),    
     # DRF  Authentication
-    path('api/rest-auth/', include('rest_framework.urls')),
-    path('api/rest-auth/register/',RedirectView.as_view(pattern_name='apps.api:user-register'), name='user-register-base'),
-    
+    path('', include('rest_framework.urls')),
+    path('register/',RedirectView.as_view(pattern_name='apps.api:user-register'), name='user-register-base'),
+  
     # Dj Rest Auth Views - removed
+    # TODO  Dj Rest Auth Views..
     # path('register/', RegisterView.as_view()),
     # path('auth/', include('dj_rest_auth.urls')),
     # path('register/', include('dj_rest_auth.registration.urls')),
@@ -53,7 +53,6 @@ urlpatterns = [
     # path('logout/', LogoutView.as_view()),
     # path('password-reset/', PasswordResetView.as_view()),
     # path('password-reset-confirm/<uidb64>/<token>/',PasswordResetConfirmView.as_view(), name='password_reset_confirm'),  
-    # TODO ..
     ## Removed
     # path('api/dj-rest-auth/', include('dj_rest_auth.urls')),
     # path('api/dj-rest-auth/register/', include('dj_rest_auth.registration.urls')),
