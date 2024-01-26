@@ -350,6 +350,16 @@ Faker = ">=0.7.7"
 toposort = ">=1.5"
 
 [[package]]
+name = "django-theme-material-kit"
+version = "1.0.19"
+description = "Modern template for Django (Material Kit)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-theme-material-kit-1.0.19.tar.gz", hash = "sha256:dfda8b3356b84b573149483ca2cea9e8ccd2178504ef9613231c6b77f4ba936b"},
+]
+
+[[package]]
 name = "djangorestframework"
 version = "3.14.0"
 description = "Web APIs for Django, made easy."
@@ -965,4 +975,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "994caa9168ce3abac58d3c77e91d45910f86fc7a36ceb2e7afb3d9de0466dac3"
+content-hash = "7775a1a1379637587ed640ec8d4f0937675a197324be461277fb7fa20ddc96d4"

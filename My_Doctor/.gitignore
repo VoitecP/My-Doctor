@@ -140,6 +140,9 @@ venv.bak/
 ../*.rar
 ./*.rar
 
+# Bootstrap 
+
+*/bootstrap/*
 
 # Spyder project settings
 .spyderproject

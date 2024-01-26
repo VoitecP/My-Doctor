@@ -25,8 +25,8 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 # from dj_rest_auth.views import (LoginView, LogoutView, 
 #                                PasswordResetView, PasswordResetConfirmView)
 
-from apps.api import urls
-#from apps.core import urls
+from apps.api import urls as api_urls
+from apps.core import urls as core_urls
 from apps.api.urls import viewsets_urls
 
 
@@ -37,8 +37,8 @@ app_name='apps.core'
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Core API aplication
-    path('api/', include(urls, namespace='base-api')),
-    #path('core/', include(urls, namespace='core')),
+    path('api/', include(api_urls, namespace='base-api')),
+    path('core/', include(core_urls, namespace='core')),
     path('api-viewset/', include(viewsets_urls, namespace='viewset-api')),    
     # DRF  Authentication
     path('', include('rest_framework.urls')),
