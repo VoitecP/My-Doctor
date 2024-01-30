@@ -7,7 +7,7 @@ readme = "../README.md"
 packages = [{include = "my_doctor"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 django = "*"
 python-decouple = "*"
 djangorestframework = "*"
@@ -23,7 +23,6 @@ requests = "^2.31.0"
 django-theme-material-kit = "^1.0.19"
 psycopg2-binary = "^2.9.9"
 factory-boy = "^3.3.0"
-flake8 = "^7.0.0"
 
 
 [build-system]
