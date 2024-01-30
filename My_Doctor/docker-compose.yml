@@ -1,0 +1,65 @@
+version: '3'
+
+
+services:
+  web:
+    build:
+      context: .
+
+    restart: always
+   
+    command: >
+      sh -c "poetry run python manage.py makemigrations --noinput &&
+             poetry run python manage.py migrate --noinput &&
+             poetry run python manage.py db_fixtures &&
+             poetry run python manage.py runserver 0.0.0.0:8000"
+
+    ports:
+      - "8000:8000"
+
+    env_file: .env
+
+    volumes:
+      - .:/usr/src/app/dir
+
+    depends_on: 
+      - db
+
+    networks:
+      - app_network
+
+    
+  db:
+    image: postgres:latest
+
+    restart: always
+
+    volumes: 
+      - postgres_data:/var/lib/postgresql/data/
+
+    env_file: .env 
+
+    networks:
+      - db_network
+
+    ports:
+      - "5432:5432"
+
+    expose:
+    - '5432'
+
+
+networks:
+  db_network:
+    driver: bridge
+
+  app_network:
+    driver: bridge
+ 
+
+volumes:
+  postgres_data:
+
+
+
+

@@ -12,13 +12,11 @@ class Visit(models.Model):
     date=models.DateTimeField(default=None, null=True, blank=True)    
     patient=models.ForeignKey(Patient, models.PROTECT, default=None)
     doctor=models.ForeignKey(Doctor, models.PROTECT, default=None)
-    category=models.ForeignKey(
-        Category,models.PROTECT,
-        null=True,blank=True, default=None)
+    category=models.ForeignKey(Category,models.PROTECT,null=True,blank=True, default=None)
     # description=models.TextField()    
-    image=models.ImageField(
-        upload_to=storage.user_image_path, validators=[storage.ext_validator], 
-        blank=True, default='')
+    image=models.ImageField(upload_to=storage.user_image_path, 
+                            validators=[storage.ext_validator], 
+                            blank=True, default='')
     description=models.TextField()
     price=models.CharField(max_length=10)
     closed=models.BooleanField(default=False)

@@ -36,3 +36,8 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=1234
 POSTGRES_HOST=db
 POSTGRES_PORT=5432
+
+
+# Set postgres database as default
+# POSTGRES_DB =  config('POSTGRES_DB')
+POSTGRES_DB=False

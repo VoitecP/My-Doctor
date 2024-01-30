@@ -36,7 +36,7 @@ class VisitDynamicSerializer(DynamicModelSerializer):
     closed = serializers.BooleanField(label='Visit Closed', default=False)
 
     mapping = {  
-        'get_title':'title',
+        'get_title':'Title',
         'get_url':'Link',
         'get_category':'Category',
         'get_date':'Visit Date',

@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_spectacular',
 
+
     ## Removed
     # 'dj_rest_auth',  
     # 'dj_rest_auth.registration',
@@ -113,12 +114,28 @@ WSGI_APPLICATION = 'My_Doctor.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+POSTGRES_DB = config('POSTGRES_DB')
+
+if POSTGRES_DB == True:
+    DATABASES = {
+        "default": {
+            "ENGINE": config('POSTGRES_ENGINE'),
+            "NAME": config('POSTGRES_DATABASE'),
+            "USER": config('POSTGRES_USER'),
+            "PASSWORD": config('POSTGRES_PASSWORD'),
+            "HOST": config('POSTGRES_HOST'),
+            "PORT": config('POSTGRES_PORT'),
+        }
     }
-}
+
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
 
 
 # Password validation
