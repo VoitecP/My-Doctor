@@ -20,6 +20,12 @@ venv.bak/
 ../*.rar
 ./*.rar
 
+# Visual Studio Code
+.vscode
+*/.vscode/*
+*.vscode*
+
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

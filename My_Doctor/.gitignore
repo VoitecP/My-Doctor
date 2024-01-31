@@ -12,6 +12,11 @@ migrations/
 #postgre data
 local-db-data/
 
+# Visual Studio Code
+.vscode
+*/.vscode/*
+*.vscode*
+
 
 # Distribution / packaging
 .Python
