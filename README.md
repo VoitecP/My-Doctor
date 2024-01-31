@@ -17,19 +17,19 @@ Patient's can create Visits with preffered Doctor, and upload images as attachem
 
 #### Links:
 Admin Site:   (Login: admin,  Password: admin)
-![https://voitecp.eu.pythonanywhere.com/admin/](https://voitecp.eu.pythonanywhere.com/admin/)
+(https://voitecp.eu.pythonanywhere.com/admin/)
 
 User Register Link:
-![https://voitecp.eu.pythonanywhere.com/api/user/register/](https://voitecp.eu.pythonanywhere.com/api/user/register/)
+(https://voitecp.eu.pythonanywhere.com/api/user/register/)
 
 Api Schema:
-![https://voitecp.eu.pythonanywhere.com/api/schema/-ui/#/](https://voitecp.eu.pythonanywhere.com/api/schema/-ui/#/)
+(https://voitecp.eu.pythonanywhere.com/api/schema/-ui/#/)
 
 Api Generic View's
-![https://voitecp.eu.pythonanywhere.com/api/user/](https://voitecp.eu.pythonanywhere.com/api/user/)
+(https://voitecp.eu.pythonanywhere.com/api/user/)
 
 Api Generic Views Set
-![https://voitecp.eu.pythonanywhere.com/api-viewset/](https://voitecp.eu.pythonanywhere.com/api-viewset/)
+(https://voitecp.eu.pythonanywhere.com/api-viewset/)
 
 
 #### How to Set up
