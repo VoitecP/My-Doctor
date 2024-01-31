@@ -30,6 +30,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'user-files')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'user-files')
 
+# Pythoneverywhere setting
+# python manage.py collectstatic
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
 # URL used to access files
@@ -184,6 +187,7 @@ SITE_ID=1
 
 STATIC_URL = '/static/'
 
+# Disable it when using  command:  python manage.py collectstatic 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
