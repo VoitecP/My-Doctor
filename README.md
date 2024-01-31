@@ -15,13 +15,13 @@ Patient's can create Visits with preffered Doctor, and upload images as attachem
 - A this moment im developing classic Django View's (with templates).
 
 #### Login accounts:
-Admin (login: admin,  password: admin)
+Admin - login: **admin**,  password: **admin**
 
-Patient (login: user-patient-00  password: password1234 )
+Patient - login: **user-patient-00**  password: **password1234** 
 
-Doctor      (login: user-doctor-00  password: password1234 )
+Doctor - login: **user-doctor-00**  password: **password1234**
 
-Director    (login: user-director-00  password: password1234 )
+Director - login: **user-director-00**  password: **password1234**
 
 
 #### Live Server Links:
