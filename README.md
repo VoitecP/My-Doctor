@@ -1,5 +1,13 @@
 # My Doctor 
 
+Docker Image:
+```
+docker pull voitecp/my-doctor
+```
+
+<a href="https://hub.docker.com/r/voitecp/my-doctor/"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
+
+
 ## Info
 Aplication  for registered user's that allows to select one role (Patient or Doctor).
 Patient's can create Visits with preffered Doctor, and upload images as attachement's to current visit. Different role have specific permission's. Director (singleton) have permissions to see summary and statistics.

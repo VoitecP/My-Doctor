@@ -187,7 +187,6 @@ SITE_ID=1
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
-
 STATIC_URL = '/static/'
 
 # Disable it when using  command:  python manage.py collectstatic 
