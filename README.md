@@ -26,7 +26,7 @@ Doctor - login: **user-doctor-00**  password: **password1234**
 Director - login: **user-director-00**  password: **password1234**
 
 
-#### Live Server Links:
+### Live Server Links:
 Admin Site:  
 - https://voitecp.eu.pythonanywhere.com/admin/
 
@@ -43,7 +43,7 @@ Api Generic Views Set
 - https://voitecp.eu.pythonanywhere.com/api-viewset/
 
 
-#### Docker:
+### Docker:
 
 <a href="https://hub.docker.com/r/voitecp/my-doctor/"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
 
@@ -59,7 +59,7 @@ docker run -it -p 8000:8000 voitecp/my-doctor:latest /bin/bash -c "sh /usr/src/a
 Open web browser and navigate to localhost address:  http://127.0.0.1:8000/ 
 
 
-#### How to Set up
+### How to Set up
 
 Clone repository to custom folder (My-Doctor):
 ```
@@ -71,7 +71,7 @@ pip install poetry
 ```
 Change directory to My-Doctor:
 ```
-cd Dshop
+cd My-Doctor
 ```
 Set poetry global option, to use project folder as place to hold Virtual environment (recommended):
 ```
