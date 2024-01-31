@@ -1,18 +1,5 @@
 # My Doctor 
 
-<a href="https://hub.docker.com/r/voitecp/my-doctor/"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
-
-Pull Docker Image:
-```
-docker pull voitecp/my-doctor:latest
-```
-Run Image:
-```
-docker run -it -p 8000:8000 voitecp/my-doctor:latest /bin/bash -c "sh /usr/src/app/init.sh"
-
-```
-Open web browser and navigate to localhost address:  http://127.0.0.1:8000/ 
-
 
 ## Info
 Aplication  for registered user's that allows to select one role (Patient or Doctor).
@@ -28,8 +15,9 @@ Patient's can create Visits with preffered Doctor, and upload images as attachem
 - I have idea's to implement new features like visit callendar, Visit Data export to PDF, OAuth features..
 - A this moment im developing classic Django View's (with templates).
 
+
 #### Login accounts:
-Admin - login: **admin**,  password: **admin**
+Admin - login: **admin**  password: **admin**
 
 Patient - login: **user-patient-00**  password: **password1234** 
 
@@ -53,6 +41,22 @@ Api Generic View's
 
 Api Generic Views Set
 - https://voitecp.eu.pythonanywhere.com/api-viewset/
+
+
+#### Docker:
+
+<a href="https://hub.docker.com/r/voitecp/my-doctor/"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
+
+Pull Docker Image:
+```
+docker pull voitecp/my-doctor:latest
+```
+Run Image:
+```
+docker run -it -p 8000:8000 voitecp/my-doctor:latest /bin/bash -c "sh /usr/src/app/init.sh"
+
+```
+Open web browser and navigate to localhost address:  http://127.0.0.1:8000/ 
 
 
 #### How to Set up
