@@ -1,5 +1,7 @@
 # My Doctor 
 
+<a href="https://hub.docker.com/r/voitecp/my-doctor/"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
+
 Pull Docker Image:
 ```
 docker pull voitecp/my-doctor:latest
@@ -9,8 +11,7 @@ Run Image:
 docker run -it -p 8000:8000 voitecp/my-doctor:latest /bin/bash -c "sh /usr/src/app/init.sh"
 
 ```
-
-<a href="https://hub.docker.com/r/voitecp/my-doctor/"><img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
+Open web browser and navigate to localhost address:  http://127.0.0.1:8000/ 
 
 
 ## Info
