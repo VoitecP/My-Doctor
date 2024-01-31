@@ -14,22 +14,28 @@ Patient's can create Visits with preffered Doctor, and upload images as attachem
 - I have idea's to implement new features like visit callendar, Visit Data export to PDF, OAuth features..
 - A this moment im developing classic Django View's (with templates).
 
+#### Login accounts:
+Admin       (login: admin,  password: admin)
+Patient     (login: user-patient-00  password: password1234 )
+Doctor      (login: user-doctor-00  password: password1234 )
+Director    (login: user-director-00  password: password1234 )
 
-#### Links:
-Admin Site:   (Login: admin,  Password: admin)
-https://voitecp.eu.pythonanywhere.com/admin/
+
+#### Live Server Links:
+Admin Site:  
+- https://voitecp.eu.pythonanywhere.com/admin/
 
 User Register Link:
-https://voitecp.eu.pythonanywhere.com/api/user/register/
+- https://voitecp.eu.pythonanywhere.com/api/user/register/
 
 Api Schema:
-https://voitecp.eu.pythonanywhere.com/api/schema/-ui/#/
+- https://voitecp.eu.pythonanywhere.com/api/schema/-ui/#/
 
 Api Generic View's
-https://voitecp.eu.pythonanywhere.com/api/user/
+- https://voitecp.eu.pythonanywhere.com/api/user/
 
 Api Generic Views Set
-https://voitecp.eu.pythonanywhere.com/api-viewset/
+- https://voitecp.eu.pythonanywhere.com/api-viewset/
 
 
 #### How to Set up

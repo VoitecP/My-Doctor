@@ -27,12 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Add user-files
-# MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'user-files')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'user-files')
-
-# Pythoneverywhere setting
-# python manage.py collectstatic
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
 # URL used to access files
@@ -183,6 +178,14 @@ SITE_ID=1
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
+
+
+
+# Pythoneverywhere settings
+
+# python manage.py collectstatic
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 
 
 STATIC_URL = '/static/'
