@@ -130,14 +130,14 @@ venv.bak/
 ./env/*
 
 # Image Files
-*.jpg
-*.JPG
-*.jpeg
-*.JPEG
-*.gif
-*.GIP
-*.png
-*.PNG
+# *.jpg
+# *.JPG
+# *.jpeg
+# *.JPEG
+# *.gif
+# *.GIP
+# *.png
+# *.PNG
 
 
 # Rar files
