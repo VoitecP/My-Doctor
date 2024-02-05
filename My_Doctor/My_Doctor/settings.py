@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'apps.api',
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -155,7 +156,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LOGIN_REDIRECT_URL = '/core/base/'
+LOGIN_REDIRECT_URL = '/'
+
+LOGIN_URL = 'login/'
 
 
 
@@ -174,7 +177,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-SITE_ID=1
+SITE_ID = 1
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/

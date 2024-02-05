@@ -5,8 +5,23 @@ from .models import (Doctor, Director, Patient,
                      User, VisitImageFile)
 
 
+
+
+# def user_update_usertype(sender, instance, created, **kwargs):
+#     if created == False:
+#         print('if created false')
+#         if instance.type_updated == False:
+#             print('if isntance  type updaed false')
+#             instance.type_updated = True
+#             instance.save()
+
+   
+# # # Todo temporary signal
+# post_save.connect(user_update_usertype, sender=User)
+
+
 def create_usertype(sender, instance, created, **kwargs):
-    if created:
+    if created == True:
         if instance.usertype =='p':
             Patient.objects.create(user=instance)
             instance.type_created = True
@@ -19,6 +34,12 @@ def create_usertype(sender, instance, created, **kwargs):
             Director.objects.create(user=instance)
             instance.type_created = True
             instance.save()
+
+    # if created == False:
+    #     if instance.type_updated == False:
+    #         # print('if isntance  type updaed false')
+    #         instance.type_updated = True
+    #         instance.save()
       
 post_save.connect(create_usertype, sender=User)
 
@@ -33,6 +54,19 @@ post_save.connect(update_usertype, sender=Patient)
 post_save.connect(update_usertype, sender=Doctor)
 post_save.connect(update_usertype, sender=Director)
 
+
+
+# def user_update_usertype(sender, instance, created, **kwargs):
+#     if created == False:
+#         print('if created false')
+#         if instance.type_updated == False:
+#             print('if isntance  type updaed false')
+#             instance.type_updated = True
+#             instance.save()
+
+   
+# # # Todo temporary signal
+# post_save.connect(user_update_usertype, sender=User)
 
 # @receiver(pre_save, sender=VisitImageFile)
 # def get_user_image_path(sender, instance, **kwargs):

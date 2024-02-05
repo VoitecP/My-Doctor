@@ -9,6 +9,7 @@ class CategoryListView(ListView):
     template_name = 'category/category_list.html'
     context_object_name = 'categories'
 
+
     # def get_context_data(self, *,object_list=None, **kwargs):
     #     if object_list is not None: 
     #         queryset = object_list

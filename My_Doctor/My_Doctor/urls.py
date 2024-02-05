@@ -38,10 +38,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Core API aplication
     path('api/', include(api_urls, namespace='base-api')),
-    path('core/', include(core_urls, namespace='core')),
+    path('', include(core_urls, namespace='core')),
     path('api-viewset/', include(viewsets_urls, namespace='viewset-api')),    
     # DRF  Authentication
-    path('', include('rest_framework.urls')),
+    path('api/', include('rest_framework.urls')),
     path('register/',RedirectView.as_view(pattern_name='apps.api:user-register'), name='user-register-base'),
   
     # Dj Rest Auth Views - removed

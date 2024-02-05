@@ -1,0 +1,26 @@
+<div class="col-md-9">
+    <h>Visit list</h>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Data</th>
+                <th>Doctor</th>
+                <!-- -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for visit in visits %}
+            <tr>
+                <td>{{ visit.id }}</td>
+                <td>{{ visit.date }}</td>
+                <td>{{ visit.doctor }}</td>
+                <!-- -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div>
+        {% include 'base/pagination.html' %}	
+    </div>
+</div>

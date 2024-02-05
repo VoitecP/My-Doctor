@@ -14,7 +14,7 @@ class User(AbstractUser):
     id=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     usertype=models.CharField(choices = CHOICES.items(), max_length=1, default='') 
     type_created=models.BooleanField(default=False, editable=False)
-    type_updated=models.BooleanField(default=False, editable=False)
+    type_updated=models.BooleanField(default=False)
     ## Heritated from AbstractUser
     # first_name  
     # last_name

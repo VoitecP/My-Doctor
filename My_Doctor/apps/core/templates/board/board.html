@@ -1,0 +1,38 @@
+{% extends 'board/base.html' %}
+
+
+{% load static %}
+
+
+{% block title %}
+    Your profile 
+{% endblock title %}
+
+
+{% block row %}
+    {% include 'board/row.html' %}
+{% endblock row %}
+
+
+{% block navbar %}
+    <nav class="navbar">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about/">About</a></li>
+        </ul>
+    </nav>
+{% endblock navbar %}
+    
+
+{% block content %}
+
+    {% if type_updated %}
+        {% include 'board/panel.html' %}
+    {% else %}
+        profile update
+        <a href="{% url 'apps.core:profile-update' user_pk %}" class="nav-link">Update profile</a>    
+    {% endif %}
+    
+{% endblock content %}
+
+

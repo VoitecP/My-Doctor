@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> My Doctor - title {% block title %}{% endblock title %}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h2>My Profile - base template</h2>
+        <h3>Other data</h3>
+    </header>
+
+    <div class="row">
+        {% block row %}
+        {% endblock row %}
+    </div>
+
+    <div class="row">
+            {% if messages %}
+                <ul class="alert alert-success">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+    </div>
+    
+
+    <nav class="navbar">
+        {% block navbar %}
+        {% endblock navbar %}
+    </nav>
+    
+    <div class="content">
+        {% block content %}
+        {% endblock content %}
+    </div>
+    
+    <footer class="navbar navbar-dark bg-dark fixed-bottom">
+        <div class="container text-center">
+            <p>&copy; 2024 My Doctor</p>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
