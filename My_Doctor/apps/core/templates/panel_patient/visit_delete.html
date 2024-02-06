@@ -1,0 +1,12 @@
+{% block panel %}
+<div>
+	<form method="post">
+		{% csrf_token %}
+		<p>Are you sure you want to delete "{{ visit.title }}"?</p>
+		<input type="submit" value="Yes Delete">
+	</form>
+	<div>
+	    <a href="{% url 'apps.core:patient-visit-detail' visit.id %}">Go back</a> 	
+    </div>
+</div>
+{% endblock %}

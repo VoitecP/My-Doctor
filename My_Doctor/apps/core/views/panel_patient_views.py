@@ -1,14 +1,15 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView, DeleteView,  TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 
-from apps.core.models import Visit
+from apps.core.models import Visit, VisitImageFile
 
 
 class VisitListView(LoginRequiredMixin, ListView):
@@ -25,11 +26,7 @@ class VisitListView(LoginRequiredMixin, ListView):
         user = self.request.user
         return Visit.objects.filter(patient__user=user)
         # return Visit.objects.all()
-    #
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['additional_data'] = AdditionalData.objects.all()
-    #     return context
+    
 
 
     def get_context_data(self, **kwargs):
@@ -43,3 +40,42 @@ class VisitListView(LoginRequiredMixin, ListView):
             context['type_updated'] = getattr(user, 'type_updated', False)
             # context['type_updated'] = False
         return context
+
+
+
+class VisitDetailView(LoginRequiredMixin, DetailView):
+
+    model = Visit
+    template_name = 'base/board.html'    
+    context_object_name = 'visit'
+    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        visit = self.get_object()
+        images = visit.visit_image.all()  
+        context['images'] = images 
+        context['user_pk'] = user.pk
+        context['panel'] = 'panel_patient/visit_detail.html'
+        return context
+    
+
+
+class VisitDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+    
+    model = Visit
+    success_url = reverse_lazy('apps.core:patient-visit-list')
+    template_name = 'base/board.html'
+    # message = 'Visit successfully deleted'
+    success_message = 'Visit successfully deleted'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['user_pk'] = visit.pk
+        context['panel'] = 'panel_patient/visit_delete.html'
+        return context
+    
+    # def delete(self, request, *args, **kwargs):
+    #     messages.success(self.request, self.message)  
+    #     return super().delete(request, *args, **kwargs)

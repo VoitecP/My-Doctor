@@ -1,3 +1,4 @@
+{% block panel %}
 <div class="col-md-9">
     <h>Visit list</h>
     <table class="table" border="1">
@@ -19,7 +20,7 @@
                 <td>{{ visit.category }}</td>
                 <td>{{ visit.doctor }}</td>
                 <td>
-                    <a href="{ url 'apps.core:visit-detail' visit.id %}">Details</a>
+                    <a href="{% url 'apps.core:patient-visit-detail' visit.id %}">Details</a>
                 </td>
             </tr>
             {% empty %}
@@ -33,3 +34,4 @@
         {% include 'base/pagination.html' %}	
     </div>
 </div>
+{% endblock %}

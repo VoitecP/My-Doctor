@@ -1,0 +1,33 @@
+{% block panel %}
+<div>
+    <h4>Visit Details</h4>
+    <div>
+        <a href="{ url 'apps.core:patient-visit-update' visit.id %}">Edit</a>
+	    <a href="{% url 'apps.core:patient-visit-delete' visit.id %}">Delete</a> 
+    </div>
+    <div>
+		<p>Title: {{ visit.title }}</p>
+        <p>Date: {{ visit.date|date:"d-m-Y" }}</p>
+		<p>Category: {{ visit.category }}</p>
+       
+        <p>Doctor: {{ visit.doctor }}</p>
+		<a href="{ url 'patientes:visit-delete' visit.id %}">Doctor Link</a>
+   
+        <p>Description: {{ visit.description }}</p>
+        <p>Price: {{ visit.price }}</p>
+		<p>Visit closed: {{ visit.closed }}</p>
+		
+    </div>
+	<div>
+		{% for image in images %}
+			<div class="image-tile">
+				<a href="{{ image.image_url }}"><img src="{{ image.thumb_url }}" alt="Image Thumb"></a>
+			</div><br>
+		{% empty %}
+             <tr>
+                <td colspan="5">no Images</td>
+             </tr>
+		{% endfor %}
+	</div>
+</div>
+{% endblock %}

@@ -30,6 +30,6 @@ class ImageFile(models.Model):
 
 class VisitImageFile(ImageFile):
     
-    visit = models.ForeignKey(Visit,models.CASCADE, related_name='visit_images', null=True, blank=True, default=None)
+    visit = models.ForeignKey(Visit,models.CASCADE, related_name='visit_image', null=True, blank=True, default=None)
     
     
