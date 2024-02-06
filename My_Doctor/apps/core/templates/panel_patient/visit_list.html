@@ -1,0 +1,35 @@
+<div class="col-md-9">
+    <h>Visit list</h>
+    <table class="table" border="1">
+        <thead>
+            <tr>
+                <th>no.</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Doctor</th>
+                <th>Link</th>
+                <!-- -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for visit in visits %}
+            <tr>
+                <td>{{page_obj.start_index|add:forloop.counter0}}.</td>
+                <td>{{ visit.title }}</td>
+                <td>{{ visit.category }}</td>
+                <td>{{ visit.doctor }}</td>
+                <td>
+                    <a href="{ url 'apps.core:visit-detail' visit.id %}">Details</a>
+                </td>
+            </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5">no Visits</td>
+              </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div>
+        {% include 'base/pagination.html' %}	
+    </div>
+</div>

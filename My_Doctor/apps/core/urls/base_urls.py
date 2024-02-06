@@ -1,7 +1,7 @@
 from django.urls import path
 
 from ..views import category_views
-from ..views.board_views import *
+from ..views.base_views import *
 
 urlpatterns =[
     path('', BoardView.as_view(), name='boardview'),

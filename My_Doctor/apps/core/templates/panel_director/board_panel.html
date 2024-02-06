@@ -27,7 +27,15 @@
 {% block content %}
 
     {% if type_updated %}
-        {% include 'board/panel.html' %}
+
+        {% if usertype == 'p' %}
+            {% include 'panel/patient_panel.html' %}
+        {% elif usertype == 'd' %}
+            {% include 'panel/doctor_panel.html' %}
+        {% elif usertype == 'c' %}
+            {% include 'panel/director_panel.html' %}
+        {% endif %}
+        
     {% else %}
         profile update
         <a href="{% url 'apps.core:profile-update' user_pk %}" class="nav-link">Update profile</a>    

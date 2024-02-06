@@ -1,4 +1,6 @@
-{% block profile_update %}
+{% extends 'base/welcome.html' %}
+
+{% block form %}
     <div class="d-flex justify-content-center">
         <div class="mx-auto col-10 col-md-8 col-lg-6 vh-100 mt-lg-3">
 
@@ -7,10 +9,14 @@
                 {{ form.non_field_errors }}
                 {{ form.as_p }}
                 <div class="align-items-center">
-                    <button type="submit" class="btn btn-info mt-2 mb-1">Update Profile</button>    
+                    <button type="submit" class="btn btn-info mt-2 mb-1">Register</button>    
                 </div>
             </form>
 
+            <div class="align-items-center">
+                <p class="mt-2">Do you have account?</p>
+                <a href="{%  url 'apps.core:welcome-login' %}" class="btn btn--link">Login here</a>
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'board/welcome.html' %}
+{% extends 'base/welcome.html' %}
 
 {% block form %}
     <div class="d-flex justify-content-center">
@@ -9,13 +9,13 @@
                 {{ form.non_field_errors }}
                 {{ form.as_p }}
                 <div class="align-items-center">
-                    <button type="submit" class="btn btn-info mt-2 mb-1">Register</button>    
+                    <button type="submit" class="btn btn-info mt-2 mb-1">Login</button>    
                 </div>
             </form>
 
             <div class="align-items-center">
-                <p class="mt-2">Do you have account?</p>
-                <a href="{%  url 'apps.core:welcome-login' %}" class="btn btn--link">Login here</a>
+                <p class="mt-2">Haven't signed up yet?</p>
+                <a href="{% url 'apps.core:welcome-register' %}" class="btn btn--link">Sign Up</a>
             </div>
         </div>
     </div>

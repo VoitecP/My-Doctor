@@ -1,4 +1,4 @@
-{% extends 'board/base.html' %}
+{% extends 'base/base.html' %}
 
 
 {% load static %}
@@ -10,7 +10,7 @@
 
 
 {% block row %}
-    {% include 'board/row.html' %}
+    {% include 'base/row.html' %}
 {% endblock row %}
 
 
@@ -25,7 +25,7 @@
     
 
 {% block content %}
-    {% include 'forms/profile_update.html' %}  
+	{% include panel %}   
 {% endblock content %}
 
 
